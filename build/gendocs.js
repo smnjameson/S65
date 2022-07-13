@@ -13,6 +13,7 @@ try {
 } catch(e) {}
 
 
+
 let currentComment = emptyComment();
 let commentStack = []
 let currentType = null;
@@ -21,7 +22,13 @@ let comments = {
 };
 
 let openCount = 0
-parseFile(inputPath)
+let cssData = null
+//fetch css first
+fs.readFile('./build/theme.css', {}, (err, data)=> {
+	console.log(data.toString())
+	cssData = data.toString()
+	parseFile(inputPath)
+})
 
 function parseFile(filename) {
 	openCount++;
@@ -229,7 +236,7 @@ function onClose(line){
 	let html = `
 		<html>
 		<head>
-			<link rel="stylesheet" href='./theme.css'>
+			<style>${cssData}</style>
 		</head>
 		<body>
 	`;
