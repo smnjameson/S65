@@ -1,0 +1,126 @@
+body {
+	font-family: Arial;
+	font-size:  10pt;
+}
+
+h2 {
+	margin-bottom:  2px;
+	margin-top:  2px;
+	font-size:  14pt;
+}
+
+h4 {
+	color:  #666;
+	margin-bottom:  2px;
+	margin-top:  2px;
+	font-size:  10pt;
+}
+
+
+
+
+
+
+
+
+.categoryHeader {
+	border-radius:  5px;
+	padding: 5px;
+	color: #fff;
+	background: #88c;
+	margin: 2px;
+	margin-top:  5px;
+}
+
+.categoryDescription {
+	padding: 5px;
+	margin: 2px;
+}
+
+
+
+.macroHeader {
+	border-radius:  5px;
+	padding: 5px;
+	color: #fff;
+	background: #88c;
+	margin: 2px;
+}
+
+.namespaceHeader {
+	border-radius:  5px;
+	padding: 5px;
+	color: #fff;
+	background: #88c;
+	margin: 2px;
+	margin-top:  5px;
+}
+
+
+.macroIndex {
+	padding: 2px;
+	margin:  4px;
+	font-size:  9pt;
+}
+
+
+
+.macroItem {
+	border: 2px solid #888;
+	border-radius: 10px;
+	margin: 4px;
+}
+.macroItemHeader {
+	border-radius:5px 5px 0px 0px;
+	/* border-radius-top-right:  5px; */
+	color: #fff;
+	background: #888;
+	padding:  4px;
+}
+.macroItemSubHeader {
+	color: #fc8;
+	font-size:  8pt;
+	line-height: 2em;
+}
+
+.macroItemSubHeader table {
+	border-collapse: collapse;
+	margin-right:  10px;
+	border-radius:  5px;
+
+}
+.macroItemSubHeader td {
+    padding: 0; 
+    border:  2px solid #444;
+	color: #222;
+	font-size:  8pt;
+	padding-left:  2px;
+	min-width:  10px;
+	text-align: center;
+}
+
+.macroItemDescription {
+	padding:  2px;
+	font-size:  9pt;
+	padding:  4px;
+}
+.macroUsageText {
+	margin: 4px;
+}
+
+.macroUsage {
+	font-size:  9pt;
+	font-family:  monospace;
+	background:  #ddd;
+	color: #226;
+	padding:  5px;
+	margin: 4px;
+
+}
+
+.paramHeader {
+
+}
+.paramDescription {
+
+}
