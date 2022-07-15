@@ -598,6 +598,8 @@ h4 {
 		
 				<div class='macroHeader' id='Layer_Pseudocommands'>Pseudocommands</div>
 			
+					<div class='macroIndex'><a href='#Layer_AddColor'>AddColor</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_AddText'>AddText</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_ClearAllLayers'>ClearAllLayers</a></div>
@@ -613,7 +615,7 @@ h4 {
 					<div class='macroIndex'><a href='#Layer_SetAllMarkers'>SetAllMarkers</a></div>
 				
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_AddText'>AddText
+						<div class='macroItemHeader' id='Layer_AddColor'>AddColor
 							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
@@ -621,9 +623,50 @@ h4 {
 	
 			<td >A</td>
 		
-			<td >Y</td>
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
 		
-			<td >Z</td>
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Writes a string of bytes to color RAM, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: When writing to color RAM. As layers are not contiguous in memory, its important to not let the colors extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit length of 128     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_AddColor <i>addrPtr</i> : <i>color</i> : <i>length</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {ABS} addrPtr - The screen address to write to</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX}} color - Color to write to color ram</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} length - <add a description here></div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_AddText'>AddText
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
 		
 		</tr></table>
 	 flags: 
@@ -638,7 +681,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices <$100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128    </div>
+						<div class='macroItemDescription'> Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_AddText <i>addrPtr</i> : <i>textPtr</i> : <i>color</i></div>
 						
@@ -649,11 +692,11 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} {ABS} textPtr - <add a description here></div></span>
+						<span><div class='paramHeader'>{word} {ABS} textPtr - The address to fetch char data from</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {REG|IMM|ABS|ABX} color - Optional color to write to color ram (doesn't use Z if this param is skipped)</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {REG|IMM|ABS|ABX} color - Optional color to write to color ram</div></span>
 						</div>
 					
 						
@@ -889,12 +932,6 @@ h4 {
 	
 			<td >A</td>
 		
-			<td >X</td>
-		
-			<td >Y</td>
-		
-			<td >Z</td>
-		
 		</tr></table>
 	 flags: 
 		<table><th></th><tr style="display:inline-block;">
@@ -919,14 +956,40 @@ h4 {
 					</div><br>
 				<div class='macroHeader' id='Layer_Functions'>Functions</div>
 			
+					<div class='macroIndex'><a href='#Layer_GetColorAddress'>GetColorAddress</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_GetIOAddress'>GetIOAddress</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_GetScreenAddress'>GetScreenAddress</a></div>
 				
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_GetColorAddress'>GetColorAddress
+						</div>
+						<div class='macroItemDescription'> Returns the address of the color RAM at the given position on this screen layer    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_GetColorAddress(<i>layerNumber</i>, <i>xpos</i>, <i>ypos</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} layerNumber - The layer number to fetch</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} xpos - The character x position on the screen layer</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} ypos - The character y position on the screen layer</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_GetIOAddress'>GetIOAddress
 						</div>
-						<div class='macroItemDescription'> Returns the base address plus an optional offset for the given layers IO registers   </div>
+						<div class='macroItemDescription'> Returns the base address plus an optional offset for the given layers IO registers.<br> See <a href='#Layer_IO'>Layer_IO<a> for register list   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_GetIOAddress(<i>layerNumber</i>, <i>offset</i>)</div>
 						
@@ -946,7 +1009,7 @@ h4 {
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_GetScreenAddress'>GetScreenAddress
 						</div>
-						<div class='macroItemDescription'> Returns the address of the char at the given position on this screen layer   </div>
+						<div class='macroItemDescription'> Returns the address of the char at the given position on this screen layer    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_GetScreenAddress(<i>layerNumber</i>, <i>xpos</i>, <i>ypos</i>)</div>
 						

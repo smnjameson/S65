@@ -313,11 +313,13 @@ Layer_AddrOffsets:
 * 
 * @namespace Layer
 *
-* @registers AXYZ
+* @registers A
 * @flags znc
 */
 .pseudocommand Layer_SetAllMarkers {
-
+		phx 
+		phy
+		phz
 
 		S65_SetBasePage()
 			//Transfer the GOTOX values from the dynamic IO
@@ -443,6 +445,10 @@ Layer_AddrOffsets:
 			lbcc !outerLoop-
 		!end:
 		S65_RestoreBasePage()
+
+		plz
+		ply
+		plx
 }
 
 
@@ -548,6 +554,80 @@ Layer_AddrOffsets:
 }
 
 
+
+
+/**
+* .pseudocommand AddColor
+*
+* Writes a string of bytes to color RAM, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), 
+* this will only work on non NCM layers with char indices less than $100 <br><br>
+* 
+* Note: When writing to color RAM. As layers are not contiguous in memory, its important to not let
+* the colors extend off the right edge of the layer as it can break the RRB on other layers. 
+* There is an upper limit length of 128
+* 
+* @namespace Layer
+*
+* @param {byte} {ABS} addrPtr The screen address to write to
+* @param {byte} {REG|IMM|ABS|ABX}} color Color to write to color ram
+* @param {byte} {IMM} length <add a description here>
+*
+* @registers A
+* @flags nzc
+* 
+* @return {byte} A <add description here> 
+*/
+.pseudocommand Layer_AddColor addrPtr : color : length {
+		.if(!_isAbs(addrPtr)) .error "Layer_InitScreen: addrPtr Only supports AT_ABSOLUTE"
+		.if(!_isImm(length)) .error "Layer_InitScreen: addrPtr Only supports AT_IMMEDIATE"
+		.if(!_isAbsX(color) && 
+			!_isImm(color) && 
+			!_isReg(color) && 
+			color.getType() != AT_NONE) .error "Layer_InitScreen: textPtr Only supports REG, AT_IMMEDIATE, AT_ABSOLUTE, AT_ABSOLUTEX" 
+
+		.if(_isReg(color)) {
+			_saveReg(color)
+		}
+
+		.const COLOR_PTR = S65_TempDword2
+
+		S65_SetBasePage()
+			.var coladdr = addrPtr.getValue()
+
+			.print "coladdr" + toHexString(coladdr) +"  "+length.getValue()
+			lda #<coladdr
+			sta.z COLOR_PTR + 0
+			lda #>coladdr
+			sta.z COLOR_PTR + 1
+			lda #[coladdr >> 16]
+			sta.z COLOR_PTR + 2
+			lda #[coladdr >> 24]
+			sta.z COLOR_PTR + 3	
+			
+
+			phz
+
+			ldz #$00
+		!loop:
+			.if(_isReg(color)) {
+				lda.z S65_PseudoReg
+			} else {
+				lda color 		
+			}
+			inz
+			sta ((COLOR_PTR)), z
+			inz
+			
+			tza
+			cmp #[length.getValue() * 2]
+
+			bne !loop-
+		!exit:
+
+			plz
+		S65_RestoreBasePage()
+}	
+
 /**
 * .pseudocommand AddText
 *
@@ -562,10 +642,10 @@ Layer_AddrOffsets:
 * @namespace Layer
 *
 * @param {word} {ABS} addrPtr The screen address to write to
-* @param {word} {ABS} textPtr <add a description here>
-* @param {byte?} {REG|IMM|ABS|ABX} color Optional color to write to color ram (doesn't use Z if this param is skipped)
+* @param {word} {ABS} textPtr The address to fetch char data from
+* @param {byte?} {REG|IMM|ABS|ABX} color Optional color to write to color ram
 *
-* @registers AYZ
+* @registers A
 * @flags zn
 */
 .pseudocommand Layer_AddText addrPtr : textPtr : color {
@@ -575,6 +655,10 @@ Layer_AddrOffsets:
 			!_isImm(color) && 
 			!_isReg(color) && 
 			color.getType() != AT_NONE) .error "Layer_InitScreen: textPtr Only supports REG, AT_IMMEDIATE, AT_ABSOLUTE, AT_ABSOLUTEX" 
+
+		.if(_isReg(color)) {
+			_saveReg(color)
+		}
 
 		.const SCREEN_PTR = S65_TempDword1
 		.const COLOR_PTR = S65_TempDword2
@@ -602,6 +686,8 @@ Layer_AddrOffsets:
 				sta.z COLOR_PTR + 3	
 			}
 
+			phy
+			phz
 			ldz #$00
 			ldy #$00
 		!loop:
@@ -621,7 +707,11 @@ Layer_AddrOffsets:
 				
 				//Add color
 				.if(color.getType() != AT_NONE) {
-					lda color 
+					.if(_isReg(color)) {
+						lda.z S65_PseudoReg
+					} else {
+						lda color 		
+					}
 					sta ((COLOR_PTR)), z
 				}
 
@@ -629,7 +719,8 @@ Layer_AddrOffsets:
 				iny
 			bra !loop-
 		!exit:
-
+		plz
+		ply
 		S65_RestoreBasePage()
 }		
 
@@ -644,15 +735,38 @@ Layer_AddrOffsets:
 * @param {byte} layerNumber The layer number to fetch
 * @param {byte} xpos The character x position on the screen layer
 * @param {byte} ypos The character y position on the screen layer
+* 
+* @return {dword} The screen RAM address
 */
 .function Layer_GetScreenAddress(layerNumber, xpos, ypos) {
 	.return Layer_LayerList.get(layerNumber).get("startAddr") + S65_SCREEN_RAM + ypos * S65_SCREEN_LOGICAL_ROW_WIDTH + xpos * 2
 }
 
+
+/**
+* .function GetColorAddress
+*
+* Returns the address of the color RAM at the given position on this screen layer
+* 
+* @namespace Layer
+*
+* @param {byte} layerNumber The layer number to fetch
+* @param {byte} xpos The character x position on the screen layer
+* @param {byte} ypos The character y position on the screen layer
+*
+* @return {dword} The color RAM address
+*/
+.function Layer_GetColorAddress(layerNumber, xpos, ypos) {
+	.var colAddr = [Layer_LayerList.get(layerNumber).get("startAddr") + S65_COLOR_RAM] + ypos * S65_SCREEN_LOGICAL_ROW_WIDTH + xpos * 2
+	.print "coll Addr "+toHexString(colAddr)
+	.return colAddr
+}
+
 /**
 * .function GetIOAddress
 *
-* Returns the base address plus an optional offset for the given layers IO registers
+* Returns the base address plus an optional offset for the given layers IO registers.<br>
+* See <a href='#Layer_IO'>Layer_IO<a> for register list
 * 
 * @namespace Layer
 *
@@ -663,6 +777,7 @@ Layer_AddrOffsets:
 
 	.return Layer_LayerList.get(layerNumber).get("dynamicDataAddr") + offset
 }
+
 
 
 

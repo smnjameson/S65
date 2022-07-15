@@ -14,35 +14,45 @@
 	
 	Layer_InitScreen #SCREEN_RAM 				//Initialize the view and all the layers in memory
 
-	Layer_ClearAllLayers #$00ff 				//Clear all the layers with the char index found in the x-register
+	Layer_ClearAllLayers #$002e 				//Clear all the layers with the char index found in the x-register
 
 
-	//Add some text
-	Layer_AddText Layer_GetScreenAddress(LayerBG,9,12) : testString1 : #$02
-	Layer_AddText Layer_GetScreenAddress(LayerUI,0,0) : testString2 : #$04
+	//Add some text on BG - no color
+	Layer_AddText Layer_GetScreenAddress(LayerBG,9,12) : testString1
 
+	ldx #$00
 loop:
  	lda #$ff
  	cmp $d012 
  	bne loop
  	inc $d020
 
- 		//Shift the UI layer continuously
-		inc Layer_GetIOAddress(LayerUI, Layer_IOGotoX + 0)
-		bne !+
-		inc Layer_GetIOAddress(LayerUI, Layer_IOGotoX + 1)
-	!:
+ 		//Shift the UI layer GOTOX continuously
 		inc Layer_GetIOAddress(LayerUI, Layer_IOGotoX + 0)
 		bne !+
 		inc Layer_GetIOAddress(LayerUI, Layer_IOGotoX + 1)
 	!:
 
-		//Draw UI text in increasing colors
+
+		//Draw UI text in increasing colors - REGISTER mode
 		inc textColor1
-		Layer_AddText Layer_GetScreenAddress(LayerUI,0,0) : testString2 : textColor1
+		ldz textColor1
+		Layer_AddText Layer_GetScreenAddress(LayerUI,0,0) : testString2 : REGZ
 
-		//update all the GOTOX markers for the non rrb sprite layers
+		//Draw BG text using a color ramp  - AT_ABSOLUTEX mode
+		Layer_AddText Layer_GetScreenAddress(LayerBG,9,22) : testString3 : textColorRamp,x
+		inx 
+		txa 
+		and #$0f
+		tax
+
+		//Animate jsut color on original text
+		Layer_AddColor Layer_GetColorAddress(LayerBG,9,12) : REGZ : #22
+
+
+		//Update all the GOTOX markers for the non rrb sprite layers
 		Layer_SetAllMarkers 					
+
 
 	dec $d020
 	jmp loop
@@ -54,5 +64,12 @@ testString1:
 	S65_Text16(" THIS IS THE BG LAYER ")
 testString2:
 	S65_Text16("10 WIDE UI")
+testString3:
+	S65_Text16(" THIS IS A COLOR RAMP ")	
+
 textColor1:
 	.byte $00
+textColorRamp:
+	.byte $01,$0d,$03,$0c,$04,$02,$09,$00
+	.byte $00,$0b,$02,$04,$0e,$03,$0d,$01
+

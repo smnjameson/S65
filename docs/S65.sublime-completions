@@ -79,11 +79,18 @@
             "details": "Sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)"
         },
         {
+            "trigger": "Layer_AddColor",
+            "annotation": "addrPtr:color:length",
+            "contents": "Layer_AddColor ${1:addrPtr} : ${2:color} : ${3:length}",
+            "kind": "snippet",
+            "details": "Writes a string of bytes to color RAM, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: When writing to color RAM. As layers are not contiguous in memory, its important to not let the colors extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit length of 128"
+        },
+        {
             "trigger": "Layer_AddText",
             "annotation": "addrPtr:textPtr:color",
             "contents": "Layer_AddText ${1:addrPtr} : ${2:textPtr} : ${3:color}",
             "kind": "snippet",
-            "details": "Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices <$100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
+            "details": "Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
         },
         {
             "trigger": "Layer_ClearAllLayers",
@@ -128,11 +135,18 @@
             "details": "Sets the RRB GotoX markers for all but the RRB sprite layers"
         },
         {
+            "trigger": "Layer_GetColorAddress",
+            "annotation": "layerNumber,xpos,ypos",
+            "contents": "Layer_GetColorAddress(${1:layerNumber}, ${2:xpos}, ${3:ypos})",
+            "kind": "snippet",
+            "details": "Returns the address of the color RAM at the given position on this screen layer"
+        },
+        {
             "trigger": "Layer_GetIOAddress",
             "annotation": "layerNumber,offset",
             "contents": "Layer_GetIOAddress(${1:layerNumber}, ${2:offset})",
             "kind": "snippet",
-            "details": "Returns the base address plus an optional offset for the given layers IO registers"
+            "details": "Returns the base address plus an optional offset for the given layers IO registers.<br> See <a href='#Layer_IO'>Layer_IO<a> for register list"
         },
         {
             "trigger": "Layer_GetScreenAddress",
