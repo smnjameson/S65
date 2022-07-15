@@ -306,9 +306,9 @@ Layer_AddrOffsets:
 
 
 /**
-* .pseudocommand SetAllMarkers
+* .pseudocommand UpdateLayerOffsets
 *
-* Sets the RRB GotoX markers for all but the 
+* Updates the RRB GotoX markers for all but the 
 * RRB sprite layers
 * 
 * @namespace Layer
@@ -316,7 +316,7 @@ Layer_AddrOffsets:
 * @registers A
 * @flags znc
 */
-.pseudocommand Layer_SetAllMarkers {
+.pseudocommand Layer_UpdateLayerOffsets {
 		phx 
 		phy
 		phz
@@ -481,7 +481,9 @@ Layer_AddrOffsets:
 	// RRB Layers total charsPerLine +
 	// Terminating GOTOX + char (2chars)
 
-	S65_Trace("Layer_InitScreen - Calculating screen configuration...")
+	S65_Trace("Layer_InitScreen")
+	S65_Trace("============================")
+	S65_Trace("Calculating screen configuration...")
 	S65_Trace("")	
 	.var currsize = 0
 	.for(var i=0; i<Layer_LayerList.size(); i++) {
@@ -512,7 +514,9 @@ Layer_AddrOffsets:
 	.eval S65_SCREEN_ROW_WIDTH += [GOTOX + 1]
 	.eval S65_SCREEN_LOGICAL_ROW_WIDTH = S65_SCREEN_ROW_WIDTH * 2
 
+	S65_Trace("")
 	S65_Trace("Screen row width is $"+toHexString(S65_SCREEN_ROW_WIDTH)+ " chars / $"+ toHexString(S65_SCREEN_LOGICAL_ROW_WIDTH) + " bytes.")
+	S65_Trace("")
 
 	jsr S65.Init
 
@@ -536,6 +540,18 @@ Layer_AddrOffsets:
 	sta $d062
 	lda #[S65_SCREEN_RAM >> 24] 
 	sta $d063
+
+		//Store screen and color ram address upper bytes
+		lda #[S65_SCREEN_RAM >> 16]
+		sta S65_ScreenRamPointer + 2
+		lda #[S65_SCREEN_RAM >> 24]
+		sta S65_ScreenRamPointer + 3
+
+
+		lda #[S65_COLOR_RAM >> 16]
+		sta S65_ColorRamPointer + 2
+		lda #[S65_COLOR_RAM >> 24]
+		sta S65_ColorRamPointer + 3
 
 	//ColorRAM initialisation
 		.const SCREEN_BYTE_SIZE = S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT
@@ -578,6 +594,8 @@ Layer_AddrOffsets:
 * @return {byte} A <add description here> 
 */
 .pseudocommand Layer_AddColor addrPtr : color : length {
+		S65_AddToMemoryReport("Layer_AddColor")
+
 		.if(!_isAbs(addrPtr)) .error "Layer_InitScreen: addrPtr Only supports AT_ABSOLUTE"
 		.if(!_isImm(length)) .error "Layer_InitScreen: addrPtr Only supports AT_IMMEDIATE"
 		.if(!_isAbsX(color) && 
@@ -589,44 +607,47 @@ Layer_AddrOffsets:
 			_saveReg(color)
 		}
 
-		.const COLOR_PTR = S65_TempDword2
+		.const VALUE = S65_TempByte1
 
 		S65_SetBasePage()
 			.var coladdr = addrPtr.getValue()
 
-			.print "coladdr" + toHexString(coladdr) +"  "+length.getValue()
 			lda #<coladdr
-			sta.z COLOR_PTR + 0
+			sta.z S65_ColorRamPointer + 0
 			lda #>coladdr
-			sta.z COLOR_PTR + 1
-			lda #[coladdr >> 16]
-			sta.z COLOR_PTR + 2
-			lda #[coladdr >> 24]
-			sta.z COLOR_PTR + 3	
-			
-
-			phz
-
-			ldz #$00
-		!loop:
+			sta.z S65_ColorRamPointer + 1
+		
 			.if(_isReg(color)) {
 				lda.z S65_PseudoReg
 			} else {
 				lda color 		
 			}
-			inz
-			sta ((COLOR_PTR)), z
-			inz
-			
-			tza
-			cmp #[length.getValue() * 2]
+			sta.z VALUE
+			lda #[length.getValue() * 2]
+			sta _Layer_AddColor.Length
+			jsr _Layer_AddColor
+		
+		S65_AddToMemoryReport("Layer_AddColor")
+}	
 
+_Layer_AddColor: {
+			.const VALUE = S65_TempByte1
+			phz
+			ldz #$00
+		!loop:
+			lda VALUE
+			inz
+			sta ((S65_ColorRamPointer)), z
+			inz
+			tza
+			cmp Length:#$BEEF
 			bne !loop-
 		!exit:
-
 			plz
-		S65_RestoreBasePage()
-}	
+			S65_RestoreBasePage()
+			rts
+}
+
 
 /**
 * .pseudocommand AddText
@@ -649,6 +670,9 @@ Layer_AddrOffsets:
 * @flags zn
 */
 .pseudocommand Layer_AddText addrPtr : textPtr : color {
+		
+		S65_AddToMemoryReport("Layer_AddText")
+
 		.if(!_isAbs(addrPtr)) .error "Layer_InitScreen: addrPtr Only supports AT_ABSOLUTE"
 		.if(!_isAbs(textPtr)) .error "Layer_InitScreen: textPtr Only supports AT_ABSOLUTE"
 		.if(!_isAbsX(color) && 
@@ -660,31 +684,50 @@ Layer_AddrOffsets:
 			_saveReg(color)
 		}
 
-		.const SCREEN_PTR = S65_TempDword1
-		.const COLOR_PTR = S65_TempDword2
+		.const SCREEN_PTR = S65_ScreenRamPointer
+		.const COLOR_PTR = S65_ColorRamPointer
+
+		.const TEXT_PTR = S65_TempWord1
+		.const VALUE = S65_TempByte1
 
 		S65_SetBasePage()
 
 			lda #<addrPtr.getValue()
-			sta.z SCREEN_PTR + 0
+			sta.z S65_ScreenRamPointer + 0
 			lda #>addrPtr.getValue()
-			sta.z SCREEN_PTR + 1
-			lda #[addrPtr.getValue() >> 16]
-			sta.z SCREEN_PTR + 2
-			lda #[addrPtr.getValue() >> 24]
-			sta.z SCREEN_PTR + 3
+			sta.z S65_ScreenRamPointer + 1
+	
 
 			.if(color.getType() != AT_NONE) {
 				.var coladdr = [[addrPtr.getValue() - S65_SCREEN_RAM] + S65_COLOR_RAM]
 				lda #<coladdr
-				sta.z COLOR_PTR + 0
+				sta.z S65_ColorRamPointer + 0
 				lda #>coladdr
-				sta.z COLOR_PTR + 1
-				lda #[coladdr >> 16]
-				sta.z COLOR_PTR + 2
-				lda #[coladdr >> 24]
-				sta.z COLOR_PTR + 3	
+				sta.z S65_ColorRamPointer + 1
 			}
+
+			lda #<textPtr.getValue()
+			sta.z TEXT_PTR + 0
+			lda #>textPtr.getValue()
+			sta.z TEXT_PTR + 1
+
+	 		.if(color.getType() != AT_NONE) {
+				.if(_isReg(color)) {
+					lda.z S65_PseudoReg	
+				} else {
+					lda color 		
+				}	
+			} else {
+				lda #$00
+			}
+			sta.z VALUE
+			jsr _Layer_AddText
+		
+		S65_AddToMemoryReport("Layer_AddText")
+}
+_Layer_AddText: {
+			.const TEXT_PTR = S65_TempWord1
+			.const VALUE = S65_TempByte1
 
 			phy
 			phz
@@ -692,28 +735,21 @@ Layer_AddrOffsets:
 			ldy #$00
 		!loop:
 			iny
-			lda textPtr.getValue(), y
+			lda.z (TEXT_PTR), y
 			cmp #$ff
 			beq !exit+
 			dey
 			
-				lda textPtr.getValue(), y
-				iny
-				sta ((SCREEN_PTR)), z
+				lda.z (TEXT_PTR), y
+				sta ((S65_ScreenRamPointer)), z
 				inz
-				lda textPtr.getValue(), y
-				sta ((SCREEN_PTR)), z
+				iny
+
+				lda.z (TEXT_PTR), y
+				sta ((S65_ScreenRamPointer)), z
 				 	
-				
-				//Add color
-				.if(color.getType() != AT_NONE) {
-					.if(_isReg(color)) {
-						lda.z S65_PseudoReg
-					} else {
-						lda color 		
-					}
-					sta ((COLOR_PTR)), z
-				}
+				lda.z VALUE
+				sta ((S65_ColorRamPointer)), z
 
 				inz
 				iny
@@ -722,7 +758,8 @@ Layer_AddrOffsets:
 		plz
 		ply
 		S65_RestoreBasePage()
-}		
+		rts
+}	
 
 
 /**
@@ -758,7 +795,6 @@ Layer_AddrOffsets:
 */
 .function Layer_GetColorAddress(layerNumber, xpos, ypos) {
 	.var colAddr = [Layer_LayerList.get(layerNumber).get("startAddr") + S65_COLOR_RAM] + ypos * S65_SCREEN_LOGICAL_ROW_WIDTH + xpos * 2
-	.print "coll Addr "+toHexString(colAddr)
 	.return colAddr
 }
 
@@ -796,13 +832,21 @@ Layer_AddrOffsets:
  * @addr {word} Layer_IOGotoX The GOTOX value to apply to this layer
  */
 .macro _configureDynamicData() {
-	S65_Trace("Layer_InitScreen - Configuring dynamic layer memory...")
-	S65_Trace("Start address $"+toHexString(*))	
+	S65_Trace("Configuring dynamic layer memory...")
+	S65_Trace("")
+	S65_Trace("Layer_DynamicDataIndex $"+toHexString(DynamicDataIndex))	
+	S65_Trace("")	
 
 	.var layerAddr = List()
 
 	.for(var i=0; i<Layer_LayerList.size(); i++) {
-		S65_Trace("Layer "+i+" start address $"+toHexString(*))	
+		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
+			//rrb only
+			S65_Trace("#"+i+"    $"+toHexString(*)+" RRB Sprites Layer")
+		} else {
+			//screenlayer only
+			S65_Trace("#"+i+"    $"+toHexString(*)+" Screen Layer")
+		}
 
 		.eval layerAddr.add(*)
 		//common values
@@ -812,15 +856,17 @@ Layer_AddrOffsets:
 
 		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
 			//rrb only
-			S65_Trace("RRB Sprites Layer")
+			
 		} else {
 			//screenlayer only
-			S65_Trace("Screen Layer")
+			
 		}
 	}
+	S65_Trace("============================")
 
-	.eval Layer_DynamicDataIndex = *
-	S65_Trace("Layer_DynamicDataIndex $"+toHexString(Layer_DynamicDataIndex))	
+	DynamicDataIndex:
+	.eval Layer_DynamicDataIndex = DynamicDataIndex
+	
 	
 	.for(var i=0; i<layerAddr.size(); i++) {
 		.word layerAddr.get(i)

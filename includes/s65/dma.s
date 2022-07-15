@@ -53,7 +53,7 @@
  * 
  * Sets the DMagic header bytes defining the source and
  * destination banks.<br><br>
- * <small>Note: The bank number of a memory adress is its 
+ * Note: The bank number of a memory adress is its 
  * 5th and 6th nybble. e.g. $ff80000 is bank number $ff
  * 
  * @namespace DMA

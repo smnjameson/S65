@@ -51,7 +51,7 @@ loop:
 
 
 		//Update all the GOTOX markers for the non rrb sprite layers
-		Layer_SetAllMarkers 					
+		Layer_UpdateLayerOffsets 					
 
 
 	dec $d020
@@ -73,3 +73,5 @@ textColorRamp:
 	.byte $01,$0d,$03,$0c,$04,$02,$09,$00
 	.byte $00,$0b,$02,$04,$0e,$03,$0d,$01
 
+
+S65_MemoryReport()

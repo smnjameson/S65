@@ -2,6 +2,13 @@
     "scope": "source.assembly.kickassembler",
     "completions": [
         {
+            "trigger": "S65_MemoryReport",
+            "annotation": "",
+            "contents": "S65_MemoryReport()",
+            "kind": "snippet",
+            "details": "Called at the very end of your program code this macro will produce a report of the memory used in each of the framework calls"
+        },
+        {
             "trigger": "S65_RestoreBasePage",
             "annotation": "",
             "contents": "S65_RestoreBasePage()",
@@ -69,7 +76,7 @@
             "annotation": "sourceBank:destBank",
             "contents": "DMA_Header ${1:sourceBank} : ${2:destBank}",
             "kind": "snippet",
-            "details": "Sets the DMagic header bytes defining the source and destination banks.<br><br> <small>Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff"
+            "details": "Sets the DMagic header bytes defining the source and destination banks.<br><br> Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff"
         },
         {
             "trigger": "DMA_Step",
@@ -128,11 +135,11 @@
             "details": "Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout"
         },
         {
-            "trigger": "Layer_SetAllMarkers",
+            "trigger": "Layer_UpdateLayerOffsets",
             "annotation": "",
-            "contents": "Layer_SetAllMarkers ",
+            "contents": "Layer_UpdateLayerOffsets ",
             "kind": "snippet",
-            "details": "Sets the RRB GotoX markers for all but the RRB sprite layers"
+            "details": "Updates the RRB GotoX markers for all but the RRB sprite layers"
         },
         {
             "trigger": "Layer_GetColorAddress",

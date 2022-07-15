@@ -220,6 +220,7 @@ function onLine(line) {
   		//Object category
   		} else if(trim.substr(0,12) == "* @namespace") {
   			trim = trim.substr(12).trim()
+  			if(trim === globalNamespace) trim = 'Global'
   			currentComment.category = trim
 			comments[currentComment.category] = comments[currentComment.category] || emptyCategory()
 

@@ -166,6 +166,8 @@ h4 {
 		
 				<div class='macroHeader' id='Global_Macros'>Macros</div>
 			
+					<div class='macroIndex'><a href='#Global_MemoryReport'>MemoryReport</a></div>
+				
 					<div class='macroIndex'><a href='#Global_RestoreBasePage'>RestoreBasePage</a></div>
 				
 					<div class='macroIndex'><a href='#Global_SetBasePage'>SetBasePage</a></div>
@@ -174,6 +176,19 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Global_Trace'>Trace</a></div>
 				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_MemoryReport'>MemoryReport
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Called at the very end of your program code this macro will produce a report of the memory used in each of the framework calls  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_MemoryReport()</div>
+						
+						
+						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_RestoreBasePage'>RestoreBasePage
 							<div class='macroItemSubHeader'>
@@ -498,7 +513,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the DMagic header bytes defining the source and destination banks.<br><br> <small>Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff   </div>
+						<div class='macroItemDescription'> Sets the DMagic header bytes defining the source and destination banks.<br><br> Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_Header <i>sourceBank</i> : <i>destBank</i></div>
 						
@@ -612,7 +627,7 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_InitScreen'>InitScreen</a></div>
 				
-					<div class='macroIndex'><a href='#Layer_SetAllMarkers'>SetAllMarkers</a></div>
+					<div class='macroIndex'><a href='#Layer_UpdateLayerOffsets'>UpdateLayerOffsets</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_AddColor'>AddColor
@@ -924,7 +939,7 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_SetAllMarkers'>SetAllMarkers
+						<div class='macroItemHeader' id='Layer_UpdateLayerOffsets'>UpdateLayerOffsets
 							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
@@ -947,9 +962,9 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the RRB GotoX markers for all but the RRB sprite layers   </div>
+						<div class='macroItemDescription'> Updates the RRB GotoX markers for all but the RRB sprite layers   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_SetAllMarkers </div>
+						<div class='macroUsage'>Layer_UpdateLayerOffsets </div>
 						
 						
 						

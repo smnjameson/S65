@@ -66,10 +66,14 @@
  * @flags nz
  */
 .macro S65_SetBasePage() {
+        jsr _S65_SetBasePage
+}
+_S65_SetBasePage: {
 		tba 
 		sta S65_LastBasePage
 		lda #S65_BASEPAGE
 		tab 
+        rts
 }
 
 /**
@@ -100,4 +104,48 @@
         .byte str.charAt(i), $00
     }
     .word $ffff
+}
+
+
+
+
+
+
+/**
+* .macro MemoryReport
+*
+* Called at the very end of your program code this macro will
+* produce a report of the memory used in each of the framework calls
+* 
+* @namespace S65
+*/
+.macro S65_MemoryReport() {
+
+    S65_Trace("Method MemoryReport")
+    S65_Trace("============================")
+    S65_Trace("")
+    .var keys = _MemoryReport.keys()
+    .for (var i=0; i<keys.size(); i++) {
+        .var ht = _MemoryReport.get(keys.get(i))
+        S65_Trace(keys.get(i) + " called " + ht.get("count")+ " times.")
+        S65_Trace("    Total memory used $"+ toHexString(ht.get("bytes"))+" bytes")
+        S65_Trace("    Average per call  $"+ toHexString(floor(ht.get("bytes") / ht.get("count")))+" bytes")
+        S65_Trace("")
+    }
+    S65_Trace("")
+    S65_Trace("============================")    
+}
+.const _MemoryReport = Hashtable()
+.macro S65_AddToMemoryReport(name) {
+    .if(_MemoryReport.containsKey(name) == false ) {
+        .eval _MemoryReport.put(name, Hashtable().put("count",0).put("bytes",0).put("start", 0))
+    }
+    .if(_MemoryReport.get(name).get("start") == 0) {
+        .eval _MemoryReport.get(name).put("start", *)
+    } else {
+        .var count = _MemoryReport.get(name).get("count") + 1
+        .var b = _MemoryReport.get(name).get("bytes") + [* - _MemoryReport.get(name).get("start")]
+        .eval _MemoryReport.get(name).put("count",count).put("bytes",b)
+        .eval _MemoryReport.get(name).put("start", 0)
+    }
 }

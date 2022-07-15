@@ -69,14 +69,22 @@ System_BasicUpstart65(S65_InitComplete)
 ////////////////////////////////////////////
 //Base page vars
 ////////////////////////////////////////////
-.align $10 //Ensure theres enough room in the page for the base vars
+.align $20 //Ensure theres enough room in the page for the base vars
 .var 		S65_BASEPAGE = [* >> 8]		//Gets the page# of this address
-			S65_LastBasePage: .byte $00
+				
+			S65_ScreenRamPointer: .dword $00000000
+			S65_ColorRamPointer: .dword $00000000
+
  			S65_TempDword1:	.dword $00000000
  			S65_TempDword2:	.dword $00000000
+
  			S65_TempWord1:	.word $0000
+
+ 			S65_TempByte1:	.byte $00
+
  			S65_PseudoReg:	.byte $00
-///////////////////////////////////////////// 12 bytes
+ 			S65_LastBasePage: .byte $00
+///////////////////////////////////////////// 21 bytes
 
 //Macros only				
 #import "includes/s65/common.s"
@@ -141,5 +149,12 @@ S65: {
 
 //This label S65_InitComplete MUST always be at the end of the library 
 //as it is where the program continues execution when initialised
+S65_Trace("============================")
+S65_Trace("          Summary")
+S65_Trace("============================")
+S65_Trace("")
+S65_Trace("S65 Base Library $2001-$"+toHexString(*))
+S65_Trace("")
+S65_Trace("============================")
 S65_InitComplete:
 

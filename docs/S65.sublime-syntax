@@ -7,11 +7,11 @@ file_extensions:
 scope: source.assembly.kickassembler
 contexts:
   main:
-    - match: \b(DMA_CopyJob|DMA_DisableTransparency|DMA_EnableTransparency|DMA_Execute|DMA_FillJob|DMA_Header|DMA_Step|Layer_AddColor|Layer_AddText|Layer_ClearAllLayers|Layer_DefineBGLayer|Layer_DefineRRBSpriteLayer|Layer_DefineScreenLayer|Layer_InitScreen|Layer_SetAllMarkers)\b
+    - match: \b(DMA_CopyJob|DMA_DisableTransparency|DMA_EnableTransparency|DMA_Execute|DMA_FillJob|DMA_Header|DMA_Step|Layer_AddColor|Layer_AddText|Layer_ClearAllLayers|Layer_DefineBGLayer|Layer_DefineRRBSpriteLayer|Layer_DefineScreenLayer|Layer_InitScreen|Layer_UpdateLayerOffsets)\b
       scope: storage.type.macro
     - match: \b(Layer_GetColorAddress|Layer_GetIOAddress|Layer_GetScreenAddress)\b
       scope: constant.language.pseudocommand
-    - match: \b(S65_RestoreBasePage|S65_SetBasePage|S65_Text16|S65_Trace|SDCard_LoadToAtticRAM|SDCard_LoadToChipRam|System_BasicUpstart65|System_DisableC65ROM|System_Enable40Mhz|System_EnableFastRRB|System_EnableVIC4)\b
+    - match: \b(S65_MemoryReport|S65_RestoreBasePage|S65_SetBasePage|S65_Text16|S65_Trace|SDCard_LoadToAtticRAM|SDCard_LoadToChipRam|System_BasicUpstart65|System_DisableC65ROM|System_Enable40Mhz|System_EnableFastRRB|System_EnableVIC4)\b
       scope: support.function.3d
     - match: '#TRUE'
       scope: constant.language.pseudocommand
