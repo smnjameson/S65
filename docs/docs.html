@@ -22,9 +22,22 @@ h4 {
 
 
 
+.sectionButtonContainer {
+	display:  flex;
+	font-size: 10pt;
+}
 
-
-
+.sectionButton {
+    min-width: 75px;
+    color: #fff;
+    background: #97B;
+    margin: 2px;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.5em;
+    padding: 5px;
+    border-radius: 5px;
+}
 
 .categoryHeader {
 	border-radius:  5px;
@@ -147,14 +160,17 @@ h4 {
 		</td><td><div style="overflow-y:scroll;height:95vh;">
 	
 			<div class='categoryHeader' id='Global'><span><h4>Namespace<h2>Global (S65)</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Global_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Global_Vars'><div class='sectionButton'>Vars</div></a></span>
 			<div class='categoryDescription'> Shallan65 macro toolkit for the MEGA65. <br><br> - Uses NCM mode and the raster rewrite buffer to provide a powerful layer and sprite framework<br> - DMA job data macros<br> - SDCard loading <br> <br> The Global(S65) namespace is mostly used internally by the engine, however some methods and vars may be of use.  </div>
 			<br>
 		
-				<div class='macroHeader'>Macros</div>
+				<div class='macroHeader' id='Global_Macros'>Macros</div>
 			
 					<div class='macroIndex'><a href='#Global_RestoreBasePage'>RestoreBasePage</a></div>
 				
 					<div class='macroIndex'><a href='#Global_SetBasePage'>SetBasePage</a></div>
+				
+					<div class='macroIndex'><a href='#Global_Text16'>Text16</a></div>
 				
 					<div class='macroIndex'><a href='#Global_Trace'>Trace</a></div>
 				
@@ -185,6 +201,7 @@ h4 {
 						<div class='macroUsage'>S65_RestoreBasePage()</div>
 						
 						
+						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SetBasePage'>SetBasePage
@@ -213,24 +230,36 @@ h4 {
 						<div class='macroUsage'>S65_SetBasePage()</div>
 						
 						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_Text16'>Text16
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Generates a string of 16 bit words based on the text input. The upper nybblwe of each word is $00 and the lower nybble is the normal 8 bit .screencode encoded value. terminates the string with $ffff  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_Text16(<i>str</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} str - The string to convert</div></span>
+						</div>
+					
+						
+						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_Trace'>Trace
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
 						</div>
 						<div class='macroItemDescription'> Outputs a string to the kick assembler console at build time  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>S65_Trace(str)</div>
+						<div class='macroUsage'>S65_Trace(<i>str</i>)</div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -239,8 +268,9 @@ h4 {
 						</div>
 					
 						
+						
 					</div><br>
-				<div class='macroHeader'>Vars</div>
+				<div class='macroHeader' id='Global_Vars'>Vars</div>
 			
 					<div class='macroIndex'><a href='#Global_COLOR_RAM'>COLOR_RAM</a></div>
 				
@@ -259,43 +289,51 @@ h4 {
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_COLOR_RAM'>COLOR_RAM</div>
 						<div class='macroItemDescription'>Defaults to $ff80000 </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_COLOR_RAM</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_LOGICAL_ROW_WIDTH'>SCREEN_LOGICAL_ROW_WIDTH</div>
 						<div class='macroItemDescription'>Number of bytes that make up an entire screen row </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_SCREEN_LOGICAL_ROW_WIDTH</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_RAM'>SCREEN_RAM</div>
 						<div class='macroItemDescription'>Defaults to $0800 </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_SCREEN_RAM</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_ROW_WIDTH'>SCREEN_ROW_WIDTH</div>
 						<div class='macroItemDescription'>Number of characters that make up an entire screen row </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_SCREEN_ROW_WIDTH</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_TERMINATOR_OFFSET'>SCREEN_TERMINATOR_OFFSET</div>
 						<div class='macroItemDescription'>Screen row offset for the row terminator bytes </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_SCREEN_TERMINATOR_OFFSET</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_VISIBLE_SCREEN_CHAR_HEIGHT'>VISIBLE_SCREEN_CHAR_HEIGHT</div>
 						<div class='macroItemDescription'>Height of the visible screen background layer in characters </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_VISIBLE_SCREEN_CHAR_HEIGHT</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_VISIBLE_SCREEN_CHAR_WIDTH'>VISIBLE_SCREEN_CHAR_WIDTH</div>
 						<div class='macroItemDescription'>Width of the visible screen background layer in characters </div>
-						
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Global_VISIBLE_SCREEN_CHAR_WIDTH</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='DMA'><span><h4>Namespace<h2>DMA</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#DMA_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#DMA_Data'><div class='sectionButton'>Data</div></a></span>
 			<div class='categoryDescription'> API for controlling the configuration and execution of DMagic jobs. Uses the <a href="#DMA_F018_DMA_11_byte_format">F018 11 byte data format</a>. throughout.  </div>
 			<br>
 		
-				<div class='macroHeader'>Macros</div>
+				<div class='macroHeader' id='DMA_Pseudocommands'>Pseudocommands</div>
 			
 					<div class='macroIndex'><a href='#DMA_CopyJob'>CopyJob</a></div>
 				
@@ -313,94 +351,80 @@ h4 {
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_CopyJob'>CopyJob
+							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
+							
 						</div>
-						<div class='macroItemDescription'> Copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s     </div>
+						<div class='macroItemDescription'> Copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_CopyJob(source, destination, length, chain, backwards)</div>
+						<div class='macroUsage'>DMA_CopyJob <i>source</i> : <i>destination</i> : <i>length</i> : <i>chain</i> : <i>Destination</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{dword} source - The source data pointer</div></span>
+						<span><div class='paramHeader'>{dword} {ABS} source - The source data pointer</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{dword} destination - The destination data pointer</div></span>
+						<span><div class='paramHeader'>{dword} {ABS} destination - The destination data pointer</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} length - The number of bytes to copy</div></span>
+						<span><div class='paramHeader'>{word} {IMM} length - The number of bytes to copy</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{bool} chain - Job chains to another</div></span>
+						<span><div class='paramHeader'>{bool} {IMM} chain - Job chains to another</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{bool} backwards - Destination pointer progresses backwards</div></span>
+						<span><div class='paramHeader'>{bool} {IMM} Destination - pointer progresses backwards</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_DisableTransparency'>DisableTransparency
+							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Disables any transparent byte masking. This is the default state.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_DisableTransparency()</div>
+						<div class='macroUsage'>DMA_DisableTransparency </div>
+						
 						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_EnableTransparency'>EnableTransparency
+							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Enables transparent byte masking. This will ignore any source bytes that match the given byte and leave the destination byte untouched.   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_EnableTransparency(transparentByte)</div>
+						<div class='macroUsage'>DMA_EnableTransparency <i>transparentByte</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} transparentByte - The byte value to match from source for transparency.</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} transparentByte - The byte value to match from source for transparency.</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_Execute'>Execute
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -418,171 +442,164 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Executes the DMagic job at the given address.    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_Execute(address)</div>
+						<div class='macroUsage'>DMA_Execute <i>address</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} address - Pointer to a DMagic job to execute</div></span>
+						<span><div class='paramHeader'>{byte} {ABS} address - Pointer to a DMagic job to execute</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_FillJob'>FillJob
+							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Fills a defined number of bytes from one location in memory to another using the DMagic chip @ 40mb/s    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_FillJob(sourceByte, destination, length, chain)</div>
+						<div class='macroUsage'>DMA_FillJob <i>sourceByte</i> : <i>destination</i> : <i>length</i> : <i>chain</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} sourceByte - The source data byte value</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} sourceByte - The source data byte value</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{dword} destination - The destination data pointer</div></span>
+						<span><div class='paramHeader'>{dword} {ABS} destination - The destination data pointer</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} length - The number of bytes to fill</div></span>
+						<span><div class='paramHeader'>{word} {IMM} length - The number of bytes to fill</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{bool} chain - Job chains to another</div></span>
+						<span><div class='paramHeader'>{bool} {IMM} chain - Job chains to another</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_Header'>Header
+							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Sets the DMagic header bytes defining the source and destination banks.<br><br> <small>Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_Header(address)</div>
+						<div class='macroUsage'>DMA_Header <i>sourceBank</i> : <i>destBank</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} address - </div></span>
+						<span><div class='paramHeader'>{byte} {IMM} sourceBank - The source bank number</div></span>
 						</div>
 					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} destBank - The destination bank number</div></span>
+						</div>
+					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_Step'>Step
+							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
+							
 						</div>
-						<div class='macroItemDescription'> Sets the source and destination stepping values. The DMA will use a fixed point (8:8) step for each increment on the source and destination by default they are both set to $01.00   </div>
+						<div class='macroItemDescription'> Sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_Step(sourceStep, sourceStepFrac, destStep, destStepFrac)</div>
+						<div class='macroUsage'>DMA_Step <i>sourceStep</i> : <i>destStep</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} sourceStep - Source data stepping value integer</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} sourceStep - Source data stepping value in 8:8 fixed point format</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} sourceStepFrac - Source data stepping value fraction</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} destStep - Destination data stepping value integer</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} destStepFrac - Destination data stepping value fraction</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} destStep - Destination data stepping value in 8:8 fixed point format</div></span>
 						</div>
 					
 						
+						
 					</div><br>
-				<div class='macroHeader'>Data</div>
+				<div class='macroHeader' id='DMA_Data'>Data</div>
 			
 					<div class='macroIndex'><a href='#DMA_F018_DMA_11_byte_format'>F018_DMA_11_byte_format</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_F018_DMA_11_byte_format'>F018_DMA_11_byte_format</div>
 						<div class='macroItemDescription'> Offsets into the DMagic job for the <a target="_blank" href="https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format">F018 11 byte data format</a>.  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>DMA_F018_DMA_11_byte_format</div>						
 						
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{byte} $00 - Command</div></span>
-						
-						</div>
-					
-						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $01 - Count</div></span>
+						<span><div class='paramHeader'>{byte} $00 - End of options</div></span>
 						
 						</div>
 					
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $03 - Source</div></span>
+						<span><div class='paramHeader'>{byte} $01 - Command</div></span>
 						
 						</div>
 					
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{byte} $05 - Source bank + flags</div></span>
+						<span><div class='paramHeader'>{word} $02 - Count</div></span>
 						
 						</div>
 					
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $06 - Destination</div></span>
+						<span><div class='paramHeader'>{word} $04 - Source</div></span>
 						
 						</div>
 					
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{byte} $08 - Destination bank + flags</div></span>
+						<span><div class='paramHeader'>{byte} $06 - Source bank + flags</div></span>
 						
 						</div>
 					
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $09 - Modulo</div></span>
+						<span><div class='paramHeader'>{word} $07 - Destination</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $09 - Destination bank + flags</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} $0a - Modulo</div></span>
 						
 						</div>
 					
 					</div><br><br>
 			<div class='categoryHeader' id='Layer'><span><h4>Namespace<h2>Layer</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Layer_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Layer_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Layer_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Layer_Vars'><div class='sectionButton'>Vars</div></a><a style='text-decoration:none;' href='#Layer_Lists'><div class='sectionButton'>Lists</div></a><a style='text-decoration:none;' href='#Layer_Hashtables'><div class='sectionButton'>Hashtables</div></a></span>
 			<div class='categoryDescription'> API for controlling the screen ram and color ram. Using the raster rewrite buffer to create and manipulate layers </div>
 			<br>
 		
-				<div class='macroHeader'>Macros</div>
+				<div class='macroHeader' id='Layer_Pseudocommands'>Pseudocommands</div>
 			
+					<div class='macroIndex'><a href='#Layer_AddText'>AddText</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_ClearAllLayers'>ClearAllLayers</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_DefineBGLayer'>DefineBGLayer</a></div>
@@ -596,7 +613,55 @@ h4 {
 					<div class='macroIndex'><a href='#Layer_SetAllMarkers'>SetAllMarkers</a></div>
 				
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_AddText'>AddText
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+			<td >Y</td>
+		
+			<td >Z</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices <$100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_AddText <i>addrPtr</i> : <i>textPtr</i> : <i>color</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} {ABS} addrPtr - The screen address to write to</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} {ABS} textPtr - <add a description here></div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {REG|IMM|ABS|ABX} color - Optional color to write to color ram (doesn't use Z if this param is skipped)</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_ClearAllLayers'>ClearAllLayers
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -614,21 +679,28 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
-						<div class='macroItemDescription'> Fills the screen RAM area with a given 16bit value    </div>
+						<div class='macroItemDescription'> Fills the screen RAM area with a given 16bit value. Note this will overwrite any RRB GotoX markers also    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_ClearAllLayers(clearChar)</div>
+						<div class='macroUsage'>Layer_ClearAllLayers <i>clearChar</i> : <i>clearChar</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} clearChar - The 16bit char value to clear with</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
 						</div>
 					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						</div>
+					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_DefineBGLayer'>DefineBGLayer
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -646,59 +718,83 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
-						<div class='macroItemDescription'> Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time.    </div>
+						<div class='macroItemDescription'> Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineBGLayer(charWidth, charHeight, offsetX)</div>
+						<div class='macroUsage'>Layer_DefineBGLayer <i>charWidth</i> : <i>charHeight</i> : <i>offsetX</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} charWidth - The screen base visible width in chars</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} charWidth - The screen base visible width in chars</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} charHeight - The screen base visible height in chars</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} charHeight - The screen base visible height in chars</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} offsetX - The new RRB GotoX position to set for this layer</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} offsetX - The new RRB GotoX position to set for this layer, defaults to 0</div></span>
+						</div>
+					
+						
+							<div class='macroUsageText'><i>Returns:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} in A - The layer number this layer was created at</div></span>
 						</div>
 					
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_DefineRRBSpriteLayer'>DefineRRBSpriteLayer
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
 	
+			<td >A</td>
+		
 		</tr></table>
 	 flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
+			<td >n</td>
+		
+			<td >z</td>
+		
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
-						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. <br><br>  RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br>  <small>Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.</small>    </div>
+						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. <br><br>  RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineRRBSpriteLayer(maxSprites, charsPerLine)</div>
+						<div class='macroUsage'>Layer_DefineRRBSpriteLayer <i>maxSprites</i> : <i>charsPerLine</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} maxSprites - The maximum number of RRB Sprites for this layer, lower numbers improve performance</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} maxSprites - The maximum number of RRB Sprites for this layer, lower numbers improve performance</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} charsPerLine - The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance.</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} charsPerLine - The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance. Defaults to 40</div></span>
+						</div>
+					
+						
+							<div class='macroUsageText'><i>Returns:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} in A - The layer number this layer was created at</div></span>
 						</div>
 					
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_DefineScreenLayer'>DefineScreenLayer
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -716,25 +812,34 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
-						<div class='macroItemDescription'> Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset.    </div>
+						<div class='macroItemDescription'> Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineScreenLayer(charWidth, offsetX)</div>
+						<div class='macroUsage'>Layer_DefineScreenLayer <i>charWidth</i> : <i>offsetX</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} charWidth - The screen layers width in chars</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} charWidth - The screen layers width in chars</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} offsetX - The new RRB GotoX position to set for this layer</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} offsetX - The new RRB GotoX position to set for this layer</div></span>
+						</div>
+					
+						
+							<div class='macroUsageText'><i>Returns:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} in A - The layer number this layer was created at</div></span>
 						</div>
 					
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_InitScreen'>InitScreen
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -760,21 +865,24 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_InitScreen(screenBaseAddress)</div>
+						<div class='macroUsage'>Layer_InitScreen <i>screenBaseAddress</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} screenBaseAddress - The base address of the Screen RAM</div></span>
+						<span><div class='paramHeader'>{word} {IMM} screenBaseAddress - The base address of the Screen RAM</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_SetAllMarkers'>SetAllMarkers
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -800,14 +908,120 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Sets the RRB GotoX markers for all but the RRB sprite layers   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_SetAllMarkers()</div>
+						<div class='macroUsage'>Layer_SetAllMarkers </div>
+						
 						
 						
 					</div><br>
-				<div class='macroHeader'>Lists</div>
+				<div class='macroHeader' id='Layer_Functions'>Functions</div>
+			
+					<div class='macroIndex'><a href='#Layer_GetIOAddress'>GetIOAddress</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_GetScreenAddress'>GetScreenAddress</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_GetIOAddress'>GetIOAddress
+						</div>
+						<div class='macroItemDescription'> Returns the base address plus an optional offset for the given layers IO registers   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_GetIOAddress(<i>layerNumber</i>, <i>offset</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} layerNumber - The layer number to fetch</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} offset - The byte offset into the IO register to fetch</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_GetScreenAddress'>GetScreenAddress
+						</div>
+						<div class='macroItemDescription'> Returns the address of the char at the given position on this screen layer   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_GetScreenAddress(<i>layerNumber</i>, <i>xpos</i>, <i>ypos</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} layerNumber - The layer number to fetch</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} xpos - The character x position on the screen layer</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} ypos - The character y position on the screen layer</div></span>
+						</div>
+					
+						
+						
+					</div><br>
+				<div class='macroHeader' id='Layer_Data'>Data</div>
+			
+					<div class='macroIndex'><a href='#Layer_AddrOffsets'>AddrOffsets</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_GotoXPositions'>GotoXPositions</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_IO'>IO</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_AddrOffsets'>AddrOffsets</div>
+						<div class='macroItemDescription'> Table of start address offsets for each layer   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_AddrOffsets</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} $00 - Layer start address byte offset</div></span>
+						
+						</div>
+					
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_GotoXPositions'>GotoXPositions</div>
+						<div class='macroItemDescription'> Table of current X positions for all the layers   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_GotoXPositions</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} $00 - Layer X position</div></span>
+						
+						</div>
+					
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_IO'>IO</div>
+						<div class='macroItemDescription'> The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_IO</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} Layer_IOGotoX - The GOTOX value to apply to this layer</div></span>
+						
+						</div>
+					
+					</div><br>
+				<div class='macroHeader' id='Layer_Vars'>Vars</div>
+			
+					<div class='macroIndex'><a href='#Layer_DynamicDataIndex'>DynamicDataIndex</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_DynamicDataIndex'>DynamicDataIndex</div>
+						<div class='macroItemDescription'> A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_DynamicDataIndex</div>						
+					</div><br>
+				<div class='macroHeader' id='Layer_Lists'>Lists</div>
 			
 					<div class='macroIndex'><a href='#Layer_LayerList'>LayerList</a></div>
 				
@@ -822,12 +1036,12 @@ h4 {
 						<div class='macroUsage'>
 						<span><div class='paramHeader'>{hashtable} 
 			<a href='#Layer_LayerListTable'>LayerListTable</a>
-		 - </div></span>
+		 - Layer data hashtable</div></span>
 						</div>
 					
 
 					</div><br>
-				<div class='macroHeader'>Hashtables</div>
+				<div class='macroHeader' id='Layer_Hashtables'>Hashtables</div>
 			
 					<div class='macroIndex'><a href='#Layer_LayerListTable'>LayerListTable</a></div>
 				
@@ -852,45 +1066,24 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} offsetX - The GotoX offset for this layer</div></span>
+						<span><div class='paramHeader'>{word} offsetX - The GotoX offset for this layer, RRB Sprite layers cannot be offset</div></span>
 						</div>
 					
 						<div class='macroUsage'>
 						<span><div class='paramHeader'>{byte} gotoX - The offset in bytes from the start of the screen row for this layers GOTOX marker</div></span>
 						</div>
 					
-					</div><br>
-				<div class='macroHeader'>Data</div>
-			
-					<div class='macroIndex'><a href='#Layer_Layer_AddrOffsets'>Layer_AddrOffsets</a></div>
-				
-					<div class='macroIndex'><a href='#Layer_Layer_GotoXPositions'>Layer_GotoXPositions</a></div>
-				
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_Layer_AddrOffsets'>Layer_AddrOffsets</div>
-						<div class='macroItemDescription'> Table of start address offsets for each layer   </div>
-						
 						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $00 - Layer start address byte offset</div></span>
-						
-						</div>
-					
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_Layer_GotoXPositions'>Layer_GotoXPositions</div>
-						<div class='macroItemDescription'> Table of current X positions for all the layers   </div>
-						
-						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $00 - Layer X position</div></span>
-						
+						<span><div class='paramHeader'>{word} dynamicDataAddr - The memory address for this layers dynamic data area</div></span>
 						</div>
 					
 					</div><br><br>
 			<div class='categoryHeader' id='SDCard'><span><h4>Namespace<h2>SDCard</h2></h4></span></div>
-			<div class='categoryDescription'> API for using the SD card to load assets to memory </div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#SDCard_Macros'><div class='sectionButton'>Macros</div></a></span>
+			<div class='categoryDescription'> API for using the SD card to load assets to memory using mostly macros </div>
 			<br>
 		
-				<div class='macroHeader'>Macros</div>
+				<div class='macroHeader' id='SDCard_Macros'>Macros</div>
 			
 					<div class='macroIndex'><a href='#SDCard_LoadToAtticRAM'>LoadToAtticRAM</a></div>
 				
@@ -926,7 +1119,7 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Loads a file from the SDCard into attic RAM    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>SDCard_LoadToAtticRAM(addr, filenamr)</div>
+						<div class='macroUsage'>SDCard_LoadToAtticRAM(<i>addr</i>, <i>filename</i>)</div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -935,9 +1128,10 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{string} filenamr - The filename on the SDCard to load</div></span>
+						<span><div class='paramHeader'>{string} filename - The filename on the SDCard to load</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
@@ -970,7 +1164,7 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Loads a file from the SDCard into chip RAM    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>SDCard_LoadToChipRam(addr, filenamr)</div>
+						<div class='macroUsage'>SDCard_LoadToChipRam(<i>addr</i>, <i>filename</i>)</div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -979,16 +1173,18 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{string} filenamr - The filename on the SDCard to load</div></span>
+						<span><div class='paramHeader'>{string} filename - The filename on the SDCard to load</div></span>
 						</div>
 					
 						
+						
 					</div><br><br>
 			<div class='categoryHeader' id='System'><span><h4>Namespace<h2>System</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#System_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#System_Data'><div class='sectionButton'>Data</div></a></span>
 			<div class='categoryDescription'> Tools and utilities for configuring the processor and launching programs. </div>
 			<br>
 		
-				<div class='macroHeader'>Macros</div>
+				<div class='macroHeader' id='System_Macros'>Macros</div>
 			
 					<div class='macroIndex'><a href='#System_BasicUpstart65'>BasicUpstart65</a></div>
 				
@@ -996,25 +1192,19 @@ h4 {
 				
 					<div class='macroIndex'><a href='#System_Enable40Mhz'>Enable40Mhz</a></div>
 				
+					<div class='macroIndex'><a href='#System_EnableFastRRB'>EnableFastRRB</a></div>
+				
 					<div class='macroIndex'><a href='#System_EnableVIC4'>EnableVIC4</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_BasicUpstart65'>BasicUpstart65
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-		</tr></table>
-	</span>
+								<span  style='display:inline-flex;'></span>
 							</div>
 						</div>
 						<div class='macroItemDescription'> Creates the <a href='#System_BasicUpstart65_Format'>Basic Upstart</a> for the MEGA65 at location $2001 pointing to the given SYS entry address    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>System_BasicUpstart65(addr)</div>
+						<div class='macroUsage'>System_BasicUpstart65(<i>addr</i>)</div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -1022,6 +1212,7 @@ h4 {
 						<span><div class='paramHeader'>{word} addr - Pointer to the program entry point</div></span>
 						</div>
 					
+						
 						
 					</div>
 					<div class='macroItem'>
@@ -1049,6 +1240,7 @@ h4 {
 						<div class='macroUsage'>System_DisableC65ROM()</div>
 						
 						
+						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_Enable40Mhz'>Enable40Mhz
@@ -1073,6 +1265,34 @@ h4 {
 						<div class='macroItemDescription'> Switches the MEGA65 45GS_02 processor to use 40.5Mhz mode   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>System_Enable40Mhz()</div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_EnableFastRRB'>EnableFastRRB
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Enables rewrite double buffering to prevent clipping on the left side of the screen and enable 2 raster scans per line for double pixel clock in V200 mode.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_EnableFastRRB()</div>
+						
 						
 						
 					</div>
@@ -1107,14 +1327,17 @@ h4 {
 						<div class='macroUsage'>System_EnableVIC4()</div>
 						
 						
+						
 					</div><br>
-				<div class='macroHeader'>Data</div>
+				<div class='macroHeader' id='System_Data'>Data</div>
 			
 					<div class='macroIndex'><a href='#System_BasicUpstart65_Format'>BasicUpstart65_Format</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_BasicUpstart65_Format'>BasicUpstart65_Format</div>
 						<div class='macroItemDescription'>  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_BasicUpstart65_Format</div>						
 						
 						<div class='macroUsage'>
 						<span><div class='paramHeader'>{word} $2001 - Pointer to next end of command marker $2009</div></span>

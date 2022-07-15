@@ -13,40 +13,43 @@
  * Offsets into the DMagic job for the
  * <a target="_blank" href="https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format">F018 11 byte data format</a>.
  * 
- * @addr {byte} $00 Command
- * @addr {word} $01 Count
- * @addr {word} $03 Source
- * @addr {byte} $05 Source bank + flags
- * @addr {word} $06 Destination
- * @addr {byte} $08 Destination bank + flags
- * @addr {word} $09 Modulo
- */
- 
+ * @addr {byte} $00 End of options
+ * @addr {byte} $01 Command
+ * @addr {word} $02 Count
+ * @addr {word} $04 Source
+ * @addr {byte} $06 Source bank + flags
+ * @addr {word} $07 Destination
+ * @addr {byte} $09 Destination bank + flags
+ * @addr {word} $0a Modulo
+ */            
+
 /**
- * .macro Execute
- * 
- * Executes the DMagic job at the given address. 
- * 
- * @namespace DMA
- * 
- * @param {word} address Pointer to a DMagic job to execute
- * 
- * @registers A
- * @flags nz
- */
-.macro DMA_Execute(address) {
-		lda #[address >> 16]
+* .pseudocommand Execute
+*
+* Executes the DMagic job at the given address. 
+* 
+* @namespace DMA
+*
+* @param {byte} {ABS} address Pointer to a DMagic job to execute
+*
+* @registers A
+* @flags nz
+*/
+.pseudocommand DMA_Execute address {
+        .if(address.getType() != AT_ABSOLUTE) .error "DMA_Execute: Only supports AT_ABSOLUTE"
+        .var addr = address.getValue()
+		lda #[addr >> 16]
 		sta $d702
 		sta $d704
-		lda #>address
+		lda #>addr
 		sta $d701
-		lda #<address
+		lda #<addr
 		sta $d705
 }
 
 
 /**
- * .macro Header
+ * .pseudocommand Header
  * 
  * Sets the DMagic header bytes defining the source and
  * destination banks.<br><br>
@@ -55,140 +58,155 @@
  * 
  * @namespace DMA
  * 
- * @param {word} address
+ * @param {byte} {IMM} sourceBank The source bank number
+ * @param {byte} {IMM} destBank The destination bank number
  */
-.macro DMA_Header(SourceBank, DestBank) {
-		.byte $0A // Request format is F018B
-		.byte $80, SourceBank
-		.byte $81, DestBank
+.pseudocommand DMA_Header sourceBank : destBank {
+    .if( !_isImm(sourceBank) || !_isImm(destBank)) .error "DMA_Header: Only supports AT_IMMEDIATE"
+
+    .byte $0A // Request format is F018B
+    .byte $80, sourceBank.getValue()
+    .byte $81, destBank.getValue()
 }
 
+
 /**
- * .macro Step
+ * .pseudocommand Step
  * 
- * Sets the source and destination stepping values. The DMA will use a 
- * fixed point (8:8) step for each increment on the source and destination 
- * by default they are both set to $01.00 
+ * Sets the source and/or destination stepping values. The DMA will use a 
+ * fixed point step for each increment on the source and destination 
+ * by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)
  * 
  * @namespace DMA
  * 
- * @param {byte} sourceStep Source data stepping value integer
- * @param {byte} sourceStepFrac Source data stepping value fraction
- * @param {byte} destStep Destination data stepping value integer
- * @param {byte} destStepFrac Destination data stepping value fraction
+ * @param {word?} {IMM} sourceStep Source data stepping value in 8:8 fixed point format
+ * @param {word?} {IMM} destStep Destination data stepping value  in 8:8 fixed point format
  */
-.macro DMA_Step(sourceStep, sourceStepFrac, destStep, destStepFrac) {
-		.if(sourceStepFrac != 0) {
-			.byte $82, sourceStepFrac
+.pseudocommand DMA_Step sourceStep : destStep {
+        .if(    !_isImmOrNone(sourceStep) || 
+                !_isImmOrNone(destStep)) .error "DMA_Step: Only supports AT_IMMEDIATE or AT_NONE"
+
+
+		.if(sourceStep.getType() != AT_NONE) {
+            .byte $82, <sourceStep.getValue()
+			.byte $83, >sourceStep.getValue()
 		}
-		.if(sourceStep != 1) {
-			.byte $83, sourceStep
-		}
-		.if(destStepFrac != 0) {
-			.byte $84, destStepFrac
-		}
-		.if(destStep != 1) {
-			.byte $85, destStep
+		.if(destStep.getType() != AT_NONE) {
+            .byte $84, <destStep.getValue()
+			.byte $85, >destStep.getValue()
 		}		
 }
 
+
 /**
- * .macro DisableTransparency
+ * .pseudocommand DisableTransparency
  * 
  * Disables any transparent byte masking. This is the default state.
  * 
  * @namespace DMA
  */
-.macro DMA_DisableTransparency() {
+.pseudocommand DMA_DisableTransparency {
 		.byte $06
 }
 
 /**
- * .macro EnableTransparency
+ * .pseudocommand EnableTransparency
  * 
  * Enables transparent byte masking. This will ignore any source bytes that 
  * match the given byte and leave the destination byte untouched.
  * 
  * @namespace DMA
  * 
- * @param {byte} transparentByte The byte value to match from source for transparency.
+ * @param {byte} {IMM} transparentByte The byte value to match from source for transparency.
  */
-.macro DMA_EnableTransparency(transparentByte) {
+.pseudocommand DMA_EnableTransparency transparentByte {
+        .if(!_isImm(transparentByte)) .error "DMA_EnableTransparency: Only supports AT_IMMEDIATE"
 		.byte $07 
 		.byte $86, transparentByte
 }
 
+
 /**
- * .macro CopyJob
+ * .pseudocommand CopyJob
  * 
  * Copys a defined number of bytes from one location in memory
  * to another using the DMagic chip @ 20mb/s
  * 
  * @namespace DMA
  * 
- * @param {dword} source The source data pointer
- * @param {dword} destination The destination data pointer
- * @param {word} length The number of bytes to copy
- * @param {bool} chain Job chains to another
- * @param {bool} backwards Destination pointer progresses backwards
- * 
-
+ * @param {dword} {ABS} source The source data pointer
+ * @param {dword} {ABS} destination The destination data pointer
+ * @param {word} {IMM} length The number of bytes to copy
+ * @param {bool} {IMM} chain Job chains to another
+ * @param {bool} {IMM} Destination pointer progresses backwards
  */
 .macro DMA_CopyJob(source, destination, length, chain, backwards) {
+    .if(!_isAbs(source)) .error "DMA_CopyJob: source Only supports AT_ABSOLUTE"
+    .if(!_isAbs(destination)) .error "DMA_CopyJob: sourceByte Only supports AT_ABSOLUTE"
+    .if(!_isImm(length)) .error "DMA_CopyJob: length Only supports AT_IMMEDIATE"
+    .if(!_isImm(chain)) .error "DMA_CopyJob: chain Only supports AT_IMMEDIATE"
+    .if(!_isImm(backwards)) .error "DMA_CopyJob: chain Only supports AT_IMMEDIATE"
+
 	.byte $00 //No more options
-	.if(chain) {
+	.if(chain.getValue() != 0) {
 		.byte $04 //Copy and chain
 	} else {
 		.byte $00 //Copy and last request
 	}	
 	
 	.var backByte = 0
-	.if(backwards) {
+	.if(backwards.getValue() != 0) {
 		.eval backByte = $40
-		.eval source = source + length - 1
-		.eval destination = destination + length - 1
+		.eval source = source.getValue() + length.getValue() - 1
+		.eval destination = destination.getValue() + length.getValue() - 1
 	}
-	.word length //Size of Copy
+	.word length.getValue() //Size of Copy
 
-	.word source & $ffff
-	.byte [source >> 16] + backByte
+	.word source.getValue() & $ffff
+	.byte [source.getValue() >> 16] + backByte
 
-	.word destination & $ffff
-	.byte [[destination >> 16] & $0f]  + backByte
-	.if(chain) {
+	.word destination.getValue() & $ffff
+	.byte [[destination.getValue() >> 16] & $0f]  + backByte
+	.if(chain.getValue() != 0) {
 		.word $0000
 	}
 }
 
+
 /**
- * .macro FillJob
+ * .pseudocommand FillJob
  * 
  * Fills a defined number of bytes from one location in memory
  * to another using the DMagic chip @ 40mb/s
  * 
  * @namespace DMA
  * 
- * @param {byte} sourceByte The source data byte value
- * @param {dword} destination The destination data pointer
- * @param {word} length The number of bytes to fill
- * @param {bool} chain Job chains to another
+ * @param {byte} {IMM} sourceByte The source data byte value
+ * @param {dword} {ABS} destination The destination data pointer
+ * @param {word} {IMM} length The number of bytes to fill
+ * @param {bool} {IMM} chain Job chains to another
  * 
  */
-.macro DMA_FillJob(sourceByte, destination, length, chain) {
+.pseudocommand DMA_FillJob sourceByte : destination : length : chain {
+    .if(!_isImm(sourceByte)) .error "DMA_FillJob: sourceByte Only supports AT_IMMEDIATE"
+    .if(!_isAbs(destination)) .error "DMA_FillJob: sourceByte Only supports AT_ABSOLUTE"
+    .if(!_isImm(length)) .error "DMA_FillJob: length Only supports AT_IMMEDIATE"
+    .if(!_isImm(chain)) .error "DMA_FillJob: chain Only supports AT_IMMEDIATE"
+
 	.byte $00 //No more options
-	.if(chain) {
+	.if(chain.getValue() != 0) {
 		.byte $07 //Fill and chain
-        .print "CHAIN"
 	} else {
 		.byte $03 //Fill and last request
 	}	
 	
-	.word length //Size of Copy
-	.word sourceByte
+	.word length.getValue() //Size of Copy
+	.word sourceByte.getValue()
 	.byte $00
-	.word destination & $ffff
-	.byte [[destination >> 16] & $0f] 
-	.if(chain) {
+	.word destination.getValue() & $ffff
+	.byte [[destination.getValue() >> 16] & $0f] 
+	.if(chain.getValue() != 0) {
 		.word $0000
 	}
 }
+

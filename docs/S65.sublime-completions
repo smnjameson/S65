@@ -1,0 +1,194 @@
+{
+    "scope": "source.assembly.kickassembler",
+    "completions": [
+        {
+            "trigger": "S65_RestoreBasePage",
+            "annotation": "",
+            "contents": "S65_RestoreBasePage()",
+            "kind": "snippet",
+            "details": "Restores the base page from S65_LastBasePage"
+        },
+        {
+            "trigger": "S65_SetBasePage",
+            "annotation": "",
+            "contents": "S65_SetBasePage()",
+            "kind": "snippet",
+            "details": "Saves the current base page in S65_LastBasePage and sets the base page to the S65 Base page area"
+        },
+        {
+            "trigger": "S65_Text16",
+            "annotation": "str",
+            "contents": "S65_Text16(${1:str})",
+            "kind": "snippet",
+            "details": "Generates a string of 16 bit words based on the text input. The upper nybblwe of each word is $00 and the lower nybble is the normal 8 bit .screencode encoded value. terminates the string with $ffff"
+        },
+        {
+            "trigger": "S65_Trace",
+            "annotation": "str",
+            "contents": "S65_Trace(${1:str})",
+            "kind": "snippet",
+            "details": "Outputs a string to the kick assembler console at build time"
+        },
+        {
+            "trigger": "DMA_CopyJob",
+            "annotation": "source:destination:length:chain:Destination",
+            "contents": "DMA_CopyJob ${1:source} : ${2:destination} : ${3:length} : ${4:chain} : ${5:Destination}",
+            "kind": "snippet",
+            "details": "Copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s"
+        },
+        {
+            "trigger": "DMA_DisableTransparency",
+            "annotation": "",
+            "contents": "DMA_DisableTransparency ",
+            "kind": "snippet",
+            "details": "Disables any transparent byte masking. This is the default state."
+        },
+        {
+            "trigger": "DMA_EnableTransparency",
+            "annotation": "transparentByte",
+            "contents": "DMA_EnableTransparency ${1:transparentByte}",
+            "kind": "snippet",
+            "details": "Enables transparent byte masking. This will ignore any source bytes that match the given byte and leave the destination byte untouched."
+        },
+        {
+            "trigger": "DMA_Execute",
+            "annotation": "address",
+            "contents": "DMA_Execute ${1:address}",
+            "kind": "snippet",
+            "details": "Executes the DMagic job at the given address."
+        },
+        {
+            "trigger": "DMA_FillJob",
+            "annotation": "sourceByte:destination:length:chain",
+            "contents": "DMA_FillJob ${1:sourceByte} : ${2:destination} : ${3:length} : ${4:chain}",
+            "kind": "snippet",
+            "details": "Fills a defined number of bytes from one location in memory to another using the DMagic chip @ 40mb/s"
+        },
+        {
+            "trigger": "DMA_Header",
+            "annotation": "sourceBank:destBank",
+            "contents": "DMA_Header ${1:sourceBank} : ${2:destBank}",
+            "kind": "snippet",
+            "details": "Sets the DMagic header bytes defining the source and destination banks.<br><br> <small>Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff"
+        },
+        {
+            "trigger": "DMA_Step",
+            "annotation": "sourceStep:destStep",
+            "contents": "DMA_Step ${1:sourceStep} : ${2:destStep}",
+            "kind": "snippet",
+            "details": "Sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)"
+        },
+        {
+            "trigger": "Layer_AddText",
+            "annotation": "addrPtr:textPtr:color",
+            "contents": "Layer_AddText ${1:addrPtr} : ${2:textPtr} : ${3:color}",
+            "kind": "snippet",
+            "details": "Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices <$100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
+        },
+        {
+            "trigger": "Layer_ClearAllLayers",
+            "annotation": "clearChar:clearChar",
+            "contents": "Layer_ClearAllLayers ${1:clearChar} : ${2:clearChar}",
+            "kind": "snippet",
+            "details": "Fills the screen RAM area with a given 16bit value. Note this will overwrite any RRB GotoX markers also"
+        },
+        {
+            "trigger": "Layer_DefineBGLayer",
+            "annotation": "charWidth:charHeight:offsetX",
+            "contents": "Layer_DefineBGLayer ${1:charWidth} : ${2:charHeight} : ${3:offsetX}",
+            "kind": "snippet",
+            "details": "Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time."
+        },
+        {
+            "trigger": "Layer_DefineRRBSpriteLayer",
+            "annotation": "maxSprites:charsPerLine",
+            "contents": "Layer_DefineRRBSpriteLayer ${1:maxSprites} : ${2:charsPerLine}",
+            "kind": "snippet",
+            "details": "Defines a new RRB Sprite layer in Screen RAM. <br><br>  RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer."
+        },
+        {
+            "trigger": "Layer_DefineScreenLayer",
+            "annotation": "charWidth:offsetX",
+            "contents": "Layer_DefineScreenLayer ${1:charWidth} : ${2:offsetX}",
+            "kind": "snippet",
+            "details": "Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset."
+        },
+        {
+            "trigger": "Layer_InitScreen",
+            "annotation": "screenBaseAddress",
+            "contents": "Layer_InitScreen ${1:screenBaseAddress}",
+            "kind": "snippet",
+            "details": "Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout"
+        },
+        {
+            "trigger": "Layer_SetAllMarkers",
+            "annotation": "",
+            "contents": "Layer_SetAllMarkers ",
+            "kind": "snippet",
+            "details": "Sets the RRB GotoX markers for all but the RRB sprite layers"
+        },
+        {
+            "trigger": "Layer_GetIOAddress",
+            "annotation": "layerNumber,offset",
+            "contents": "Layer_GetIOAddress(${1:layerNumber}, ${2:offset})",
+            "kind": "snippet",
+            "details": "Returns the base address plus an optional offset for the given layers IO registers"
+        },
+        {
+            "trigger": "Layer_GetScreenAddress",
+            "annotation": "layerNumber,xpos,ypos",
+            "contents": "Layer_GetScreenAddress(${1:layerNumber}, ${2:xpos}, ${3:ypos})",
+            "kind": "snippet",
+            "details": "Returns the address of the char at the given position on this screen layer"
+        },
+        {
+            "trigger": "SDCard_LoadToAtticRAM",
+            "annotation": "addr,filename",
+            "contents": "SDCard_LoadToAtticRAM(${1:addr}, ${2:filename})",
+            "kind": "snippet",
+            "details": "Loads a file from the SDCard into attic RAM"
+        },
+        {
+            "trigger": "SDCard_LoadToChipRam",
+            "annotation": "addr,filename",
+            "contents": "SDCard_LoadToChipRam(${1:addr}, ${2:filename})",
+            "kind": "snippet",
+            "details": "Loads a file from the SDCard into chip RAM"
+        },
+        {
+            "trigger": "System_BasicUpstart65",
+            "annotation": "addr",
+            "contents": "System_BasicUpstart65(${1:addr})",
+            "kind": "snippet",
+            "details": "Creates the <a href='#System_BasicUpstart65_Format'>Basic Upstart</a> for the MEGA65 at location $2001 pointing to the given SYS entry address"
+        },
+        {
+            "trigger": "System_DisableC65ROM",
+            "annotation": "",
+            "contents": "System_DisableC65ROM()",
+            "kind": "snippet",
+            "details": "Disables the C65 rom protection making it writable"
+        },
+        {
+            "trigger": "System_Enable40Mhz",
+            "annotation": "",
+            "contents": "System_Enable40Mhz()",
+            "kind": "snippet",
+            "details": "Switches the MEGA65 45GS_02 processor to use 40.5Mhz mode"
+        },
+        {
+            "trigger": "System_EnableFastRRB",
+            "annotation": "",
+            "contents": "System_EnableFastRRB()",
+            "kind": "snippet",
+            "details": "Enables rewrite double buffering to prevent clipping on the left side of the screen and enable 2 raster scans per line for double pixel clock in V200 mode."
+        },
+        {
+            "trigger": "System_EnableVIC4",
+            "annotation": "",
+            "contents": "System_EnableVIC4()",
+            "kind": "snippet",
+            "details": "Switches the VIC chip in the MEGA65 into VIC4 mode."
+        }
+    ]
+}

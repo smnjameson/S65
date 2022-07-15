@@ -4,10 +4,10 @@
 /**
  * .namespace SDCard
  * 
- * API for using the SD card to load assets to memory
+ * API for using the SD card to load assets to memory using
+ * mostly macros
  */
- * = * "SDCard IO code"
-
+ 
 
 .const SDFILENAME = $0200 //-$03ff
 .const HVC_SD_TO_CHIPRAM = $36
@@ -22,7 +22,7 @@
  * @namespace SDCard
  * 
  * @param {dword} addr Pointer to the memory load location
- * @param {string} filenamr The filename on the SDCard to load
+ * @param {string} filename The filename on the SDCard to load
  * 
  * @registers AXYZ
  * @flags izc
@@ -56,7 +56,7 @@
  * @namespace SDCard
  * 
  * @param {word} addr Pointer to the memory load location
- * @param {string} filenamr The filename on the SDCard to load
+ * @param {string} filename The filename on the SDCard to load
  * 
  * @registers AXYZ
  * @flags izc

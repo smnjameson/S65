@@ -84,3 +84,20 @@
 		lda.z S65_LastBasePage
 		tab 
 }
+
+
+/**
+* .macro Text16
+*
+* Generates a string of 16 bit words based on the text input.
+* The upper nybblwe of each word is $00 and the lower nybble 
+* is the normal 8 bit .screencode encoded value. terminates the string with $ffff
+*
+* @param {byte} str The string to convert
+*/
+.macro S65_Text16(str) {
+    .for(var i=0; i<str.size(); i++) {
+        .byte str.charAt(i), $00
+    }
+    .word $ffff
+}

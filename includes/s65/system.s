@@ -65,6 +65,39 @@
 		sta $00 //40 Mhz mode
 }
 
+/**
+* .macro EnableFastRRB
+*
+* Enables rewrite double buffering to prevent clipping on the
+* left side of the screen and enable 2 raster scans per line for 
+* double pixel clock in V200 mode.
+* 
+* @namespace System
+*
+* @registers A
+* @flags nz
+*/
+.macro System_EnableFastRRB() {
+        lda #$80    //Enable Rewrite double buffering
+        trb $d051   //prevents clipping in FCM (bit 7)
+
+        //Enable double line RRB to double the time for RRB operations 
+        //by setting V400 mode, enabling bit 6 in $d051 and setting $d05b Y scale to 0
+        lda #$08
+        tsb $d031
+        lda #$40    
+        tsb $d051
+        lda #$00    
+        sta $d05b
+
+        //need to move the textYpos back because of double buffer pushing the layer down 1px
+        dec $d04e
+        dec $d04e
+
+        //need to move the textXpos back because of single column of pixel junk on left
+        dec $d04c
+        dec $d04c
+}
 
 /**
  * .macro EnableVIC4

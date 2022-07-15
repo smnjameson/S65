@@ -16,13 +16,55 @@
  * @author     Shallan50k
  * @date       13/07/2022
  */
-
 .cpu _45gs02
 * = $1400 "Pre BASIC small code"
 #import "includes/s65/sdcard.s"
 
 System_BasicUpstart65(S65_InitComplete)
 * = $2016 "S65 Base page area"
+
+//Constants and functions for use with the pseudocommandsystem
+.const AT_IMMEDIATE16 = -6
+.const REGA = $10000001
+.const REGX = $10000002
+.const REGY = $10000003
+.const REGZ = $10000004
+
+.const TRUE = 1
+.const FALSE = 0
+
+.function _isImm(p) {
+	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE)
+}
+.function _isAbs(p) {
+	.return (p.getType() == AT_ABSOLUTE)
+}
+.function _isAbsX(p) {
+	.return (p.getType() == AT_ABSOLUTE || p.getType() == AT_ABSOLUTEX)
+}
+.function _isAbsXY(p) {
+	.return (p.getType() == AT_ABSOLUTE || p.getType() == AT_ABSOLUTEX || p.getType() == AT_ABSOLUTEY)
+}
+.function _isAbsImm(p) {
+	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_ABSOLUTE)
+}
+.function _isImmOrNone(p) {
+	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_NONE)
+}
+.function _isAbsImmOrNone(p) {
+	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_ABSOLUTE || p.getType() == AT_NONE)
+}
+.function _isReg(p) {
+	.return (p.getType() == AT_ABSOLUTE  && p.getValue() >=REGA && p.getValue() <= REGZ)
+}
+.macro _saveReg(p) {
+	.if(!_isReg(p)) .error "_saveReg: Cannot use saveReg as value is not a register"
+	.if(p.getValue() == REGA) sta S65_PseudoReg 
+	.if(p.getValue() == REGX) stx S65_PseudoReg 
+	.if(p.getValue() == REGY) sty S65_PseudoReg 
+	.if(p.getValue() == REGZ) stz S65_PseudoReg 
+}
+
 
 ////////////////////////////////////////////
 //Base page vars
@@ -33,7 +75,8 @@ System_BasicUpstart65(S65_InitComplete)
  			S65_TempDword1:	.dword $00000000
  			S65_TempDword2:	.dword $00000000
  			S65_TempWord1:	.word $0000
-///////////////////////////////////////////// 11 bytes
+ 			S65_PseudoReg:	.byte $00
+///////////////////////////////////////////// 12 bytes
 
 //Macros only				
 #import "includes/s65/common.s"
@@ -75,6 +118,10 @@ S65: {
 			lda #$80		
 			trb $d031 
 
+			//Set VIC3 ATTR register to enable 8bit color
+			lda #$20 
+			tsb $d031
+
 			//Turn on FCM mode and
 			//16bit per char number
 			//bit 0 = Enable 16 bit char numbers
@@ -82,6 +129,9 @@ S65: {
 			//bit 2 = Enable Fullcolor for chars >$ff
 			lda #$05
 			sta $d054
+
+			System_EnableFastRRB()
+			
 			rts
 	}
 

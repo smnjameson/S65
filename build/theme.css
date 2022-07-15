@@ -19,9 +19,22 @@ h4 {
 
 
 
+.sectionButtonContainer {
+	display:  flex;
+	font-size: 10pt;
+}
 
-
-
+.sectionButton {
+    min-width: 75px;
+    color: #fff;
+    background: #97B;
+    margin: 2px;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.5em;
+    padding: 5px;
+    border-radius: 5px;
+}
 
 .categoryHeader {
 	border-radius:  5px;
