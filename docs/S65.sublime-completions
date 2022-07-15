@@ -108,8 +108,8 @@
         },
         {
             "trigger": "Layer_DefineBGLayer",
-            "annotation": "charWidth:charHeight:offsetX",
-            "contents": "Layer_DefineBGLayer ${1:charWidth} : ${2:charHeight} : ${3:offsetX}",
+            "annotation": "charWidth:charHeight:offsetX:ncm",
+            "contents": "Layer_DefineBGLayer ${1:charWidth} : ${2:charHeight} : ${3:offsetX} : ${4:ncm}",
             "kind": "snippet",
             "details": "Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time."
         },
@@ -122,8 +122,8 @@
         },
         {
             "trigger": "Layer_DefineScreenLayer",
-            "annotation": "charWidth:offsetX",
-            "contents": "Layer_DefineScreenLayer ${1:charWidth} : ${2:offsetX}",
+            "annotation": "charWidth:offsetX:ncm",
+            "contents": "Layer_DefineScreenLayer ${1:charWidth} : ${2:offsetX} : ${3:ncm}",
             "kind": "snippet",
             "details": "Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset."
         },

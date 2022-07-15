@@ -1,7 +1,6 @@
-// #define NODEBUG
-
-
 #import "includes/s65/s65.s"
+
+
 	.const SCREEN_RAM = $8000
 
 	.const LayerBG = 0

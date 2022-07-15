@@ -11,6 +11,7 @@ class CustomCompletionListener(sublime_plugin.EventListener):
 
 
 
+
 class AddKickDocCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         # Walk through each region in the selection
@@ -61,6 +62,18 @@ class AddKickDocCommand(sublime_plugin.TextCommand):
                     params=splitsig[1].split(',')
                     self.view.insert(edit, line.begin(), self.getfunction(name, namespace, params))
                     return
+
+            else:
+                #DEEBUG prints
+       
+                sel = self.view.sel()
+                region1 = sel[0]
+                selectionText = self.view.substr(region1)
+                print(selectionText)
+                line = self.view.line(region)
+                self.view.insert(edit, line.begin(), 
+                    '''.print ("%s: $" + toHexString(%s))\n''' % (selectionText, selectionText)
+                )
 
 
     @classmethod

@@ -52,7 +52,10 @@
  * @param {string} str The string to output in the console
  */
 .macro S65_Trace(str) {
-	.print "-=[S65]=- "+str
+    #if NODEBUG
+    #else
+	   .print "-=[S65]=- "+str
+    #endif
 }
 
 
@@ -121,18 +124,24 @@ _S65_SetBasePage: {
 */
 .macro S65_MemoryReport() {
 
-    S65_Trace("Method MemoryReport")
+    S65_Trace("Memory Report")
     S65_Trace("============================")
-    S65_Trace("")
+    S65_Trace("Total   Count:Avg     Method")
+    S65_Trace("-----   ---------     ------")
     .var keys = _MemoryReport.keys()
     .for (var i=0; i<keys.size(); i++) {
         .var ht = _MemoryReport.get(keys.get(i))
-        S65_Trace(keys.get(i) + " called " + ht.get("count")+ " times.")
-        S65_Trace("    Total memory used $"+ toHexString(ht.get("bytes"))+" bytes")
-        S65_Trace("    Average per call  $"+ toHexString(floor(ht.get("bytes") / ht.get("count")))+" bytes")
-        S65_Trace("")
+        .if(keys.get(i) != "Layer_DynamicDataAndIO") {
+            S65_Trace("$"+toHexString(ht.get("bytes"),4)+"  ($"+toHexString(ht.get("count"),2)+":$"+toHexString(floor(ht.get("bytes") / ht.get("count")),4) + ")    "+keys.get(i))
+        }
     }
-    S65_Trace("")
+    S65_Trace("")   
+    S65_Trace("Summary:")
+    S65_Trace("    S65 Base Library $2001-$"+ toHexString( S65_InitComplete) + " ($" + toHexString( S65_InitComplete - $2001) + " bytes)")
+    S65_Trace("    Total program memory used $"+ toHexString( * - S65_InitComplete))
+    S65_Trace("        of which:")
+    .var _dynamicDataIO = _MemoryReport.get("Layer_DynamicDataAndIO")
+    S65_Trace("        Dynamic IO and data $"+toHexString(_dynamicDataIO.get("bytes")))
     S65_Trace("============================")    
 }
 .const _MemoryReport = Hashtable()

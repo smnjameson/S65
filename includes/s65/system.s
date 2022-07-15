@@ -141,3 +141,50 @@
 }
 
 
+/**
+* .macro WaitForRaster
+*
+* Halts execution and waits for the given raster line
+* 
+* @namespace System
+*
+* @param {byte} raster The line to wait for
+*
+* @registers A
+* @flags czn
+*/
+.macro System_WaitForRaster(raster) {
+
+    .if(raster>=$100) {
+        !:
+            lda $d011
+            bpl !-
+    }
+    !:
+        lda #raster
+        cmp $d012 
+        bne !-
+}
+
+/**
+* .macro BorderDebug
+*
+* If the preprocessor #define NODEBUG is not defined
+* this will set the border color to the give value. Useful 
+* for debugging
+* 
+* @namespace System
+*
+* @param {byte} color The color to set the border
+*
+* @registers A
+* @flags zn
+*/
+.macro System_BorderDebug(color) {
+    #if NODEBUG
+    #else
+        lda #color
+        sta $d020
+    #endif
+}
+

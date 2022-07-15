@@ -780,7 +780,7 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineBGLayer <i>charWidth</i> : <i>charHeight</i> : <i>offsetX</i></div>
+						<div class='macroUsage'>Layer_DefineBGLayer <i>charWidth</i> : <i>charHeight</i> : <i>offsetX</i> : <i>ncm</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -794,6 +794,10 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} offsetX - The new RRB GotoX position to set for this layer, defaults to 0</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{bool} {IMM} ncm - NCM enabled for this layer, defaults to FALSE</div></span>
 						</div>
 					
 						
@@ -874,7 +878,7 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineScreenLayer <i>charWidth</i> : <i>offsetX</i></div>
+						<div class='macroUsage'>Layer_DefineScreenLayer <i>charWidth</i> : <i>offsetX</i> : <i>ncm</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -884,6 +888,10 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} offsetX - The new RRB GotoX position to set for this layer</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{bool} {IMM} ncm - NCM enabled for this layer, defaults to FALSE</div></span>
 						</div>
 					
 						

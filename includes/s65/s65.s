@@ -72,25 +72,29 @@ System_BasicUpstart65(S65_InitComplete)
 .align $20 //Ensure theres enough room in the page for the base vars
 .var 		S65_BASEPAGE = [* >> 8]		//Gets the page# of this address
 				
+			S65_BaseScreenRamPointer: .dword $00000000
+			S65_BaseColorRamPointer: .dword $00000000
 			S65_ScreenRamPointer: .dword $00000000
 			S65_ColorRamPointer: .dword $00000000
 
- 			S65_TempDword1:	.dword $00000000
- 			S65_TempDword2:	.dword $00000000
-
- 			S65_TempWord1:	.word $0000
-
- 			S65_TempByte1:	.byte $00
-
+			S65_DynamicLayerData: .word $0000
  			S65_PseudoReg:	.byte $00
  			S65_LastBasePage: .byte $00
-///////////////////////////////////////////// 21 bytes
 
-//Macros only				
+ 			S65_TempDword1:	.dword $00000000
+ 			S65_TempDword2:	.dword $00000000
+ 			S65_TempWord1:	.word $0000
+ 			S65_TempByte1:	.byte $00
+
+
+///////////////////////////////////////////// 31 bytes
+
+				
 #import "includes/s65/common.s"
+#import "includes/s65/layer.s"
+
 #import "includes/s65/system.s"
 #import "includes/s65/dma.s"
-#import "includes/s65/layer.s"
 
 S65: {
 	Init: {
@@ -149,12 +153,5 @@ S65: {
 
 //This label S65_InitComplete MUST always be at the end of the library 
 //as it is where the program continues execution when initialised
-S65_Trace("============================")
-S65_Trace("          Summary")
-S65_Trace("============================")
-S65_Trace("")
-S65_Trace("S65 Base Library $2001-$"+toHexString(*))
-S65_Trace("")
-S65_Trace("============================")
 S65_InitComplete:
 

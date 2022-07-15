@@ -32,6 +32,7 @@
 .var Layer_LayerList = List()
 
 
+S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 /**
 * .var DynamicDataIndex
 *
@@ -54,7 +55,6 @@
  * 
  * @addr {word} $00 Layer X position
  */
-  .print "Layer_GotoXPositions $"+toHexString(*)
 Layer_GotoXPositions:
 	.fill $40, 00
 
@@ -67,11 +67,10 @@ Layer_GotoXPositions:
  * 
  * @addr {word} $00 Layer start address byte offset
  */
- .print "Layer_AddrOffsets $"+toHexString(*)
 Layer_AddrOffsets:
 	.fill $40, 00
 
-
+S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 
 
 
@@ -91,6 +90,7 @@ Layer_AddrOffsets:
 * @flags zn
 */
 .pseudocommand Layer_ClearAllLayers clearChar {
+	S65_AddToMemoryReport("Layer_ClearAllLayers")
 			.if(_isReg(clearChar)) {
 				 _saveReg(clearChar)
 			} else {
@@ -132,6 +132,7 @@ Layer_AddrOffsets:
 				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
 			}
 		end:
+	S65_AddToMemoryReport("Layer_ClearAllLayers")
 }
 
 
@@ -147,13 +148,15 @@ Layer_AddrOffsets:
   * @param {byte} {IMM} charWidth The screen base visible width in chars
   * @param {byte} {IMM} charHeight The screen base visible height in chars
   * @param {word?} {IMM} offsetX The new RRB GotoX position to set for this layer, defaults to 0
+  * @param {bool?} {IMM} ncm NCM enabled for this layer, defaults to FALSE
   * 
   * @registers A
   * @flags nz
   * 
   * @setreg {byte} A The layer number this layer was created at
   */
-.pseudocommand Layer_DefineBGLayer charWidth : charHeight : offsetX {
+.pseudocommand Layer_DefineBGLayer charWidth : charHeight : offsetX : ncm {
+	S65_AddToMemoryReport("Layer_DefineBGLayer")
 	.var index = Layer_LayerList.size()
 	.if(index != 0) {
 		.error("Can only define a single BG layer.")
@@ -161,6 +164,7 @@ Layer_AddrOffsets:
  	.if(!_isImm(charWidth)) .error "Layer_DefineBGLayer: charWidth Only supports AT_IMMEDIATE"
  	.if(!_isImm(charHeight)) .error "Layer_DefineBGLayer: charHeight Only supports AT_IMMEDIATE"
  	.if(!_isImmOrNone(offsetX)) .error "Layer_DefineBGLayer: offsetX Only supports AT_IMMEDIATE or AT_NONE"
+ 	.if(!_isImmOrNone(ncm)) .error "Layer_DefineBGLayer: ncm Only supports AT_IMMEDIATE or AT_NONE"
 
 
 	.eval S65_VISIBLE_SCREEN_CHAR_WIDTH = charWidth.getValue()
@@ -175,6 +179,7 @@ Layer_AddrOffsets:
 	.eval Layer_LayerList.get(index).put("startAddr", 2 )
 	.eval Layer_LayerList.get(index).put("charWidth", charWidth.getValue())
 	.eval Layer_LayerList.get(index).put("offsetX", offsetX.getValue())
+	.eval Layer_LayerList.get(index).put("ncm", ncm.getValue() == 1)
 
 	lda #$00
 	sta Layer_AddrOffsets + 0
@@ -185,6 +190,8 @@ Layer_AddrOffsets:
 	lda #>offsetX.getValue()
 	sta Layer_GotoXPositions + 1
 	lda #index
+
+	S65_AddToMemoryReport("Layer_DefineBGLayer")
 }
 
 
@@ -201,10 +208,13 @@ Layer_AddrOffsets:
  * 
  * @param {byte} {IMM} charWidth The screen layers width in chars
  * @param {word?} {IMM} offsetX The new RRB GotoX position to set for this layer
+ * @param {bool?} {IMM} ncm NCM enabled for this layer, defaults to FALSE
  * 
  * @setreg {byte} A The layer number this layer was created at
  */
- .pseudocommand Layer_DefineScreenLayer charWidth : offsetX {
+ .pseudocommand Layer_DefineScreenLayer charWidth : offsetX : ncm {
+ 	S65_AddToMemoryReport("Layer_DefineBGLayer")
+
  		.var cw = charWidth.getValue()
  		.var t_cw = charWidth.getType()
  		.var ox = offsetX.getValue()
@@ -212,6 +222,7 @@ Layer_AddrOffsets:
 
 	 	.if(!_isImm(charWidth)) .error "Layer_DefineScreenLayer: charWidth Only supports AT_IMMEDIATE"
 	 	.if(!_isImmOrNone(offsetX)) .error "Layer_DefineScreenLayer: offsetX Only supports AT_IMMEDIATE or AT_NONE"
+	 	.if(!_isImmOrNone(ncm)) .error "Layer_DefineScreenLayer: ncm Only supports AT_IMMEDIATE or AT_NONE"
 
 		.var index = Layer_LayerList.size()
 		.if(offsetX.getType() == AT_NONE) {
@@ -228,6 +239,7 @@ Layer_AddrOffsets:
 		.eval Layer_LayerList.get(index).put("startAddr", S65_SCREEN_LOGICAL_ROW_WIDTH + 2 )
 		.eval Layer_LayerList.get(index).put("charWidth", cw )
 		.eval Layer_LayerList.get(index).put("offsetX", ox )
+		.eval Layer_LayerList.get(index).put("ncm", ncm.getValue() == 1)
 
 		lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
 		sta [Layer_AddrOffsets + index * 2]
@@ -243,6 +255,7 @@ Layer_AddrOffsets:
 		sta Layer_GotoXPositions + index * 2 + 1	
 
 		lda #index
+	S65_AddToMemoryReport("Layer_DefineBGLayer")
  }
 
 
@@ -267,6 +280,8 @@ Layer_AddrOffsets:
  * @setreg {byte} A The layer number this layer was created at
  */
 .pseudocommand Layer_DefineRRBSpriteLayer maxSprites : charsPerLine {
+	S65_AddToMemoryReport("Layer_DefineBGLayer")
+
 	.var index = Layer_LayerList.size()
 
 
@@ -286,6 +301,7 @@ Layer_AddrOffsets:
 	.eval Layer_LayerList.get(index).put("startAddr", S65_SCREEN_LOGICAL_ROW_WIDTH)
 	.eval Layer_LayerList.get(index).put("gotoX", S65_SCREEN_LOGICAL_ROW_WIDTH )
 	.eval Layer_LayerList.get(index).put("offsetX", $01ff)
+	.eval Layer_LayerList.get(index).put("ncm", true)
 
 	lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
 	sta [Layer_AddrOffsets + index * 2]
@@ -301,6 +317,8 @@ Layer_AddrOffsets:
 	.eval S65_SCREEN_LOGICAL_ROW_WIDTH = S65_SCREEN_ROW_WIDTH * 2 //16bit chars	
 
 	lda #index
+
+	S65_AddToMemoryReport("Layer_DefineBGLayer")
 }
 
 
@@ -317,72 +335,66 @@ Layer_AddrOffsets:
 * @flags znc
 */
 .pseudocommand Layer_UpdateLayerOffsets {
+		S65_AddToMemoryReport("Layer_UpdateLayerOffsets")
+		jsr _Layer_UpdateLayerOffsets
+		S65_AddToMemoryReport("Layer_UpdateLayerOffsets")
+}
+_Layer_UpdateLayerOffsets: {
 		phx 
 		phy
 		phz
 
+		.const DYN_TABLE = S65_TempWord1
 		S65_SetBasePage()
 			//Transfer the GOTOX values from the dynamic IO
 			ldy #$00
 			ldx #$00
+			ldz #$00
 		!loop:
-			lda Layer_DynamicDataIndex, x
-			inx
-			sta.z S65_TempWord1 + 0
-			lda Layer_DynamicDataIndex, x
-			sta.z S65_TempWord1 + 1
-			dex
-
-			lda.z (S65_TempWord1), y 
+			lda (S65_DynamicLayerData), y
 			iny
-			sta Layer_GotoXPositions, x
-			inx 
-			lda.z (S65_TempWord1), y 
-			and #$03 //Clamp the value to only use the first 2 bits	
+			sta.z DYN_TABLE + 0
+			lda (S65_DynamicLayerData), y
 			dey
-			sta Layer_GotoXPositions, x 
+			sta.z DYN_TABLE + 1
+
+			//yreg = 0 {word} Layer_IOGotoX
+			lda (DYN_TABLE), z
+			inz
+			sta Layer_GotoXPositions, y
+			inx 
+			iny
+			lda (DYN_TABLE), z 
+			dez
+			and #$03 //Clamp the value to only use the first 2 bits	
+			sta Layer_GotoXPositions, y 
+			iny
 			inx
-			cpx #[Layer_LayerList.size() * 2]
+			cpx ListSize0:#$BEEF
 			bne !loop-
 
-
-
-			.const COLOR_PTR = S65_TempDword1
-			.const SCREEN_PTR = S65_TempDword2
- 		
 			//add the rrb GOTOX markers
-			ldx #$00
+			ldx #$02
 		!outerLoop:
 			clc 
-			lda Layer_AddrOffsets, x
-			adc #<S65_COLOR_RAM
+			lda Layer_AddrOffsets, x//0
+			adc.z S65_BaseColorRamPointer + 0
 			inx
-			sta COLOR_PTR + 0
-			lda Layer_AddrOffsets, x
-			adc #>S65_COLOR_RAM
-			sta COLOR_PTR + 1
-			lda #[S65_COLOR_RAM >> 16]
-			adc #$00
-			sta COLOR_PTR + 2
-			lda #[S65_COLOR_RAM >> 24]
-			sta COLOR_PTR + 3
+			sta S65_ColorRamPointer + 0
+			lda Layer_AddrOffsets, x//1
+			adc.z S65_BaseColorRamPointer + 1
+			sta S65_ColorRamPointer + 1
 			dex
 
 			clc 
-			lda Layer_AddrOffsets, x
-			adc #<S65_SCREEN_RAM
+			lda Layer_AddrOffsets, x//0
+			adc.z S65_BaseScreenRamPointer + 0
 			inx
-			sta SCREEN_PTR + 0
-			lda Layer_AddrOffsets, x
-			adc #>S65_SCREEN_RAM
-			sta SCREEN_PTR + 1
-			lda #[S65_SCREEN_RAM >> 16]
-			adc #$00
-			sta SCREEN_PTR + 2
-			lda #[S65_SCREEN_RAM >> 24]
-			sta SCREEN_PTR + 3
+			sta S65_ScreenRamPointer + 0
+			lda Layer_AddrOffsets, x//1
+			adc.z S65_BaseScreenRamPointer + 1
+			sta S65_ScreenRamPointer + 1
 			dex
-
 
 				ldy #S65_VISIBLE_SCREEN_CHAR_HEIGHT
 			!loop:
@@ -393,55 +405,49 @@ Layer_AddrOffsets:
 				beq !+
 				lda #$90 //All other layers transparent
 			!:
-				sta ((COLOR_PTR)), z 
+
+
+				sta ((S65_ColorRamPointer)), z 
 				inz
 				lda #$00
-				sta ((COLOR_PTR)), z 
+				sta ((S65_ColorRamPointer)), z 
+				dez
 
 				//next row
 				clc 
-				lda COLOR_PTR + 0
+				lda.z S65_ColorRamPointer + 0
 				adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta COLOR_PTR + 0
-				lda COLOR_PTR + 1
+				sta.z S65_ColorRamPointer + 0
+				lda.z S65_ColorRamPointer + 1
 				adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta COLOR_PTR + 1		
-				bcc !+
-				inc COLOR_PTR + 2				
-			!:
+				sta.z S65_ColorRamPointer + 1		
 
 				//SCREEN RAM
-				dez
-				lda Layer_GotoXPositions, x
+				lda Layer_GotoXPositions, x//0
 				inx
-				sta ((SCREEN_PTR)), z 
+				sta ((S65_ScreenRamPointer)), z 
 				inz
-				lda ((SCREEN_PTR)), z
+				lda ((S65_ScreenRamPointer)), z
 				and #%11111100
-				ora Layer_GotoXPositions, x
+				ora Layer_GotoXPositions, x//1
 				dex
-				sta ((SCREEN_PTR)), z 
+				sta ((S65_ScreenRamPointer)), z 
 
 				//next row
 				clc 
-				lda SCREEN_PTR + 0
+				lda.z S65_ScreenRamPointer + 0
 				adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta SCREEN_PTR + 0
-				lda SCREEN_PTR + 1
+				sta.z S65_ScreenRamPointer + 0
+				lda.z S65_ScreenRamPointer + 1
 				adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta SCREEN_PTR + 1		
-				bcc !+
-				inc SCREEN_PTR + 2
-			!:
-
-				// jmp *
+				sta.z S65_ScreenRamPointer + 1		
 
 				dey 
 				bne !loop-
 
 				inx
 				inx
-			cpx #[[Layer_LayerList.size() + 1]* 2] //Include the terminating block
+			cpx ListSize1:#$BEEF
 			lbcc !outerLoop-
 		!end:
 		S65_RestoreBasePage()
@@ -449,7 +455,9 @@ Layer_AddrOffsets:
 		plz
 		ply
 		plx
+		rts
 }
+
 
 
 
@@ -468,11 +476,13 @@ Layer_AddrOffsets:
  * @flags znc
  */
 .pseudocommand Layer_InitScreen screenBaseAddress {
+	S65_AddToMemoryReport("Layer_InitScreen")
 	.const GOTOX = 1
 
 	.if(!_isImm(screenBaseAddress)) .error "Layer_InitScreen: screenBaseAddress Only supports AT_IMMEDIATE"
 
 	.eval S65_SCREEN_RAM = screenBaseAddress.getValue()
+
 
 	//Total screen width in chars = 
 	// Base screen width +
@@ -542,15 +552,26 @@ Layer_AddrOffsets:
 	sta $d063
 
 		//Store screen and color ram address upper bytes
+		lda #<S65_SCREEN_RAM
+		sta S65_BaseScreenRamPointer + 0	
+		lda #>S65_SCREEN_RAM
+		sta S65_BaseScreenRamPointer + 1		
 		lda #[S65_SCREEN_RAM >> 16]
+		sta S65_BaseScreenRamPointer + 2	
 		sta S65_ScreenRamPointer + 2
 		lda #[S65_SCREEN_RAM >> 24]
+		sta S65_BaseScreenRamPointer + 3	
 		sta S65_ScreenRamPointer + 3
 
-
+		lda #<S65_COLOR_RAM
+		sta S65_BaseColorRamPointer + 0	
+		lda #>S65_COLOR_RAM
+		sta S65_BaseColorRamPointer + 1
 		lda #[S65_COLOR_RAM >> 16]
+		sta S65_BaseColorRamPointer + 2
 		sta S65_ColorRamPointer + 2
 		lda #[S65_COLOR_RAM >> 24]
+		sta S65_BaseColorRamPointer + 3
 		sta S65_ColorRamPointer + 3
 
 	//ColorRAM initialisation
@@ -565,8 +586,26 @@ Layer_AddrOffsets:
 		//////////////////////////
 		//Sprites data
 		//////////////////////////
-		_configureDynamicData()
+		_configureDynamicData(*)
+
+		
 	end:
+		//FINAL SETUP based on previously unknown values
+
+		lda #[Layer_LayerList.size() * 2]
+		sta _Layer_UpdateLayerOffsets.ListSize0
+		lda #[Layer_LayerList.size() * 2 + 2]
+		sta _Layer_UpdateLayerOffsets.ListSize1
+
+
+.print ("Layer_DynamicDataIndex: $" + toHexString(Layer_DynamicDataIndex))
+		lda #<Layer_DynamicDataIndex 
+.print ("S65_DynamicLayerData: $" + toHexString(S65_DynamicLayerData))
+		sta S65_DynamicLayerData + 0
+		lda #>Layer_DynamicDataIndex
+		sta S65_DynamicLayerData + 1
+
+	S65_AddToMemoryReport("Layer_InitScreen")
 }
 
 
@@ -831,14 +870,16 @@ _Layer_AddText: {
  * 
  * @addr {word} Layer_IOGotoX The GOTOX value to apply to this layer
  */
-.macro _configureDynamicData() {
+.macro _configureDynamicData(pc) {
+	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
+
 	S65_Trace("Configuring dynamic layer memory...")
 	S65_Trace("")
-	S65_Trace("Layer_DynamicDataIndex $"+toHexString(DynamicDataIndex))	
+	S65_Trace("Layer_DynamicDataIndex $"+toHexString(Layer_DynamicDataIndex))	
 	S65_Trace("")	
 
 	.var layerAddr = List()
-
+	
 	.for(var i=0; i<Layer_LayerList.size(); i++) {
 		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
 			//rrb only
@@ -847,30 +888,27 @@ _Layer_AddText: {
 			//screenlayer only
 			S65_Trace("#"+i+"    $"+toHexString(*)+" Screen Layer")
 		}
-
 		.eval layerAddr.add(*)
 		//common values
 		.eval Layer_LayerList.get(i).put("dynamicDataAddr", *)
 
 		.word Layer_LayerList.get(i).get("offsetX") //GOTOX position value
-
-		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
-			//rrb only
-			
-		} else {
-			//screenlayer only
-			
-		}
 	}
 	S65_Trace("============================")
 
-	DynamicDataIndex:
-	.eval Layer_DynamicDataIndex = DynamicDataIndex
-	
-	
+	.eval Layer_DynamicDataIndex = *
 	.for(var i=0; i<layerAddr.size(); i++) {
 		.word layerAddr.get(i)
+		// .if(Layer_LayerList.get(i).get("rrbSprites") == true) {
+		// 	//rrb only
+			
+		// } else {
+		// 		//screenlayer only
+				
+		// }
 	}
+
+	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 }
 
 
