@@ -58,15 +58,23 @@
  * 
  * @namespace DMA
  * 
- * @param {byte} {IMM} sourceBank The source bank number
- * @param {byte} {IMM} destBank The destination bank number
+ * @param {byte?} {IMM} sourceBank The source bank number Defaults to 0
+ * @param {byte?} {IMM} destBank The destination bank number Defaults to 0
  */
 .pseudocommand DMA_Header sourceBank : destBank {
-    .if( !_isImm(sourceBank) || !_isImm(destBank)) .error "DMA_Header: Only supports AT_IMMEDIATE"
+    .if( !_isImmOrNone(sourceBank) || !_isImmOrNone(destBank)) .error "DMA_Header: Only supports AT_IMMEDIATE and AT_NONE"
 
     .byte $0A // Request format is F018B
-    .byte $80, sourceBank.getValue()
-    .byte $81, destBank.getValue()
+    .if(sourceBank.getType() == AT_NONE) {
+        .byte $80, $00
+    } else {
+        .byte $80, sourceBank.getValue()
+    }
+    .if(destBank.getType() == AT_NONE) {
+        .byte $81, $00
+    } else {
+        .byte $81, destBank.getValue()
+    }    
 }
 
 

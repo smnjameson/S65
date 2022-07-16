@@ -129,10 +129,12 @@ _S65_SetBasePage: {
     S65_Trace("Total   Count:Avg     Method")
     S65_Trace("-----   ---------     ------")
     .var keys = _MemoryReport.keys()
+    .var libCallsTotal = 0
     .for (var i=0; i<keys.size(); i++) {
         .var ht = _MemoryReport.get(keys.get(i))
         .if(keys.get(i) != "Layer_DynamicDataAndIO") {
             S65_Trace("$"+toHexString(ht.get("bytes"),4)+"  ($"+toHexString(ht.get("count"),2)+":$"+toHexString(floor(ht.get("bytes") / ht.get("count")),4) + ")    "+keys.get(i))
+            .eval libCallsTotal += ht.get("bytes")
         }
     }
     S65_Trace("")   
@@ -141,10 +143,24 @@ _S65_SetBasePage: {
     S65_Trace("    Total program memory used $"+ toHexString( * - S65_InitComplete))
     S65_Trace("        of which:")
     .var _dynamicDataIO = _MemoryReport.get("Layer_DynamicDataAndIO")
-    S65_Trace("        Dynamic IO and data $"+toHexString(_dynamicDataIO.get("bytes")))
+    S65_Trace("        Library calls       $"+toHexString(libCallsTotal))
+    S65_Trace("        Layer IO and data   $"+toHexString(_dynamicDataIO.get("bytes")))
     S65_Trace("============================")    
 }
 .const _MemoryReport = Hashtable()
+
+/**
+* .macro AddToMemoryReport
+*
+* Measures the byte size of a block of assembly and records
+* it in the memory report output by <a href="S65_MemoryReport">S65_MemoryReport</a><br><br>
+* Called at the start and the end of the code block you wish to measure by passing the same name
+* in both
+* 
+* @namespace S65
+*
+* @param {string} name The StringID you wish to appear in the report
+*/
 .macro S65_AddToMemoryReport(name) {
     .if(_MemoryReport.containsKey(name) == false ) {
         .eval _MemoryReport.put(name, Hashtable().put("count",0).put("bytes",0).put("start", 0))

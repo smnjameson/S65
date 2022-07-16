@@ -2,6 +2,13 @@
     "scope": "source.assembly.kickassembler",
     "completions": [
         {
+            "trigger": "S65_AddToMemoryReport",
+            "annotation": "name",
+            "contents": "S65_AddToMemoryReport(${1:name})",
+            "kind": "snippet",
+            "details": "Measures the byte size of a block of assembly and records it in the memory report output by <a href=\"S65_MemoryReport\">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both"
+        },
+        {
             "trigger": "S65_MemoryReport",
             "annotation": "",
             "contents": "S65_MemoryReport()",
@@ -184,6 +191,13 @@
             "details": "Creates the <a href='#System_BasicUpstart65_Format'>Basic Upstart</a> for the MEGA65 at location $2001 pointing to the given SYS entry address"
         },
         {
+            "trigger": "System_BorderDebug",
+            "annotation": "color",
+            "contents": "System_BorderDebug(${1:color})",
+            "kind": "snippet",
+            "details": "If the preprocessor #define NODEBUG is not defined this will set the border color to the give value. Useful for debugging"
+        },
+        {
             "trigger": "System_DisableC65ROM",
             "annotation": "",
             "contents": "System_DisableC65ROM()",
@@ -210,6 +224,13 @@
             "contents": "System_EnableVIC4()",
             "kind": "snippet",
             "details": "Switches the VIC chip in the MEGA65 into VIC4 mode."
+        },
+        {
+            "trigger": "System_WaitForRaster",
+            "annotation": "raster",
+            "contents": "System_WaitForRaster(${1:raster})",
+            "kind": "snippet",
+            "details": "Halts execution and waits for the given raster line"
         }
     ]
 }

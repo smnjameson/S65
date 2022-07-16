@@ -45,18 +45,52 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 */
 .var Layer_DynamicDataIndex = $0000
 
+// /**
+// * .var SetNCMDataDMA
+// *
+// * A pointer to the DMA job created on a <a href='#Layer_InitScreen'>Layer_InitScreen</a>
+// * which sets the ncm flag in color ram
+// * 
+// * @namespace Layer
+// *
+// */
+// .var Layer_SetNCMDataDMA = $0000
+
+/**
+ * .data LogicalWidth
+ * 
+ * Contains the current Screen Row Logical Width in bytes
+ * 
+ * @namespace Layer
+ * 
+ * @addr {word} $00 Screen Row Logical Width
+ */
+Layer_LogicalWidth:
+	.word $0000
 
 /**
  * .data GotoXPositions
  * 
- * Table of current X positions for all the layers
+ * Table of current GOTOX positions for all the layers
  * 
  * @namespace Layer
  * 
  * @addr {word} $00 Layer X position
  */
 Layer_GotoXPositions:
-	.fill $40, 00
+	.fill S65_MAX_LAYERS * 2, 00
+
+/**
+ * .data GotoXColorPositions
+ * 
+ * Table of GOTOX Attribute in color ram for each layer
+ * 
+ * @namespace Layer
+ * 
+ * @addr {word} $00 Layer X position
+ */	
+Layer_GotoXColorPositions:
+	.fill S65_MAX_LAYERS * 2, 00
 
 /**
  * .data AddrOffsets
@@ -68,7 +102,7 @@ Layer_GotoXPositions:
  * @addr {word} $00 Layer start address byte offset
  */
 Layer_AddrOffsets:
-	.fill $40, 00
+	.fill S65_MAX_LAYERS * 2, 00
 
 S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 
@@ -123,10 +157,10 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 				DMA_Step #$0100 : #$0200 
 
 				.label Job1_Source = * + $04
-				DMA_FillJob #<clearChar.getValue() : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #TRUE
+				DMA_FillJob #<clearChar.getValue() : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE/2 : #TRUE
 
 				.label Job2_Source = * + $04		
-				DMA_FillJob #>clearChar.getValue() : S65_SCREEN_RAM + 1 : #SCREEN_BYTE_SIZE : #FALSE
+				DMA_FillJob #>clearChar.getValue() : S65_SCREEN_RAM + 1 : #SCREEN_BYTE_SIZE/2 : #FALSE
 
 			} else {
 				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
@@ -134,8 +168,6 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 		end:
 	S65_AddToMemoryReport("Layer_ClearAllLayers")
 }
-
-
 
  /**
   * .pseudocommand DefineBGLayer
@@ -185,10 +217,28 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	sta Layer_AddrOffsets + 0
 	sta Layer_AddrOffsets + 1
 
+	//screen ram
 	lda #<offsetX.getValue()
 	sta Layer_GotoXPositions + 0
 	lda #>offsetX.getValue()
 	sta Layer_GotoXPositions + 1
+
+	//color ram
+	.var colRamB0 = $10 //GOTOX On!
+	.var colRamB1 = $00 //This byte is actually for the data not the gotox header
+	.if(index == 0) {
+		.eval colRamB0 = colRamB0 | $80 //Transparency
+	}
+	.if(ncm.getValue() == 1) {
+		.eval colRamB1 = colRamB1 | $08
+	}
+	lda #colRamB0
+	sta Layer_GotoXColorPositions + 0
+	lda #colRamB1
+	sta Layer_GotoXColorPositions + 1
+
+
+
 	lda #index
 
 	S65_AddToMemoryReport("Layer_DefineBGLayer")
@@ -249,10 +299,25 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 		.eval S65_SCREEN_ROW_WIDTH += cw + 1 //add a gotox
 		.eval S65_SCREEN_LOGICAL_ROW_WIDTH = S65_SCREEN_ROW_WIDTH * 2 //16bit chars
 
+		//screen ram
 		lda #<offsetX.getValue()
 		sta Layer_GotoXPositions + index * 2
 		lda #>offsetX.getValue()
 		sta Layer_GotoXPositions + index * 2 + 1	
+
+		//color ram
+		.var colRamB0 = $10 //GOTOX On!
+		.var colRamB1 = $00 //This byte is actually for the data not the gotox header
+		.if(index == 0) {
+			.eval colRamB0 = colRamB0 | $80 //Transparency
+		}
+		.if(ncm.getValue() == 1) {
+			.eval colRamB1 = colRamB1 | $08
+		}
+		lda #colRamB0
+		sta Layer_GotoXColorPositions + 0
+		lda #colRamB1
+		sta Layer_GotoXColorPositions + 1
 
 		lda #index
 	S65_AddToMemoryReport("Layer_DefineBGLayer")
@@ -308,13 +373,22 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	lda #>S65_SCREEN_LOGICAL_ROW_WIDTH
 	sta [Layer_AddrOffsets + index * 2 + 1]
 
+	.eval S65_SCREEN_ROW_WIDTH += cpl
+	.eval S65_SCREEN_LOGICAL_ROW_WIDTH = S65_SCREEN_ROW_WIDTH * 2 //16bit chars	
+
+	//screen ram
 	lda #$00
 	sta Layer_GotoXPositions + index * 2
 	lda #$00
 	sta Layer_GotoXPositions + index * 2 + 1
 
-	.eval S65_SCREEN_ROW_WIDTH += cpl
-	.eval S65_SCREEN_LOGICAL_ROW_WIDTH = S65_SCREEN_ROW_WIDTH * 2 //16bit chars	
+	//color ram
+	.var colRamB0 = $90 //RRB sprite layer default is always transparent and offscreen
+	.var colRamB1 = $08 //This byte is actually for the data not the gotox header and this layer is NCM on!
+	lda #colRamB0
+	sta Layer_GotoXColorPositions + 0
+	lda #colRamB1
+	sta Layer_GotoXColorPositions + 1
 
 	lda #index
 
@@ -373,27 +447,31 @@ _Layer_UpdateLayerOffsets: {
 			cpx ListSize0:#$BEEF
 			bne !loop-
 
+
+
 			//add the rrb GOTOX markers
-			ldx #$02
+			.var offset = 0
+			ldx #$00
 		!outerLoop:
+ 
 			clc 
 			lda Layer_AddrOffsets, x//0
 			adc.z S65_BaseColorRamPointer + 0
 			inx
-			sta S65_ColorRamPointer + 0
+			sta.z S65_ColorRamPointer + 0
 			lda Layer_AddrOffsets, x//1
 			adc.z S65_BaseColorRamPointer + 1
-			sta S65_ColorRamPointer + 1
+			sta.z S65_ColorRamPointer + 1
 			dex
 
 			clc 
 			lda Layer_AddrOffsets, x//0
 			adc.z S65_BaseScreenRamPointer + 0
 			inx
-			sta S65_ScreenRamPointer + 0
+			sta.z S65_ScreenRamPointer + 0
 			lda Layer_AddrOffsets, x//1
 			adc.z S65_BaseScreenRamPointer + 1
-			sta S65_ScreenRamPointer + 1
+			sta.z S65_ScreenRamPointer + 1
 			dex
 
 				ldy #S65_VISIBLE_SCREEN_CHAR_HEIGHT
@@ -406,21 +484,11 @@ _Layer_UpdateLayerOffsets: {
 				lda #$90 //All other layers transparent
 			!:
 
-
 				sta ((S65_ColorRamPointer)), z 
 				inz
 				lda #$00
 				sta ((S65_ColorRamPointer)), z 
-				dez
-
-				//next row
-				clc 
-				lda.z S65_ColorRamPointer + 0
-				adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta.z S65_ColorRamPointer + 0
-				lda.z S65_ColorRamPointer + 1
-				adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta.z S65_ColorRamPointer + 1		
+				dez	
 
 				//SCREEN RAM
 				lda Layer_GotoXPositions, x//0
@@ -433,14 +501,24 @@ _Layer_UpdateLayerOffsets: {
 				dex
 				sta ((S65_ScreenRamPointer)), z 
 
+
 				//next row
-				clc 
+				clc
+				lda.z S65_ColorRamPointer + 0
+				adc Layer_LogicalWidth + 0
+				sta.z S65_ColorRamPointer + 0
+				lda.z S65_ColorRamPointer + 1
+				adc Layer_LogicalWidth + 1
+				sta.z S65_ColorRamPointer + 1
+
+				clc
 				lda.z S65_ScreenRamPointer + 0
-				adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
+				adc Layer_LogicalWidth + 0
 				sta.z S65_ScreenRamPointer + 0
 				lda.z S65_ScreenRamPointer + 1
-				adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta.z S65_ScreenRamPointer + 1		
+				adc Layer_LogicalWidth + 1
+				sta.z S65_ScreenRamPointer + 1
+
 
 				dey 
 				bne !loop-
@@ -448,7 +526,7 @@ _Layer_UpdateLayerOffsets: {
 				inx
 				inx
 			cpx ListSize1:#$BEEF
-			lbcc !outerLoop-
+			bcc !outerLoop-
 		!end:
 		S65_RestoreBasePage()
 
@@ -574,28 +652,40 @@ _Layer_UpdateLayerOffsets: {
 		sta S65_BaseColorRamPointer + 3
 		sta S65_ColorRamPointer + 3
 
+		lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
+		sta Layer_LogicalWidth + 0
+		lda #>S65_SCREEN_LOGICAL_ROW_WIDTH
+		sta Layer_LogicalWidth + 1
+
 	//ColorRAM initialisation
 		.const SCREEN_BYTE_SIZE = S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT
 		DMA_Execute job
+		
+		//FINAL SETUP based on previously unknown values
+		_configureCharModes()
+
+		lda #[Layer_LayerList.size() * 2]
+		sta _Layer_UpdateLayerOffsets.ListSize0
+		lda #[Layer_LayerList.size() * 2 + 2]
+		sta _Layer_UpdateLayerOffsets.ListSize1
+
 		jmp end
+
 	job:
 		DMA_Header #$00 : #$ff
 		DMA_FillJob #0 : S65_COLOR_RAM : #SCREEN_BYTE_SIZE : #FALSE			
+
+	S65_AddToMemoryReport("Layer_InitScreen")
 
 		//This area can be used for dynamic memory based on the size of layers and sprites
 		//////////////////////////
 		//Sprites data
 		//////////////////////////
 		_configureDynamicData(*)
-
 		
 	end:
-		//FINAL SETUP based on previously unknown values
+		
 
-		lda #[Layer_LayerList.size() * 2]
-		sta _Layer_UpdateLayerOffsets.ListSize0
-		lda #[Layer_LayerList.size() * 2 + 2]
-		sta _Layer_UpdateLayerOffsets.ListSize1
 
 
 .print ("Layer_DynamicDataIndex: $" + toHexString(Layer_DynamicDataIndex))
@@ -909,6 +999,87 @@ _Layer_AddText: {
 	}
 
 	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
+}
+
+
+
+.macro _configureCharModes() {
+		S65_SetBasePage()
+		S65_RestoreBasePage()
+		//reset color ram pointer
+		lda S65_BaseColorRamPointer + 0
+		sta S65_ColorRamPointer + 0
+		lda S65_BaseColorRamPointer + 1
+		sta S65_ColorRamPointer + 1
+
+		//prepare values
+		
+
+
+
+		//loop through screen rows
+		ldx #$00 //row
+	!rows:
+		
+
+		//loop through layers
+		ldy #$00
+	!loop:
+				//move to the start off this layers row
+				clc
+				lda S65_ColorRamPointer + 0
+				adc layer_offsetAdd, y
+				sta S65_ColorRamPointer + 0
+				bcc !+
+				inc S65_ColorRamPointer + 1	
+			!:
+
+				//fill this layers row only
+				ldz #$00
+			!:
+				lda layer_src, y
+				sta ((S65_ColorRamPointer)), z 
+				inz 
+				lda #$00
+				sta ((S65_ColorRamPointer)), z 
+				inz 
+				tza
+				cmp layer_width, y
+				bne !-
+
+		iny
+		cpy #[Layer_LayerList.size()]
+		bcc !loop-
+
+		//advance to the nexxt screen row
+		clc
+		lda S65_ColorRamPointer + 0
+		adc layer_offsetAdd, y
+		sta S65_ColorRamPointer + 0
+		bcc !+
+		inc S65_ColorRamPointer + 1	
+	!:
+
+		inx 
+		cpx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		bne !rows-
+		bra end
+
+		//Tables
+		layer_src: 
+				.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("ncm") ? $08: $00
+		layer_width: 
+				.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("charWidth") * 2
+		layer_offsetAdd: 
+			.var layerOffset = 0
+			.for(var i=0; i<Layer_LayerList.size(); i++) {
+				.var layer = Layer_LayerList.get(i)
+				.byte [layer.get("startAddr") - layerOffset]
+				.if( i == Layer_LayerList.size()-1) .byte [[layer.get("charWidth") * 2] + 4]
+				.eval layerOffset = layer.get("startAddr")
+			}
+
+	end:
 }
 
 

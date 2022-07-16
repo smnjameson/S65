@@ -166,6 +166,8 @@ h4 {
 		
 				<div class='macroHeader' id='Global_Macros'>Macros</div>
 			
+					<div class='macroIndex'><a href='#Global_AddToMemoryReport'>AddToMemoryReport</a></div>
+				
 					<div class='macroIndex'><a href='#Global_MemoryReport'>MemoryReport</a></div>
 				
 					<div class='macroIndex'><a href='#Global_RestoreBasePage'>RestoreBasePage</a></div>
@@ -176,6 +178,25 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Global_Trace'>Trace</a></div>
 				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_AddToMemoryReport'>AddToMemoryReport
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Measures the byte size of a block of assembly and records it in the memory report output by <a href="S65_MemoryReport">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_AddToMemoryReport(<i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The StringID you wish to appear in the report</div></span>
+						</div>
+					
+						
+						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_MemoryReport'>MemoryReport
 							<div class='macroItemSubHeader'>
@@ -520,11 +541,11 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} sourceBank - The source bank number</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} sourceBank - The source bank number Defaults to 0</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} destBank - The destination bank number</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} destBank - The destination bank number Defaults to 0</div></span>
 						</div>
 					
 						
@@ -1057,9 +1078,13 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Layer_AddrOffsets'>AddrOffsets</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_GotoXColorPositions'>GotoXColorPositions</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_GotoXPositions'>GotoXPositions</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_IO'>IO</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_LogicalWidth'>LogicalWidth</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_AddrOffsets'>AddrOffsets</div>
@@ -1074,8 +1099,20 @@ h4 {
 					
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_GotoXColorPositions'>GotoXColorPositions</div>
+						<div class='macroItemDescription'> Table of GOTOX Attribute in color ram for each layer   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_GotoXColorPositions</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} $00 - Layer X position</div></span>
+						
+						</div>
+					
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_GotoXPositions'>GotoXPositions</div>
-						<div class='macroItemDescription'> Table of current X positions for all the layers   </div>
+						<div class='macroItemDescription'> Table of current GOTOX positions for all the layers   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_GotoXPositions</div>						
 						
@@ -1093,6 +1130,18 @@ h4 {
 						
 						<div class='macroUsage'>
 						<span><div class='paramHeader'>{word} Layer_IOGotoX - The GOTOX value to apply to this layer</div></span>
+						
+						</div>
+					
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_LogicalWidth'>LogicalWidth</div>
+						<div class='macroItemDescription'> Contains the current Screen Row Logical Width in bytes   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_LogicalWidth</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} $00 - Screen Row Logical Width</div></span>
 						
 						</div>
 					
@@ -1274,6 +1323,8 @@ h4 {
 			
 					<div class='macroIndex'><a href='#System_BasicUpstart65'>BasicUpstart65</a></div>
 				
+					<div class='macroIndex'><a href='#System_BorderDebug'>BorderDebug</a></div>
+				
 					<div class='macroIndex'><a href='#System_DisableC65ROM'>DisableC65ROM</a></div>
 				
 					<div class='macroIndex'><a href='#System_Enable40Mhz'>Enable40Mhz</a></div>
@@ -1281,6 +1332,8 @@ h4 {
 					<div class='macroIndex'><a href='#System_EnableFastRRB'>EnableFastRRB</a></div>
 				
 					<div class='macroIndex'><a href='#System_EnableVIC4'>EnableVIC4</a></div>
+				
+					<div class='macroIndex'><a href='#System_WaitForRaster'>WaitForRaster</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_BasicUpstart65'>BasicUpstart65
@@ -1296,6 +1349,39 @@ h4 {
 						
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{word} addr - Pointer to the program entry point</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_BorderDebug'>BorderDebug
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> If the preprocessor #define NODEBUG is not defined this will set the border color to the give value. Useful for debugging    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_BorderDebug(<i>color</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} color - The color to set the border</div></span>
 						</div>
 					
 						
@@ -1412,6 +1498,41 @@ h4 {
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>System_EnableVIC4()</div>
 						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_WaitForRaster'>WaitForRaster
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Halts execution and waits for the given raster line    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_WaitForRaster(<i>raster</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} raster - The line to wait for</div></span>
+						</div>
+					
 						
 						
 					</div><br>

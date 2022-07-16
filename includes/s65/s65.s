@@ -17,6 +17,8 @@
  * @date       13/07/2022
  */
 .cpu _45gs02
+.const S65_MAX_LAYERS = $10
+
 * = $1400 "Pre BASIC small code"
 #import "includes/s65/sdcard.s"
 

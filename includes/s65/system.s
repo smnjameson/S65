@@ -78,6 +78,7 @@
 * @flags nz
 */
 .macro System_EnableFastRRB() {
+    
         lda #$80    //Enable Rewrite double buffering
         trb $d051   //prevents clipping in FCM (bit 7)
 
@@ -90,13 +91,13 @@
         lda #$00    
         sta $d05b
 
-        //need to move the textYpos back because of double buffer pushing the layer down 1px
-        dec $d04e
-        dec $d04e
+        // //need to move the textYpos back because of double buffer pushing the layer down 1px
+        // dec $d04e
+        // dec $d04e
 
-        //need to move the textXpos back because of single column of pixel junk on left
-        dec $d04c
-        dec $d04c
+        // //need to move the textXpos back because of single column of pixel junk on left
+        // dec $d04c
+        // dec $d04c
 }
 
 /**

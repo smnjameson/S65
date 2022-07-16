@@ -1,78 +1,103 @@
-// #define NODEBUG
+* = $e000
+
+
 
 
 #import "includes/s65/s65.s"
 	.const SCREEN_RAM = $8000
 
+	.const NUM_LAYERS = 12
 	.const LayerBG = 0
-	.const LayerSprites = 1
-	.const LayerUI = 2
+	.const Layers = 1
+	.const LayerMessage = Layers + NUM_LAYERS
 
-	// Define the engine layering parameters first
-	Layer_DefineBGLayer #40 : #25 : #0			//Background 40x25 add as ScreenLayer 0 at offsetX 0
-	Layer_DefineRRBSpriteLayer #128 : #20 		//128 Sprite layer (20/line) add as ScreenLayer 1
-	Layer_DefineScreenLayer #10 : #0			//UI 10 wide add as ScreenLayer 2 at offsetX 0
-	
-	Layer_InitScreen #SCREEN_RAM 				//Initialize the view and all the layers in memory
-
-	Layer_ClearAllLayers #$002e 				//Clear all the layers with the char index found in the x-register
+.print ("Boot: $" + toHexString(Boot))
+	Boot:
+		jmp Start 
 
 
-	//Add some text on BG - no color
-	Layer_AddText Layer_GetScreenAddress(LayerBG,9,12) : testString1
+	//Better to keep data before the code as it may not be parsable for some commands
+	//using evaluated addressing modes. It also keeps the file neat with "declarations" of sort
+	//at the top. You can also put data in hard coded places using the kick asm program counter directive * = $c000
+	.encoding "screencode_upper"
+	messageString:
+		S65_Text16("FCM MULTI LAYER TEST")
+	testString:
+		.for(var i=0; i<NUM_LAYERS; i++) {
+			S65_Text16(toIntString([i+1],2)) //each string will be 6 bytes
+		}
 
-	ldx #$00
-loop:
- 	lda #$ff
- 	cmp $d012 
- 	bne loop
- 	inc $d020
+	ticker:
+		.byte $00
+	sinus:
+		.fill 256 + NUM_LAYERS * 2, sin([i/256] * PI * 2) * $7f + $80
 
- 		//Shift the UI layer GOTOX continuously
-		inc Layer_GetIOAddress(LayerUI, Layer_IOGotoX + 0)
-		bne !+
-		inc Layer_GetIOAddress(LayerUI, Layer_IOGotoX + 1)
-	!:
+	textColor1:
+		.byte $00
+	textColorRamp:
+		.byte $01,$0d,$03,$0c,$04,$02,$09,$00
+		.byte $00,$0b,$02,$04,$0e,$03,$0d,$01
 
 
-		//Draw UI text in increasing colors - REGISTER mode
-		inc textColor1
-		ldz textColor1
-		Layer_AddText Layer_GetScreenAddress(LayerUI,0,0) : testString2 : REGZ
 
-		//Draw BG text using a color ramp  - AT_ABSOLUTEX mode
-		Layer_AddText Layer_GetScreenAddress(LayerBG,9,22) : testString3 : textColorRamp,x
-		inx 
-		txa 
-		and #$0f
+.print ("Start: $" + toHexString(Start))
+	Start:
+		// Define the engine layering parameters first
+
+		//Background 40x25 add as ScreenLayer 0
+		Layer_DefineBGLayer #40 : #25 :	#0 : #FALSE
+
+		//Add moving layers		
+		.for(var i=0; i<NUM_LAYERS; i++) {
+			Layer_DefineScreenLayer #3				//Add small 3 char wide layer
+		}
+
+		//Message layer
+		Layer_DefineScreenLayer #20 : #[[320 - 20 * 8]/2]	//Centered text offset
+
+
+		//Initialize the view and all the layers in memory
+		Layer_InitScreen #SCREEN_RAM 				
+		Layer_ClearAllLayers #$004f 				
+
+		//Draw message
+		.var msgAddr = Layer_GetScreenAddress(LayerMessage, 0, 24)
+		Layer_AddText msgAddr : messageString : #$01
+
+		//Draw text to each layer
+		//VERY WASTEFUL TO CALL THISALOT!!!!
+		.for(var y=0; y<NUM_LAYERS; y++) {
+			.var addr = Layer_GetScreenAddress(Layers + y, 0, y)
+			Layer_AddText  addr : [testString + y * 6] : [textColorRamp + mod(y,$10)]
+		}
+
+
+	ldz #$00
+!loop:
+	System_WaitForRaster($0ff)
+	System_BorderDebug(1)
+		tza  
 		tax
-
-		//Animate jsut color on original text
-		Layer_AddColor Layer_GetColorAddress(LayerBG,9,12) : REGZ : #22
-
+ 		.for(var i=0; i<NUM_LAYERS; i++) {
+ 			lda sinus + i, x
+ 			sta Layer_GetIOAddress(Layers + i, Layer_IOGotoX + 0)
+ 			inx
+ 			inx
+ 		}
+ 		inz
 
 		//Update all the GOTOX markers for the non rrb sprite layers
-		Layer_UpdateLayerOffsets 					
+	!end:
+		Layer_UpdateLayerOffsets 
+
+	System_BorderDebug(0)
+	jmp !loop-
 
 
-	dec $d020
-	jmp loop
 
+.print ("End: $" + toHexString(End))
+End:
 
-
-.encoding "screencode_upper"
-testString1:
-	S65_Text16(" THIS IS THE BG LAYER ")
-testString2:
-	S65_Text16("10 WIDE UI")
-testString3:
-	S65_Text16(" THIS IS A COLOR RAMP ")	
-
-textColor1:
-	.byte $00
-textColorRamp:
-	.byte $01,$0d,$03,$0c,$04,$02,$09,$00
-	.byte $00,$0b,$02,$04,$0e,$03,$0d,$01
 
 
 S65_MemoryReport()

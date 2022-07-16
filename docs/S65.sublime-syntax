@@ -11,7 +11,7 @@ contexts:
       scope: storage.type.macro
     - match: \b(Layer_GetColorAddress|Layer_GetIOAddress|Layer_GetScreenAddress)\b
       scope: constant.language.pseudocommand
-    - match: \b(S65_MemoryReport|S65_RestoreBasePage|S65_SetBasePage|S65_Text16|S65_Trace|SDCard_LoadToAtticRAM|SDCard_LoadToChipRam|System_BasicUpstart65|System_DisableC65ROM|System_Enable40Mhz|System_EnableFastRRB|System_EnableVIC4)\b
+    - match: \b(S65_AddToMemoryReport|S65_MemoryReport|S65_RestoreBasePage|S65_SetBasePage|S65_Text16|S65_Trace|SDCard_LoadToAtticRAM|SDCard_LoadToChipRam|System_BasicUpstart65|System_BorderDebug|System_DisableC65ROM|System_Enable40Mhz|System_EnableFastRRB|System_EnableVIC4|System_WaitForRaster)\b
       scope: support.function.3d
     - match: '#TRUE'
       scope: constant.language.pseudocommand
