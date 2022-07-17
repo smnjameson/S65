@@ -206,6 +206,8 @@ _Layer_AddText: {
 
 			DMA_Execute job
 			jmp end
+
+			
 		job:
 			DMA_Header #$00 : #$00
 			jobIf:
@@ -236,13 +238,22 @@ _Layer_AddText: {
 * @param {byte} {IMM} layer <add a description here>
 * @param {byte} {IMM} clearChar The 16bit char value to clear with, defaults to $0000
 *
-* @registers
-* @flags
+* @registers AXY
+* @flags nzc
 * 
 * @return {byte} A <add description here> 
 */
 .pseudocommand Layer_ClearLayer layer : clearChar {
+	S65_AddToMemoryReport("Layer_ClearLayer")
+		.if(!_isImm(layer) || !_isImm(clearChar)) .error "Layer_ClearLayer: does not support this addressing mode"	
 
+		//X=charLo, Y=charHi, A = layer
+.print ("layer.getValue(): $" + toHexString(layer.getValue()))
+		lda #layer.getValue()
+		ldx #<clearChar.getValue()
+		ldy #>clearChar.getValue()
+		jsr Layer_DMAClear
+	S65_AddToMemoryReport("Layer_ClearLayer")
 }
 
 

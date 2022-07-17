@@ -132,6 +132,18 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	Layer_AddrOffsets:
 		.fill S65_MAX_LAYERS * 2, 00
 
+	/**
+	 * .data LayerWidth
+	 * 
+	 * Table of start address offsets for each layer
+	 * 
+	 * @namespace Layer
+	 * 
+	 * @addr {word} $00 Layer width in chars
+	 */
+	Layer_LayerWidth:
+		.fill S65_MAX_LAYERS * 2, 00		
+
 S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 
 

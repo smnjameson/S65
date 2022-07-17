@@ -249,6 +249,12 @@
             "details": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
         },
         {
+            "trigger": "Layer_LayerWidth",
+            "annotation": "Table of start address offsets for each layer",
+            "kind": "snippet",
+            "details": "Table of start address offsets for each layer"
+        },
+        {
             "trigger": "Layer_LogicalWidth",
             "annotation": "Contains the current Screen Row Logical Width in bytes",
             "kind": "snippet",

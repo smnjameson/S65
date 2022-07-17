@@ -54,7 +54,7 @@
  * @setreg {byte} A The layer number this layer was created at
  */
  .macro Layer_DefineScreenLayer(charWidth, offsetX, ncm) {
- 	S65_AddToMemoryReport("Layer_DefineBGLayer")
+ 	S65_AddToMemoryReport("Layer_DefineScreenLayer")
 		.if(charWidth < 1 || charWidth > 126) .error "Layer_DefineScreenLayer: charWidth must be between 1 and 126"
 
 	 	// .if(!_isImm(charWidth)) .error "Layer_DefineScreenLayer: charWidth Only supports AT_IMMEDIATE"
@@ -75,6 +75,11 @@
 		.eval Layer_LayerList.get(index).put("offsetX", offsetX )
 		.eval Layer_LayerList.get(index).put("ncm", ncm)
 
+		lda #<charWidth 
+		sta [Layer_LayerWidth + index * 2]
+		lda #>charWidth 
+		sta [Layer_LayerWidth + index * 2 + 1]
+			
 		lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
 		sta [Layer_AddrOffsets + index * 2]
 		lda #>S65_SCREEN_LOGICAL_ROW_WIDTH
@@ -104,7 +109,7 @@
 		sta Layer_GotoXColorPositions + 1
 
 		lda #index
-	S65_AddToMemoryReport("Layer_DefineBGLayer")
+	S65_AddToMemoryReport("Layer_DefineScreenLayer")
  }
 
 
@@ -149,6 +154,11 @@
 	.eval Layer_LayerList.get(index).put("gotoX", S65_SCREEN_LOGICAL_ROW_WIDTH )
 	.eval Layer_LayerList.get(index).put("offsetX", $01ff)
 	.eval Layer_LayerList.get(index).put("ncm", true)
+
+	lda #<charsPerLine 
+	sta [Layer_LayerWidth + index * 2]
+	lda #>charsPerLine 
+	sta [Layer_LayerWidth + index * 2 + 1]
 
 	lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
 	sta [Layer_AddrOffsets + index * 2]
@@ -617,16 +627,72 @@
 		inx 
 		cpx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
 		bne !rows-
-		bra end
+		jmp end
+
+
+		job:
+			DMA_Header
+			DMA_Step #$0000 : #$0200
+
+			.var lengthJob1 = * + $02
+			.var destJob1 = * + $07
+			.var jobData1 = * + $04
+			DMA_FillJob #$BEEF : S65_SCREEN_RAM + 0: #$BEEF : #TRUE
+
+			.var lengthJob2 = * + $02
+			.var destJob2 = * + $07
+			.var jobData2 = * + $04
+			DMA_FillJob #$BEEF : S65_SCREEN_RAM + 1: #$BEEF : #FALSE
+
+		jobData:
+			.word $0000
+		jobDest:
+			.word $0000
 
 		//generate DMA lists for clearing a layer
 		.eval Layer_DMAClear = *
 		DMAClear: {
-				//A=layer, X=charLo, Y=charHi
+				//X=charLo, Y=charHi, A = layer
+				stx jobData1 + 0
+				sty jobData2 + 0
+				asl 
+				tay
 
+				lda Layer_AddrOffsets, y 	
+				clc 
+				adc #<[S65_SCREEN_RAM + 2]				
+				sta destJob1 + 0
+				sta destJob2 + 0
+				lda Layer_AddrOffsets + 1, y 
+				adc #>[S65_SCREEN_RAM + 2]				
+				sta destJob1 + 1	
+				sta destJob2 + 1	
+
+				//Layer length 
+				lda Layer_LayerWidth, y 
+				sta lengthJob1 + 0				
+				sta lengthJob2 + 0				
+				lda Layer_LayerWidth + 1, y
+				sta lengthJob1 + 1
+				sta lengthJob2 + 1
+
+				ldx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+			!:
 				DMA_Execute job
+
+					lda destJob1 + 0	
+					clc 
+					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH		
+					sta destJob1 + 0
+					sta destJob2 + 0
+					lda destJob1 + 1
+					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH	
+					sta destJob1 + 1	
+					sta destJob2 + 1	
+
+				dex 
+				bne !-
 				rts 
-			job:
 
 		}
 
