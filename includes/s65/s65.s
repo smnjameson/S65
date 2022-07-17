@@ -27,46 +27,56 @@ System_BasicUpstart65(S65_InitComplete)
 
 //Constants and functions for use with the pseudocommandsystem
 .const AT_IMMEDIATE16 = -6
-.const REGA = $10000001
-.const REGX = $10000002
-.const REGY = $10000003
-.const REGZ = $10000004
+.const REGA = $f0128ceee1
+.const REGX = $f0128ceee2
+.const REGY = $f0128ceee3
+.const REGZ = $f0128ceee4
+
 
 .const TRUE = 1
 .const FALSE = 0
 
-.function _isImm(p) {
-	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE)
+.function _isReg(p) {
+	.return ((p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_ABSOLUTE) && _isRegValue(p))
+}
+.function _isRegValue(p) {
+	.return (p.getValue() >=REGA && p.getValue() <= REGZ)
+}
+.function _isNone(p) {
+	.return (p.getType() == AT_NONE) && !_isRegValue(p)
 }
 .function _isAbs(p) {
 	.return (p.getType() == AT_ABSOLUTE)
 }
+.function _isImm(p) {
+	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE) && !_isRegValue(p)
+}
 .function _isAbsX(p) {
-	.return (p.getType() == AT_ABSOLUTE || p.getType() == AT_ABSOLUTEX)
+	.return (_isAbs(p) || p.getType() == AT_ABSOLUTEX) && !_isRegValue(p)
 }
 .function _isAbsXY(p) {
-	.return (p.getType() == AT_ABSOLUTE || p.getType() == AT_ABSOLUTEX || p.getType() == AT_ABSOLUTEY)
+	.return (_isAbsX(p) || p.getType() == AT_ABSOLUTEY) && !_isRegValue(p)
 }
 .function _isAbsImm(p) {
-	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_ABSOLUTE)
+	.return (_isAbs(p) || _isImm(p)) && !_isRegValue(p)
 }
 .function _isImmOrNone(p) {
-	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_NONE)
-}
+	.return (_isImm(p) || _isNone(p)) && !_isRegValue(p)
+} 
 .function _isAbsImmOrNone(p) {
-	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_ABSOLUTE || p.getType() == AT_NONE)
-}
-.function _isReg(p) {
-	.return (p.getType() == AT_ABSOLUTE  && p.getValue() >=REGA && p.getValue() <= REGZ)
-}
-.macro _saveReg(p) {
-	.if(!_isReg(p)) .error "_saveReg: Cannot use saveReg as value is not a register"
-	.if(p.getValue() == REGA) sta S65_PseudoReg 
-	.if(p.getValue() == REGX) stx S65_PseudoReg 
-	.if(p.getValue() == REGY) sty S65_PseudoReg 
-	.if(p.getValue() == REGZ) stz S65_PseudoReg 
+	.return (_isAbs(p) || _isNone(p) || _isImm(p)) && !_isRegValue(p)
 }
 
+
+
+.macro _saveIfReg(p , addr) {
+	.if(_isReg(p)) {
+		.if(p.getValue() == REGA) sta addr
+		.if(p.getValue() == REGX) stx addr
+		.if(p.getValue() == REGY) sty addr
+		.if(p.getValue() == REGZ) stz addr
+	}
+}
 
 ////////////////////////////////////////////
 //Base page vars
@@ -80,7 +90,7 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_ColorRamPointer: .dword $00000000
 
 			S65_DynamicLayerData: .word $0000
- 			S65_PseudoReg:	.byte $00
+ 			S65_PseudoReg:	.byte $00,$00,$00,$00
  			S65_LastBasePage: .byte $00
 
  			S65_TempDword1:	.dword $00000000
@@ -127,10 +137,6 @@ S65: {
 			lda #$80		
 			trb $d05d		//wont destroy VIC4 values (bit 7)
 
-			// Set VIC to use 40 column mode display
-			//turn off bit 7 
-			lda #$80		
-			trb $d031 
 
 			//Set VIC3 ATTR register to enable 8bit color
 			lda #$20 
@@ -144,7 +150,7 @@ S65: {
 			lda #$05
 			sta $d054
 
-			System_EnableFastRRB()
+
 			
 			rts
 	}

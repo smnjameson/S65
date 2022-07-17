@@ -153,6 +153,8 @@ h4 {
 		
 			<div class='macroIndex'><a href='#Layer'>Layer</a></div>
 		
+			<div class='macroIndex'><a href='#Global'></a></div>
+		
 			<div class='macroIndex'><a href='#SDCard'>SDCard</a></div>
 		
 			<div class='macroIndex'><a href='#System'>System</a></div>
@@ -171,6 +173,10 @@ h4 {
 					<div class='macroIndex'><a href='#Global_MemoryReport'>MemoryReport</a></div>
 				
 					<div class='macroIndex'><a href='#Global_RestoreBasePage'>RestoreBasePage</a></div>
+				
+					<div class='macroIndex'><a href='#Global_RestoreRegisters'>RestoreRegisters</a></div>
+				
+					<div class='macroIndex'><a href='#Global_SaveRegisters'>SaveRegisters</a></div>
 				
 					<div class='macroIndex'><a href='#Global_SetBasePage'>SetBasePage</a></div>
 				
@@ -235,6 +241,32 @@ h4 {
 						<div class='macroItemDescription'> Restores the base page from S65_LastBasePage  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_RestoreBasePage()</div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_RestoreRegisters'>RestoreRegisters
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Pulls the AXYZ registers off the stack  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_RestoreRegisters()</div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_SaveRegisters'>SaveRegisters
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Pushes the AXYZ registers onto the stack  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_SaveRegisters()</div>
 						
 						
 						
@@ -628,39 +660,23 @@ h4 {
 					
 					</div><br><br>
 			<div class='categoryHeader' id='Layer'><span><h4>Namespace<h2>Layer</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Layer_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Layer_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Layer_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Layer_Vars'><div class='sectionButton'>Vars</div></a><a style='text-decoration:none;' href='#Layer_Lists'><div class='sectionButton'>Lists</div></a><a style='text-decoration:none;' href='#Layer_Hashtables'><div class='sectionButton'>Hashtables</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Layer_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Layer_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Layer_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Layer_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Layer_Vars'><div class='sectionButton'>Vars</div></a><a style='text-decoration:none;' href='#Layer_Lists'><div class='sectionButton'>Lists</div></a><a style='text-decoration:none;' href='#Layer_Hashtables'><div class='sectionButton'>Hashtables</div></a></span>
 			<div class='categoryDescription'> API for controlling the screen ram and color ram. Using the raster rewrite buffer to create and manipulate layers </div>
 			<br>
 		
 				<div class='macroHeader' id='Layer_Pseudocommands'>Pseudocommands</div>
 			
-					<div class='macroIndex'><a href='#Layer_AddColor'>AddColor</a></div>
-				
 					<div class='macroIndex'><a href='#Layer_AddText'>AddText</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_ClearAllLayers'>ClearAllLayers</a></div>
 				
-					<div class='macroIndex'><a href='#Layer_DefineBGLayer'>DefineBGLayer</a></div>
-				
-					<div class='macroIndex'><a href='#Layer_DefineRRBSpriteLayer'>DefineRRBSpriteLayer</a></div>
-				
-					<div class='macroIndex'><a href='#Layer_DefineScreenLayer'>DefineScreenLayer</a></div>
-				
-					<div class='macroIndex'><a href='#Layer_InitScreen'>InitScreen</a></div>
-				
 					<div class='macroIndex'><a href='#Layer_UpdateLayerOffsets'>UpdateLayerOffsets</a></div>
 				
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_AddColor'>AddColor
+						<div class='macroItemHeader' id='Layer_AddText'>AddText
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >c</td>
@@ -674,57 +690,22 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Writes a string of bytes to color RAM, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: When writing to color RAM. As layers are not contiguous in memory, its important to not let the colors extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit length of 128     </div>
+						<div class='macroItemDescription'> Writes a string of bytes to the given layer and co-ordinate. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: As layer screen rows are interlaced in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_AddColor <i>addrPtr</i> : <i>color</i> : <i>length</i></div>
+						<div class='macroUsage'>Layer_AddText <i>layer</i> : <i>xpos</i> : <i>ypos</i> : <i>textPtr</i> : <i>color</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {ABS} addrPtr - The screen address to write to</div></span>
+						<span><div class='paramHeader'>{word} {IMM} layer - The layer number to write to</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX}} color - Color to write to color ram</div></span>
+						<span><div class='paramHeader'>{word} {REG|IMM} xpos - Layer char X position</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} length - <add a description here></div></span>
-						</div>
-					
-						
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_AddText'>AddText
-							
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >n</td>
-		
-			<td >z</td>
-		
-		</tr></table>
-	</span>
-							</div>
-							
-						</div>
-						<div class='macroItemDescription'> Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128    </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_AddText <i>addrPtr</i> : <i>textPtr</i> : <i>color</i></div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} {ABS} addrPtr - The screen address to write to</div></span>
+						<span><div class='paramHeader'>{word} {REG|IMM} ypos - Layer char Y position</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
@@ -732,7 +713,7 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {REG|IMM|ABS|ABX} color - Optional color to write to color ram</div></span>
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX|ABY} color - Color to write to color ram</div></span>
 						</div>
 					
 						
@@ -762,206 +743,12 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Fills the screen RAM area with a given 16bit value. Note this will overwrite any RRB GotoX markers also    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_ClearAllLayers <i>clearChar</i> : <i>clearChar</i></div>
+						<div class='macroUsage'>Layer_ClearAllLayers <i>clearChar</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
-						</div>
-					
-						
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_DefineBGLayer'>DefineBGLayer
-							
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >n</td>
-		
-			<td >z</td>
-		
-		</tr></table>
-	</span>
-							</div>
-							
-						</div>
-						<div class='macroItemDescription'> Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time.     </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineBGLayer <i>charWidth</i> : <i>charHeight</i> : <i>offsetX</i> : <i>ncm</i></div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} charWidth - The screen base visible width in chars</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} charHeight - The screen base visible height in chars</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} offsetX - The new RRB GotoX position to set for this layer, defaults to 0</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{bool} {IMM} ncm - NCM enabled for this layer, defaults to FALSE</div></span>
-						</div>
-					
-						
-							<div class='macroUsageText'><i>Returns:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} in A - The layer number this layer was created at</div></span>
-						</div>
-					
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_DefineRRBSpriteLayer'>DefineRRBSpriteLayer
-							
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >n</td>
-		
-			<td >z</td>
-		
-		</tr></table>
-	</span>
-							</div>
-							
-						</div>
-						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. <br><br>  RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.     </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineRRBSpriteLayer <i>maxSprites</i> : <i>charsPerLine</i></div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} maxSprites - The maximum number of RRB Sprites for this layer, lower numbers improve performance</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} charsPerLine - The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance. Defaults to 40</div></span>
-						</div>
-					
-						
-							<div class='macroUsageText'><i>Returns:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} in A - The layer number this layer was created at</div></span>
-						</div>
-					
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_DefineScreenLayer'>DefineScreenLayer
-							
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >n</td>
-		
-			<td >z</td>
-		
-		</tr></table>
-	</span>
-							</div>
-							
-						</div>
-						<div class='macroItemDescription'> Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset.     </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineScreenLayer <i>charWidth</i> : <i>offsetX</i> : <i>ncm</i></div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} charWidth - The screen layers width in chars</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} offsetX - The new RRB GotoX position to set for this layer</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{bool} {IMM} ncm - NCM enabled for this layer, defaults to FALSE</div></span>
-						</div>
-					
-						
-							<div class='macroUsageText'><i>Returns:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} in A - The layer number this layer was created at</div></span>
-						</div>
-					
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_InitScreen'>InitScreen
-							
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-			<td >X</td>
-		
-			<td >Y</td>
-		
-			<td >Z</td>
-		
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >c</td>
-		
-			<td >n</td>
-		
-			<td >z</td>
-		
-		</tr></table>
-	</span>
-							</div>
-							
-						</div>
-						<div class='macroItemDescription'> Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout    </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_InitScreen <i>screenBaseAddress</i></div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} {IMM} screenBaseAddress - The base address of the Screen RAM</div></span>
 						</div>
 					
 						
@@ -995,6 +782,174 @@ h4 {
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_UpdateLayerOffsets </div>
 						
+						
+						
+					</div><br>
+				<div class='macroHeader' id='Layer_Macros'>Macros</div>
+			
+					<div class='macroIndex'><a href='#Layer_DefineRRBSpriteLayer'>DefineRRBSpriteLayer</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_DefineResolution'>DefineResolution</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_DefineScreenLayer'>DefineScreenLayer</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_InitScreen'>InitScreen</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_DefineRRBSpriteLayer'>DefineRRBSpriteLayer
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode. IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_DefineRRBSpriteLayer(<i>maxSprites</i>, <i>charsPerLine</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} maxSprites - The maximum number of RRB Sprites for this layer, lower numbers improve performance</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} charsPerLine - The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance but reduce the number of visible sprites per line</div></span>
+						</div>
+					
+						
+							<div class='macroUsageText'><i>Sets Registers:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>A {byte} - The layer number this layer was created at</div></span>
+						</div>
+					
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_DefineResolution'>DefineResolution
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched horizontally to fit the width of the display. <a href="#Layer_InitScreen">Layer_InitScreen</a> will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>  NOTE:<br> - charHeight above 32 will use V400 mode and disable any RRB double buffering and double rate RRB<br> - charWidth above 42 will use H640 mode<br>   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_DefineResolution(<i>charWidth</i>, <i>charHeight</i>, <i>stretchWide</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} charWidth - The screen base visible width in chars, range 1-84</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} charHeight - The screen base visible height in chars, range 1-50</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{bool} stretchWide - should this screen be stetched horizontally to fit the screen</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_DefineScreenLayer'>DefineScreenLayer
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset.<br> Note: the maximum charWidth for a layer is 126    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_DefineScreenLayer(<i>charWidth</i>, <i>offsetX</i>, <i>ncm</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} charWidth - The screen layers width in chars</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} offsetX - The new RRB GotoX position to set for this layer</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{bool} ncm - NCM enabled for this layer, defaults to FALSE</div></span>
+						</div>
+					
+						
+							<div class='macroUsageText'><i>Sets Registers:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>A {byte} - The layer number this layer was created at</div></span>
+						</div>
+					
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_InitScreen'>InitScreen
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+			<td >X</td>
+		
+			<td >Y</td>
+		
+			<td >Z</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_InitScreen(<i>screenBaseAddress</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} screenBaseAddress - The base address of the Screen RAM</div></span>
+						</div>
+					
 						
 						
 					</div><br>
@@ -1148,13 +1103,37 @@ h4 {
 					</div><br>
 				<div class='macroHeader' id='Layer_Vars'>Vars</div>
 			
+					<div class='macroIndex'><a href='#Layer_DMAClear'>DMAClear</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_DynamicDataIndex'>DynamicDataIndex</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_RowAddressLSB'>RowAddressLSB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_RowAddressMSB'>RowAddressMSB</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_DMAClear'>DMAClear</div>
+						<div class='macroItemDescription'> Pointer to a dma subroutine that clears the layer, A=layer, X=charLo, Y=charHi   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_DMAClear</div>						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_DynamicDataIndex'>DynamicDataIndex</div>
-						<div class='macroItemDescription'> A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory   </div>
+						<div class='macroItemDescription'> A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_DynamicDataIndex</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_RowAddressLSB'>RowAddressLSB</div>
+						<div class='macroItemDescription'> Pointer to the table of LSB values for the address of the start of each screen row directly after the first GOTOX  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_RowAddressLSB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_RowAddressMSB'>RowAddressMSB</div>
+						<div class='macroItemDescription'> Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_RowAddressMSB</div>						
 					</div><br>
 				<div class='macroHeader' id='Layer_Lists'>Lists</div>
 			
@@ -1212,6 +1191,40 @@ h4 {
 						<span><div class='paramHeader'>{word} dynamicDataAddr - The memory address for this layers dynamic data area</div></span>
 						</div>
 					
+					</div><br><br>
+			<div class='categoryHeader' id='Global'><span><h4>Namespace<h2></h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Global_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a></span>
+			<div class='categoryDescription'></div>
+			<br>
+		
+				<div class='macroHeader' id='Global_Pseudocommands'>Pseudocommands</div>
+			
+					<div class='macroIndex'><a href='#Global_ClearLayer'>ClearLayer</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_ClearLayer'>ClearLayer
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Fills the screen RAM area for the layer with a given 16bit value.     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>_ClearLayer <i>layer</i> : <i>clearChar</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layer - <add a description here></div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						</div>
+					
+						
+						
 					</div><br><br>
 			<div class='categoryHeader' id='SDCard'><span><h4>Namespace<h2>SDCard</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#SDCard_Macros'><div class='sectionButton'>Macros</div></a></span>

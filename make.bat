@@ -1,7 +1,7 @@
 @echo off
 
 set KICKASM=java -cp Z:\Projects\Mega65\_build_utils\kickass.jar kickass.KickAssembler65CE02  -vicesymbols -showmem 
-set SUBLIME_PACKAGES="C:\Users\sybedroom\AppData\Roaming\Sublime Text\Packages\User"
+set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages\User"
 
 echo ASSEMBLING SOURCES...
 %KICKASM%  main.s -odir ./bin

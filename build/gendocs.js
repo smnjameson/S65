@@ -647,6 +647,7 @@ function onClose(line){
 
 
 		if(cat.data.length) {
+			
 			//data header
 			html += `
 				<div class='macroHeader' id='${(cat.name || "Global")}_Data'>Data</div>
@@ -670,6 +671,7 @@ function onClose(line){
 				let desc = cat.data[j].description
 				let params = ``;
 				let usage = (cat.name || globalNamespace) + "_" + name
+				var fullcmd = (cat.name !== "Global" ? cat.name : globalNamespace) + "_" + name
 
 
 				for(var k=0; k<cat.data[j].params.length;k++) {
@@ -689,6 +691,13 @@ function onClose(line){
 						<div class='macroUsage'>${usage}</div>						
 						${params}
 					</div>`;	
+
+				completions.completions.push({
+		            "trigger": fullcmd,
+		            "annotation": `${desc.trim()}`,
+		            "kind": "snippet",
+		            "details": `${desc.trim()}`
+        		})	
 			}	
 			html += '<br>'
 		}
@@ -717,6 +726,7 @@ function onClose(line){
 				let name = cat.var[j].name 
 				let desc = cat.var[j].description
 				let usage = (cat.name || globalNamespace) + "_" + name
+				var fullcmd = (cat.name !== "Global" ? cat.name : globalNamespace) + "_" + name
 
 				html += `
 					<div class='macroItem'>
@@ -725,6 +735,13 @@ function onClose(line){
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>${usage}</div>						
 					</div>`;	
+
+				completions.completions.push({
+		            "trigger": fullcmd,
+		            "annotation": `${desc.trim()}`,
+		            "kind": "snippet",
+		            "details": `${desc.trim()}`
+        		})						
 			}	
 			html += '<br>'
 		}

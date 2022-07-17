@@ -23,6 +23,20 @@
             "details": "Restores the base page from S65_LastBasePage"
         },
         {
+            "trigger": "S65_RestoreRegisters",
+            "annotation": "",
+            "contents": "S65_RestoreRegisters()",
+            "kind": "snippet",
+            "details": "Pulls the AXYZ registers off the stack"
+        },
+        {
+            "trigger": "S65_SaveRegisters",
+            "annotation": "",
+            "contents": "S65_SaveRegisters()",
+            "kind": "snippet",
+            "details": "Pushes the AXYZ registers onto the stack"
+        },
+        {
             "trigger": "S65_SetBasePage",
             "annotation": "",
             "contents": "S65_SetBasePage()",
@@ -42,6 +56,48 @@
             "contents": "S65_Trace(${1:str})",
             "kind": "snippet",
             "details": "Outputs a string to the kick assembler console at build time"
+        },
+        {
+            "trigger": "S65_COLOR_RAM",
+            "annotation": "Defaults to $ff80000",
+            "kind": "snippet",
+            "details": "Defaults to $ff80000"
+        },
+        {
+            "trigger": "S65_SCREEN_LOGICAL_ROW_WIDTH",
+            "annotation": "Number of bytes that make up an entire screen row",
+            "kind": "snippet",
+            "details": "Number of bytes that make up an entire screen row"
+        },
+        {
+            "trigger": "S65_SCREEN_RAM",
+            "annotation": "Defaults to $0800",
+            "kind": "snippet",
+            "details": "Defaults to $0800"
+        },
+        {
+            "trigger": "S65_SCREEN_ROW_WIDTH",
+            "annotation": "Number of characters that make up an entire screen row",
+            "kind": "snippet",
+            "details": "Number of characters that make up an entire screen row"
+        },
+        {
+            "trigger": "S65_SCREEN_TERMINATOR_OFFSET",
+            "annotation": "Screen row offset for the row terminator bytes",
+            "kind": "snippet",
+            "details": "Screen row offset for the row terminator bytes"
+        },
+        {
+            "trigger": "S65_VISIBLE_SCREEN_CHAR_HEIGHT",
+            "annotation": "Height of the visible screen background layer in characters",
+            "kind": "snippet",
+            "details": "Height of the visible screen background layer in characters"
+        },
+        {
+            "trigger": "S65_VISIBLE_SCREEN_CHAR_WIDTH",
+            "annotation": "Width of the visible screen background layer in characters",
+            "kind": "snippet",
+            "details": "Width of the visible screen background layer in characters"
         },
         {
             "trigger": "DMA_CopyJob",
@@ -93,53 +149,24 @@
             "details": "Sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)"
         },
         {
-            "trigger": "Layer_AddColor",
-            "annotation": "addrPtr:color:length",
-            "contents": "Layer_AddColor ${1:addrPtr} : ${2:color} : ${3:length}",
+            "trigger": "DMA_F018_DMA_11_byte_format",
+            "annotation": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>.",
             "kind": "snippet",
-            "details": "Writes a string of bytes to color RAM, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: When writing to color RAM. As layers are not contiguous in memory, its important to not let the colors extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit length of 128"
+            "details": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>."
         },
         {
             "trigger": "Layer_AddText",
-            "annotation": "addrPtr:textPtr:color",
-            "contents": "Layer_AddText ${1:addrPtr} : ${2:textPtr} : ${3:color}",
+            "annotation": "layer:xpos:ypos:textPtr:color",
+            "contents": "Layer_AddText ${1:layer} : ${2:xpos} : ${3:ypos} : ${4:textPtr} : ${5:color}",
             "kind": "snippet",
-            "details": "Writes a string of bytes to the given address. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: If writing to screen RAM. As layers are not contiguous in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
+            "details": "Writes a string of bytes to the given layer and co-ordinate. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: As layer screen rows are interlaced in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
         },
         {
             "trigger": "Layer_ClearAllLayers",
-            "annotation": "clearChar:clearChar",
-            "contents": "Layer_ClearAllLayers ${1:clearChar} : ${2:clearChar}",
+            "annotation": "clearChar",
+            "contents": "Layer_ClearAllLayers ${1:clearChar}",
             "kind": "snippet",
             "details": "Fills the screen RAM area with a given 16bit value. Note this will overwrite any RRB GotoX markers also"
-        },
-        {
-            "trigger": "Layer_DefineBGLayer",
-            "annotation": "charWidth:charHeight:offsetX:ncm",
-            "contents": "Layer_DefineBGLayer ${1:charWidth} : ${2:charHeight} : ${3:offsetX} : ${4:ncm}",
-            "kind": "snippet",
-            "details": "Defines the mandatory first layer in Screen RAM, acting as a background. Can have only one background at any time."
-        },
-        {
-            "trigger": "Layer_DefineRRBSpriteLayer",
-            "annotation": "maxSprites:charsPerLine",
-            "contents": "Layer_DefineRRBSpriteLayer ${1:maxSprites} : ${2:charsPerLine}",
-            "kind": "snippet",
-            "details": "Defines a new RRB Sprite layer in Screen RAM. <br><br>  RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer."
-        },
-        {
-            "trigger": "Layer_DefineScreenLayer",
-            "annotation": "charWidth:offsetX:ncm",
-            "contents": "Layer_DefineScreenLayer ${1:charWidth} : ${2:offsetX} : ${3:ncm}",
-            "kind": "snippet",
-            "details": "Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset."
-        },
-        {
-            "trigger": "Layer_InitScreen",
-            "annotation": "screenBaseAddress",
-            "contents": "Layer_InitScreen ${1:screenBaseAddress}",
-            "kind": "snippet",
-            "details": "Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout"
         },
         {
             "trigger": "Layer_UpdateLayerOffsets",
@@ -147,6 +174,34 @@
             "contents": "Layer_UpdateLayerOffsets ",
             "kind": "snippet",
             "details": "Updates the RRB GotoX markers for all but the RRB sprite layers"
+        },
+        {
+            "trigger": "Layer_DefineRRBSpriteLayer",
+            "annotation": "maxSprites,charsPerLine",
+            "contents": "Layer_DefineRRBSpriteLayer(${1:maxSprites}, ${2:charsPerLine})",
+            "kind": "snippet",
+            "details": "Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode. IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer."
+        },
+        {
+            "trigger": "Layer_DefineResolution",
+            "annotation": "charWidth,charHeight,stretchWide",
+            "contents": "Layer_DefineResolution(${1:charWidth}, ${2:charHeight}, ${3:stretchWide})",
+            "kind": "snippet",
+            "details": "Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched horizontally to fit the width of the display. <a href=\"#Layer_InitScreen\">Layer_InitScreen</a> will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>  NOTE:<br> - charHeight above 32 will use V400 mode and disable any RRB double buffering and double rate RRB<br> - charWidth above 42 will use H640 mode<br>"
+        },
+        {
+            "trigger": "Layer_DefineScreenLayer",
+            "annotation": "charWidth,offsetX,ncm",
+            "contents": "Layer_DefineScreenLayer(${1:charWidth}, ${2:offsetX}, ${3:ncm})",
+            "kind": "snippet",
+            "details": "Defines a new screen layer in Screen RAM optionally shifting its RRB GOTOX offset.<br> Note: the maximum charWidth for a layer is 126"
+        },
+        {
+            "trigger": "Layer_InitScreen",
+            "annotation": "screenBaseAddress",
+            "contents": "Layer_InitScreen(${1:screenBaseAddress})",
+            "kind": "snippet",
+            "details": "Initialises the MEGA65 and VIC-IV and parses the Layer definitions into a Screen RAM layout"
         },
         {
             "trigger": "Layer_GetColorAddress",
@@ -168,6 +223,67 @@
             "contents": "Layer_GetScreenAddress(${1:layerNumber}, ${2:xpos}, ${3:ypos})",
             "kind": "snippet",
             "details": "Returns the address of the char at the given position on this screen layer"
+        },
+        {
+            "trigger": "Layer_AddrOffsets",
+            "annotation": "Table of start address offsets for each layer",
+            "kind": "snippet",
+            "details": "Table of start address offsets for each layer"
+        },
+        {
+            "trigger": "Layer_GotoXColorPositions",
+            "annotation": "Table of GOTOX Attribute in color ram for each layer",
+            "kind": "snippet",
+            "details": "Table of GOTOX Attribute in color ram for each layer"
+        },
+        {
+            "trigger": "Layer_GotoXPositions",
+            "annotation": "Table of current GOTOX positions for all the layers",
+            "kind": "snippet",
+            "details": "Table of current GOTOX positions for all the layers"
+        },
+        {
+            "trigger": "Layer_IO",
+            "annotation": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.",
+            "kind": "snippet",
+            "details": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
+        },
+        {
+            "trigger": "Layer_LogicalWidth",
+            "annotation": "Contains the current Screen Row Logical Width in bytes",
+            "kind": "snippet",
+            "details": "Contains the current Screen Row Logical Width in bytes"
+        },
+        {
+            "trigger": "Layer_DMAClear",
+            "annotation": "Pointer to a dma subroutine that clears the layer, A=layer, X=charLo, Y=charHi",
+            "kind": "snippet",
+            "details": "Pointer to a dma subroutine that clears the layer, A=layer, X=charLo, Y=charHi"
+        },
+        {
+            "trigger": "Layer_DynamicDataIndex",
+            "annotation": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory",
+            "kind": "snippet",
+            "details": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory"
+        },
+        {
+            "trigger": "Layer_RowAddressLSB",
+            "annotation": "Pointer to the table of LSB values for the address of the start of each screen row directly after the first GOTOX",
+            "kind": "snippet",
+            "details": "Pointer to the table of LSB values for the address of the start of each screen row directly after the first GOTOX"
+        },
+        {
+            "trigger": "Layer_RowAddressMSB",
+            "annotation": "Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX",
+            "kind": "snippet",
+            "details": "Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX"
+        },
+        {
+            "trigger": "_ClearLayer",
+            "annotation": "layer:clearChar",
+            "contents": "_ClearLayer ${1:layer} : ${2:clearChar}",
+            "kind": "snippet",
+            "details": "Fills the screen RAM area for the layer with a given 16bit value."
         },
         {
             "trigger": "SDCard_LoadToAtticRAM",
@@ -231,6 +347,12 @@
             "contents": "System_WaitForRaster(${1:raster})",
             "kind": "snippet",
             "details": "Halts execution and waits for the given raster line"
+        },
+        {
+            "trigger": "System_BasicUpstart65_Format",
+            "annotation": "",
+            "kind": "snippet",
+            "details": ""
         }
     ]
 }

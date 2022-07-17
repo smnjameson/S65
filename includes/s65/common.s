@@ -14,13 +14,13 @@
 * .var VISIBLE_SCREEN_CHAR_WIDTH
 * Width of the visible screen background layer in characters
 */
-.var 		S65_VISIBLE_SCREEN_CHAR_WIDTH = 40
+.var 		S65_VISIBLE_SCREEN_CHAR_WIDTH = 84 //692x512
 
 /**
 * .var VISIBLE_SCREEN_CHAR_HEIGHT
 * Height of the visible screen background layer in characters
 */
-.var 		S65_VISIBLE_SCREEN_CHAR_HEIGHT = 25
+.var 		S65_VISIBLE_SCREEN_CHAR_HEIGHT = 64 //MUST start with this value as its the MAX possible height
 
 /**
 * .var SCREEN_ROW_WIDTH
@@ -39,7 +39,6 @@
 * Screen row offset for the row terminator bytes
 */
 .var 		S65_SCREEN_TERMINATOR_OFFSET = 0
-
 
 
 
@@ -92,6 +91,34 @@ _S65_SetBasePage: {
 		tab 
 }
 
+/**
+* .macro SaveRegisters
+*
+* Pushes the AXYZ registers onto the stack
+* 
+* @namespace S65
+*/
+.macro S65_SaveRegisters() {
+    pha 
+    phx 
+    phy 
+    phz
+}
+
+
+/**
+* .macro RestoreRegisters
+*
+* Pulls the AXYZ registers off the stack
+* 
+* @namespace S65
+*/
+.macro S65_RestoreRegisters() {
+    plz 
+    ply 
+    plx 
+    pla
+}
 
 /**
 * .macro Text16
@@ -145,6 +172,7 @@ _S65_SetBasePage: {
     .var _dynamicDataIO = _MemoryReport.get("Layer_DynamicDataAndIO")
     S65_Trace("        Library calls       $"+toHexString(libCallsTotal))
     S65_Trace("        Layer IO and data   $"+toHexString(_dynamicDataIO.get("bytes")))
+    // S65_Trace("        Other program code  $"+toHexString( (* - S65_InitComplete) - (_dynamicDataIO.get("bytes") + libCallsTotal) ))
     S65_Trace("============================")    
 }
 .const _MemoryReport = Hashtable()
