@@ -32,7 +32,7 @@
 	paletteFilename:
 		.text @"PALETTE1.BIN\$00" //Zero terminated string
 	palette:
-		.import binary "assets/bin/palette.bin"
+		.import binary "assets/bin/test1_palette.bin"
 
 	Start:
 
@@ -97,4 +97,4 @@ S65_MemoryReport()
 
 //NCM Test data
 *=$4000
-	.import binary "assets/bin/chars.bin"
+	.import binary "assets/bin/test1_chars.bin"

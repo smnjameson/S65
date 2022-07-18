@@ -12,7 +12,7 @@
 */
 .pseudocommand DMA_Execute address {
     S65_AddToMemoryReport("DMA_Execute")
-        .if(address.getType() != AT_ABSOLUTE) .error "DMA_Execute: Only supports AT_ABSOLUTE"
+        .if(address.getType() != AT_ABSOLUTE) .error "DMA_Execute:"+ S65_TypeError
         .var addr = address.getValue()
 		lda #[addr >> 16]
 		sta $d702
@@ -39,7 +39,7 @@
  * @param {byte?} {IMM} destBank The destination bank number Defaults to 0
  */
 .pseudocommand DMA_Header sourceBank : destBank {
-        .if( !_isImmOrNone(sourceBank) || !_isImmOrNone(destBank)) .error "DMA_Header: Only supports AT_IMMEDIATE and AT_NONE"
+        .if( !_isImmOrNone(sourceBank) || !_isImmOrNone(destBank)) .error "DMA_Header:"+ S65_TypeError
 
         .byte $0A // Request format is F018B
         .if(sourceBank.getType() == AT_NONE) {
@@ -69,7 +69,7 @@
  */
 .pseudocommand DMA_Step sourceStep : destStep {
         .if(    !_isImmOrNone(sourceStep) || 
-                !_isImmOrNone(destStep)) .error "DMA_Step: Only supports AT_IMMEDIATE or AT_NONE"
+                !_isImmOrNone(destStep)) .error "DMA_Step:"+ S65_TypeError
 
 
 		.if(sourceStep.getType() != AT_NONE) {
@@ -105,7 +105,7 @@
  * @param {byte} {IMM} transparentByte The byte value to match from source for transparency.
  */
 .pseudocommand DMA_EnableTransparency transparentByte {
-        .if(!_isImm(transparentByte)) .error "DMA_EnableTransparency: Only supports AT_IMMEDIATE"
+        .if(!_isImm(transparentByte)) .error "DMA_EnableTransparency:"+ S65_TypeError
 		.byte $07 
 		.byte $86, transparentByte
 }
@@ -127,11 +127,11 @@
  * 
  */
 .pseudocommand DMA_CopyJob source : destination : length : chain : backwards : modulo : rowcount {
-    .if(!_isAbs(source)) .error "DMA_CopyJob: source Only supports AT_ABSOLUTE"
-    .if(!_isAbs(destination)) .error "DMA_CopyJob: sourceByte Only supports AT_ABSOLUTE"
-    .if(!_isImm(length)) .error "DMA_CopyJob: length Only supports AT_IMMEDIATE"
-    .if(!_isImm(chain)) .error "DMA_CopyJob: chain Only supports AT_IMMEDIATE"
-    .if(!_isImmOrNone(backwards)) .error "DMA_CopyJob: chain Only supports AT_IMMEDIATE or AT_NONE"
+    .if(!_isAbs(source)) .error "DMA_CopyJob:"+ S65_TypeError
+    .if(!_isAbs(destination)) .error "DMA_CopyJob:"+ S65_TypeError
+    .if(!_isImm(length)) .error "DMA_CopyJob:"+ S65_TypeError
+    .if(!_isImm(chain)) .error "DMA_CopyJob:"+ S65_TypeError
+    .if(!_isImmOrNone(backwards)) .error "DMA_CopyJob:"+ S65_TypeError
 
     .var backwardsVal = false
     .if(!_isNone(backwards)) .eval backwardsVal = [backwards.getValue() == 1]
@@ -181,11 +181,11 @@
  * @param {word} {IMM} length The number of bytes to fill
  * @param {bool} {IMM} chain Job chains to another
  */
-.pseudocommand DMA_FillJob sourceByte : destination : length : chain {
-    .if(!_isImm(sourceByte)) .error "DMA_FillJob: sourceByte Only supports AT_IMMEDIATE"
-    .if(!_isAbs(destination)) .error "DMA_FillJob: sourceByte Only supports AT_ABSOLUTE"
-    .if(!_isImm(length)) .error "DMA_FillJob: length Only supports AT_IMMEDIATE"
-    .if(!_isImm(chain)) .error "DMA_FillJob: chain Only supports AT_IMMEDIATE"
+ .pseudocommand DMA_FillJob sourceByte : destination : length : chain {
+    .if(!_isImm(sourceByte)) .error "DMA_FillJob:"+ S65_TypeError
+    .if(!_isAbs(destination)) .error "DMA_FillJob:"+ S65_TypeError
+    .if(!_isImm(length)) .error "DMA_FillJob:"+ S65_TypeError
+    .if(!_isImm(chain)) .error "DMA_FillJob:"+ S65_TypeError
 
 
 	.byte $00 //No more options
@@ -197,13 +197,14 @@
 	
     .word length.getValue() //Size of Copy
 	
-	.word sourceByte.getValue()
+	.word <sourceByte.getValue()
 	.byte $00
 
 
 	.word destination.getValue() & $ffff
 	.byte [[destination.getValue() >> 16] & $0f]
-
-    .word $0000
+    .if(chain.getValue() > 0) {
+        .word $0000
+    }
 }
 

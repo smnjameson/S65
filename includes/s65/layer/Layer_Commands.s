@@ -23,12 +23,14 @@
 		S65_AddToMemoryReport("Layer_AddText")
 		S65_SaveRegisters()
 
-		.if(!_isImm(layer)) .error "Layer_AddText: layer does not support this addressing mode"
-		.if(!_isReg(xpos) && !_isImm(xpos)) .error "Layer_AddText: xpos does not support this addressing mode"
-		.if(!_isReg(ypos) && !_isImm(ypos)) .error "Layer_AddText: ypos does not support this addressing mode"
-		.if(!_isAbs(textPtr)) .error "Layer_AddText: textPtr does not support this addressing mode"
-		.if(!_isAbsXY(color) && !_isImm(color) && !_isReg(color)) .error "Layer_AddText: color does not support this addressing mode"
-		
+		.if(!_isImm(layer)) .error "Layer_AddText:"+ S65_TypeError
+		.if(!_isReg(xpos) && !_isImm(xpos)) .error "Layer_AddText:"+ S65_TypeError
+		.if(!_isReg(ypos) && !_isImm(ypos)) .error "Layer_AddText:"+ S65_TypeError
+		.if(!_isAbs(textPtr)) .error "Layer_AddText:"+ S65_TypeError
+
+		.if(!_isAbsXY(color) && !_isImm(color) && !_isReg(color)) .error "Layer_AddText:"+ S65_TypeError
+			
+
 		_saveIfReg(color,	SMcolor)
 		_saveIfReg(xpos, 	S65_PseudoReg + 1)
 		_saveIfReg(ypos, 	S65_PseudoReg + 2)
@@ -62,6 +64,7 @@
 			}
 
 			.if(_isReg(xpos) && _isReg(ypos)) {
+				phx
 					asl.z S65_PseudoReg + 1 //xpos
 					ldx S65_PseudoReg + 2 //ypos
 					clc 
@@ -82,9 +85,11 @@
 					lda.z S65_ScreenRamPointer + 1
 					adc.z Layer_AddrOffsets + 1, x
 					sta.z S65_ScreenRamPointer + 1
+				plx
 				} 
 
 			.if(_isImm(xpos) && _isReg(ypos)) {
+				phx
 					ldx S65_PseudoReg + 2
 
 					clc 
@@ -105,7 +110,8 @@
 					sta.z S65_ScreenRamPointer + 0
 					lda.z S65_ScreenRamPointer + 1
 					adc.z Layer_AddrOffsets + 1, x
-					sta.z S65_ScreenRamPointer + 1					
+					sta.z S65_ScreenRamPointer + 1	
+				plx				
 			}
 		
 			clc
@@ -121,7 +127,7 @@
 			lda #>textPtr.getValue()
 			sta.z TEXT_PTR + 1
 
-			lda SMcolor:color 		
+			lda SMcolor: color 		
 			sta _Layer_AddText.VALUE 
 
 			jsr _Layer_AddText
@@ -174,17 +180,19 @@ _Layer_AddText: {
 * 
 * @namespace Layer 
 *
-* @param {word?} {REG|IMM|ABS} clearChar The 16bit char value to clear with, defaults to $0000
+* @param {word?} {IMM} clearChar The 16bit char value to clear with, defaults to $0000
 * 
-* @registers A
 * @flags zn
 */
 .pseudocommand Layer_ClearAllLayers clearChar {
 	S65_AddToMemoryReport("Layer_ClearAllLayers")
+	phy
+	phx
+	pha
 			.if(_isReg(clearChar)) {
 				 _saveIfReg(clearChar, S65_PseudoReg + 0)
 			} else {
-				.if(!_isAbsImmOrNone(clearChar)) .error "Layer_ClearAllLayers: does not support this addressing mode"
+				.if(!_isAbsImmOrNone(clearChar)) .error "Layer_ClearAllLayers:"+ S65_TypeError
 			}
 	        
 			.const SCREEN_BYTE_SIZE = S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT
@@ -224,6 +232,9 @@ _Layer_AddText: {
 				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
 			}
 		end:
+	pla
+	plx 
+	ply
 	S65_AddToMemoryReport("Layer_ClearAllLayers")
 }
 
@@ -233,10 +244,10 @@ _Layer_AddText: {
 *
 * Fills the screen RAM area for the layer with a given 16bit value. 
 * 
-* @namespace Layer The layer number to clear
+* @namespace Layer
 *
-* @param {byte} {IMM} layer <add a description here>
-* @param {byte} {IMM} clearChar The 16bit char value to clear with, defaults to $0000
+* @param {byte} {REG|IMM} layer The layer number to clear
+* @param {word?} {REG|IMM} clearChar The 16bit char value to clear with, defaults to $0000
 *
 * @registers AXY
 * @flags nzc
@@ -245,13 +256,34 @@ _Layer_AddText: {
 */
 .pseudocommand Layer_ClearLayer layer : clearChar {
 	S65_AddToMemoryReport("Layer_ClearLayer")
-		.if(!_isImm(layer) || !_isImm(clearChar)) .error "Layer_ClearLayer: does not support this addressing mode"	
+		.if(_isReg(layer)) {
+			 _saveIfReg(layer, SMlayer)
+		} else {
+			.if(!_isImmOrNone(layer)) .error "Layer_ClearLayer:"+ S65_TypeError
+		}
+		.if(_isReg(clearChar)) {
+			 _saveIfReg(clearChar, S65_PseudoReg + 0)
+		} else {
+			.if(!_isImmOrNone(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
+		}
+
+		_saveIfReg(layer, SMlayer)
 
 		//X=charLo, Y=charHi, A = layer
-.print ("layer.getValue(): $" + toHexString(layer.getValue()))
-		lda #layer.getValue()
-		ldx #<clearChar.getValue()
-		ldy #>clearChar.getValue()
+		
+			
+		//REGISTER
+		.if(_isReg(clearChar)) {
+			lda S65_PseudoReg + 0
+			tax 
+			ldy #$00
+		}  else {
+			ldx #<clearChar.getValue()
+
+			ldy #>clearChar.getValue()
+
+		}
+		lda SMlayer:#[layer.getValue()]
 		jsr Layer_DMAClear
 	S65_AddToMemoryReport("Layer_ClearLayer")
 }

@@ -153,7 +153,7 @@ h4 {
 		
 			<div class='macroIndex'><a href='#Layer'>Layer</a></div>
 		
-			<div class='macroIndex'><a href='#Global'></a></div>
+			<div class='macroIndex'><a href='#Palette'>Palette</a></div>
 		
 			<div class='macroIndex'><a href='#SDCard'>SDCard</a></div>
 		
@@ -670,6 +670,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_ClearAllLayers'>ClearAllLayers</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_ClearLayer'>ClearLayer</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_UpdateLayerOffsets'>UpdateLayerOffsets</a></div>
 				
 					<div class='macroItem'>
@@ -723,13 +725,7 @@ h4 {
 						<div class='macroItemHeader' id='Layer_ClearAllLayers'>ClearAllLayers
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >n</td>
@@ -748,7 +744,52 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_ClearLayer'>ClearLayer
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+			<td >X</td>
+		
+			<td >Y</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Fills the screen RAM area for the layer with a given 16bit value.     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_ClearLayer <i>layer</i> : <i>clearChar</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM} layer - The layer number to clear</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
 						</div>
 					
 						
@@ -817,16 +858,16 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode. IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DefineRRBSpriteLayer(<i>maxSprites</i>, <i>charsPerLine</i>)</div>
+						<div class='macroUsage'>Layer_DefineRRBSpriteLayer(<i>charsPerLine</i>, <i>maxSprites</i>)</div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} maxSprites - The maximum number of RRB Sprites for this layer, lower numbers improve performance</div></span>
+						<span><div class='paramHeader'>{byte} charsPerLine - The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance but reduce the number of visible sprites per line</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} charsPerLine - The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance but reduce the number of visible sprites per line</div></span>
+						<span><div class='paramHeader'>{byte} maxSprites - The maximum number of RRB Sprites for this layer, lower numbers improve performance</div></span>
 						</div>
 					
 						
@@ -959,6 +1000,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_GetIOAddress'>GetIOAddress</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_GetLayerCount'>GetLayerCount</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_GetScreenAddress'>GetScreenAddress</a></div>
 				
 					<div class='macroItem'>
@@ -1002,6 +1045,16 @@ h4 {
 						<span><div class='paramHeader'>{word} offset - The byte offset into the IO register to fetch</div></span>
 						</div>
 					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_GetLayerCount'>GetLayerCount
+						</div>
+						<div class='macroItemDescription'> Returns the current number of layers, useful for assigning to constants to name each layer for use in your code.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_GetLayerCount()</div>
+						
 						
 						
 					</div>
@@ -1206,17 +1259,23 @@ h4 {
 						</div>
 					
 					</div><br><br>
-			<div class='categoryHeader' id='Global'><span><h4>Namespace<h2></h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Global_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a></span>
-			<div class='categoryDescription'></div>
+			<div class='categoryHeader' id='Palette'><span><h4>Namespace<h2>Palette</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Palette_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Palette_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Palette_Vars'><div class='sectionButton'>Vars</div></a></span>
+			<div class='categoryDescription'> API for manipulating the <a href="#MEGA65_Palette">MEGA65 Palettes</a>  </div>
 			<br>
 		
-				<div class='macroHeader' id='Global_Pseudocommands'>Pseudocommands</div>
+				<div class='macroHeader' id='Palette_Pseudocommands'>Pseudocommands</div>
 			
-					<div class='macroIndex'><a href='#Global_ClearLayer'>ClearLayer</a></div>
+					<div class='macroIndex'><a href='#Palette_LoadFromMem'>LoadFromMem</a></div>
+				
+					<div class='macroIndex'><a href='#Palette_LoadFromSD'>LoadFromSD</a></div>
+				
+					<div class='macroIndex'><a href='#Palette_Map'>Map</a></div>
+				
+					<div class='macroIndex'><a href='#Palette_SetPalettes'>SetPalettes</a></div>
 				
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Global_ClearLayer'>ClearLayer
+						<div class='macroItemHeader' id='Palette_LoadFromMem'>LoadFromMem
 							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
@@ -1225,8 +1284,6 @@ h4 {
 			<td >A</td>
 		
 			<td >X</td>
-		
-			<td >Y</td>
 		
 		</tr></table>
 	 flags: 
@@ -1243,36 +1300,224 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Fills the screen RAM area for the layer with a given 16bit value.     </div>
+						<div class='macroItemDescription'> Copys data from agiven address into one of the MEGA65 palettes. The palette will remain the active mapped palette at $d100    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>_ClearLayer <i>layer</i> : <i>clearChar</i></div>
+						<div class='macroUsage'>Palette_LoadFromMem <i>paletteNum</i> : <i>addr</i> : <i>size</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} layer - <add a description here></div></span>
+						<span><div class='paramHeader'>{byte} {IMM} paletteNum - The MEGA65 Palette number to load to</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						<span><div class='paramHeader'>{word} {ABS} addr - The location of the source palette data in memory</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} size - The number of colors in the palette data, defaults to 256</div></span>
 						</div>
 					
 						
 						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_LoadFromSD'>LoadFromSD
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+			<td >X</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Loads a full 256 color palette from SD card    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_LoadFromSD <i>paletteNum</i> : <i>addr</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} paletteNum - The MEGA65 Palette number to load to</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} {ABS} addr - Pointer to the filename in CAPITALS and zero terminated</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_Map'>Map
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Maps a palette into IO memory    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_Map <i>paletteNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM} paletteNum - The MEGA palette number to map</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_SetPalettes'>SetPalettes
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Assigns palettes to the MEGA65 palette banks.    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_SetPalettes <i>palleteChar</i> : <i>paletteSprite</i> : <i>paletteAltChar</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} palleteChar - The VIC IV Character/Bitmap color palette</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteSprite - The VIC IV Sprite color palette</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteAltChar - The VIC IV Alternate Character/Bitmap color palette</div></span>
+						</div>
+					
+						
+						
+					</div><br>
+				<div class='macroHeader' id='Palette_Data'>Data</div>
+			
+					<div class='macroIndex'><a href='#Palette_MEGA65_Palette'>MEGA65_Palette</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_MEGA65_Palette'>MEGA65_Palette</div>
+						<div class='macroItemDescription'> The MEGA65 has up to 4 palettes that can be assigned to the various graphic types Sprite and Character. At any one time one of the palettes will be banked into IO memory at $d100-$d3ff.  Note: While the palette format is RGB788 the nybbles of each byte are switched e.g. $F0 becomes $0F, to maintain compatibility with the C65    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_MEGA65_Palette</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $000-$0ff - Red channel data</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $100-$1ff - Green channel data</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $200-$2ff - Blue channel data</div></span>
+						
+						</div>
+					
+					</div><br>
+				<div class='macroHeader' id='Palette_Vars'>Vars</div>
+			
+					<div class='macroIndex'><a href='#Palette_0'>0</a></div>
+				
+					<div class='macroIndex'><a href='#Palette_1'>1</a></div>
+				
+					<div class='macroIndex'><a href='#Palette_2'>2</a></div>
+				
+					<div class='macroIndex'><a href='#Palette_3'>3</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_0'>0</div>
+						<div class='macroItemDescription'>MEGA65 palette 0 </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_0</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_1'>1</div>
+						<div class='macroItemDescription'>MEGA65 palette 1 </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_1</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_2'>2</div>
+						<div class='macroItemDescription'>MEGA65 palette 2 </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_2</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_3'>3</div>
+						<div class='macroItemDescription'>MEGA65 palette 3 </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_3</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='SDCard'><span><h4>Namespace<h2>SDCard</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#SDCard_Macros'><div class='sectionButton'>Macros</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#SDCard_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a></span>
 			<div class='categoryDescription'> API for using the SD card to load assets to memory using mostly macros </div>
 			<br>
 		
-				<div class='macroHeader' id='SDCard_Macros'>Macros</div>
+				<div class='macroHeader' id='SDCard_Pseudocommands'>Pseudocommands</div>
 			
-					<div class='macroIndex'><a href='#SDCard_LoadToAtticRAM'>LoadToAtticRAM</a></div>
+					<div class='macroIndex'><a href='#SDCard_LoadToAtticRam'>LoadToAtticRam</a></div>
 				
 					<div class='macroIndex'><a href='#SDCard_LoadToChipRam'>LoadToChipRam</a></div>
 				
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='SDCard_LoadToAtticRAM'>LoadToAtticRAM
+						<div class='macroItemHeader' id='SDCard_LoadToAtticRam'>LoadToAtticRam
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -1298,19 +1543,20 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Loads a file from the SDCard into attic RAM    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>SDCard_LoadToAtticRAM(<i>addr</i>, <i>filename</i>)</div>
+						<div class='macroUsage'>SDCard_LoadToAtticRam <i>addr</i> : <i>filePtr</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{word} addr - Pointer to the memory load location</div></span>
+						<span><div class='paramHeader'>{word} {ABS} addr - Pointer to the memory load location</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{string} filename - The filename on the SDCard to load</div></span>
+						<span><div class='paramHeader'>{string} {ABS} filePtr - Pointer to the filename (zero terminated) on the SDCard to load</div></span>
 						</div>
 					
 						
@@ -1318,6 +1564,7 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='SDCard_LoadToChipRam'>LoadToChipRam
+							
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'>registers: 
 		<table><th></th><tr style="display:inline-block;">
@@ -1343,19 +1590,20 @@ h4 {
 		</tr></table>
 	</span>
 							</div>
+							
 						</div>
 						<div class='macroItemDescription'> Loads a file from the SDCard into chip RAM    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>SDCard_LoadToChipRam(<i>addr</i>, <i>filename</i>)</div>
+						<div class='macroUsage'>SDCard_LoadToChipRam <i>addr</i> : <i>filePtr</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{dword} addr - Pointer to the memory load location</div></span>
+						<span><div class='paramHeader'>{dword} {ABS} addr - Pointer to the memory load location</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{string} filename - The filename on the SDCard to load</div></span>
+						<span><div class='paramHeader'>{word} {ABS} filePtr - Pointer to the filename (zero terminated) on the SDCard to load</div></span>
 						</div>
 					
 						

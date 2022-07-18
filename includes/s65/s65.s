@@ -32,6 +32,7 @@ System_BasicUpstart65(S65_InitComplete)
 .const REGY = $f0128ceee3
 .const REGZ = $f0128ceee4
 
+.const S65_TypeError = " does not support this addressing mode."
 
 .const TRUE = 1
 .const FALSE = 0
@@ -77,6 +78,18 @@ System_BasicUpstart65(S65_InitComplete)
 		.if(p.getValue() == REGZ) stz addr
 	}
 }
+.macro _saveIfRegOrNone(p , addr) {
+	.if(_isReg(p)) {
+		.if(p.getValue() == REGA) sta addr
+		.if(p.getValue() == REGX) stx addr
+		.if(p.getValue() == REGY) sty addr
+		.if(p.getValue() == REGZ) stz addr
+	} 
+	.if(_isNone(p)) {
+		lda #$00
+		sta addr
+	}	
+}
 
 ////////////////////////////////////////////
 //Base page vars
@@ -104,9 +117,9 @@ System_BasicUpstart65(S65_InitComplete)
 				
 #import "includes/s65/common.s"
 #import "includes/s65/layer.s"
-
 #import "includes/s65/system.s"
 #import "includes/s65/dma.s"
+#import "includes/s65/palette.s"
 
 S65: {
 	Init: {
@@ -138,9 +151,13 @@ S65: {
 			trb $d05d		//wont destroy VIC4 values (bit 7)
 
 
-			//Set VIC3 ATTR register to enable 8bit color
+			//Disable VIC3 ATTR register to enable 8bit color
 			lda #$20 
-			tsb $d031
+			trb $d031
+
+			//Enable RAM palettes
+			lda #$04
+			tsb $d030
 
 			//Turn on FCM mode and
 			//16bit per char number

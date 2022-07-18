@@ -35,6 +35,20 @@
 }
 
 /**
+* .function GetLayerCount
+*
+* Returns the current number of layers, useful for assigning to constants
+* to name each layer for use in your code.
+* 
+* @namespace Layer
+*
+* @return {byte} Current number of layers
+*/
+.function Layer_GetLayerCount() {
+	.return Layer_LayerList.size() 
+}
+
+/**
 * .function GetIOAddress
 *
 * Returns the base address plus an optional offset for the given layers IO registers.<br>

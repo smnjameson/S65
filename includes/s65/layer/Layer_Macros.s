@@ -129,15 +129,15 @@
  * 
  * @namespace Layer
  * 
- * @param {byte} maxSprites The maximum number of RRB Sprites for this layer, lower numbers improve performance
  * @param {byte} charsPerLine The number of RRB chars reserved in the buffer for this layer, lower numbers improve performance but reduce the number of visible sprites per line
+ * @param {byte} maxSprites The maximum number of RRB Sprites for this layer, lower numbers improve performance
  * 
  * @registers A
  * @flags nz
  *  
  * @setreg {byte} A The layer number this layer was created at
  */
-.macro Layer_DefineRRBSpriteLayer (maxSprites, charsPerLine) {
+.macro Layer_DefineRRBSpriteLayer (charsPerLine, maxSprites) {
 	S65_AddToMemoryReport("Layer_DefineBGLayer")
 
 	.var index = Layer_LayerList.size()
@@ -152,7 +152,7 @@
 	.eval Layer_LayerList.get(index).put("charWidth", charsPerLine)
 	.eval Layer_LayerList.get(index).put("startAddr", S65_SCREEN_LOGICAL_ROW_WIDTH)
 	.eval Layer_LayerList.get(index).put("gotoX", S65_SCREEN_LOGICAL_ROW_WIDTH )
-	.eval Layer_LayerList.get(index).put("offsetX", $01ff)
+	.eval Layer_LayerList.get(index).put("offsetX", $02a0)
 	.eval Layer_LayerList.get(index).put("ncm", true)
 
 	lda #<charsPerLine 
@@ -240,9 +240,9 @@
 	sta [Layer_AddrOffsets + Layer_LayerList.size() * 2]
 	lda #>[S65_SCREEN_ROW_WIDTH * 2]
 	sta [Layer_AddrOffsets + Layer_LayerList.size() * 2 + 1]
-	lda #$00
+	lda #$a0
 	sta [Layer_GotoXPositions + Layer_LayerList.size() * 2]
-	lda #$03
+	lda #$02
 	sta [Layer_GotoXPositions + Layer_LayerList.size() * 2 + 1]
 
 	.eval S65_SCREEN_TERMINATOR_OFFSET = S65_SCREEN_ROW_WIDTH
@@ -630,68 +630,82 @@
 		jmp end
 
 
-		job:
-			DMA_Header
-			DMA_Step #$0000 : #$0200
+
+		dmaClearJob:
+			DMA_Header 
+			DMA_Step #$0100 : #$0200
 
 			.var lengthJob1 = * + $02
-			.var destJob1 = * + $07
-			.var jobData1 = * + $04
-			DMA_FillJob #$BEEF : S65_SCREEN_RAM + 0: #$BEEF : #TRUE
+			.var destJobA = * + $07
+			.var jobDataA = * + $04
+			DMA_FillJob #$0000 : S65_SCREEN_RAM + 0: #$00 : #TRUE
 
 			.var lengthJob2 = * + $02
-			.var destJob2 = * + $07
-			.var jobData2 = * + $04
-			DMA_FillJob #$BEEF : S65_SCREEN_RAM + 1: #$BEEF : #FALSE
+			.var destJobB = * + $07
+			.var jobDataB = * + $04
+			DMA_FillJob #$0000 : S65_SCREEN_RAM + 1: #$00 : #FALSE
 
-		jobData:
-			.word $0000
-		jobDest:
-			.word $0000
 
 		//generate DMA lists for clearing a layer
 		.eval Layer_DMAClear = *
 		DMAClear: {
 				//X=charLo, Y=charHi, A = layer
-				stx jobData1 + 0
-				sty jobData2 + 0
+				stx jobDataA
+				sty jobDataB + 0
 				asl 
 				tay
 
-				lda Layer_AddrOffsets, y 	
 				clc 
+				lda Layer_AddrOffsets, y 	
 				adc #<[S65_SCREEN_RAM + 2]				
-				sta destJob1 + 0
-				sta destJob2 + 0
+				sta destJobA + 0
+				sta destJobB + 0
 				lda Layer_AddrOffsets + 1, y 
 				adc #>[S65_SCREEN_RAM + 2]				
-				sta destJob1 + 1	
-				sta destJob2 + 1	
+				sta destJobA + 1	
+				sta destJobB + 1	
 
+				inc destJobB + 0
+				bne !+
+				inc destJobB + 1	
+			!:
+				
+			
 				//Layer length 
 				lda Layer_LayerWidth, y 
 				sta lengthJob1 + 0				
 				sta lengthJob2 + 0				
+
 				lda Layer_LayerWidth + 1, y
 				sta lengthJob1 + 1
 				sta lengthJob2 + 1
 
-				ldx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
-			!:
-				DMA_Execute job
 
-					lda destJob1 + 0	
+				ldx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+			!loop:
+
+				DMA_Execute dmaClearJob
+
+					lda destJobA + 0	
 					clc 
 					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH		
-					sta destJob1 + 0
-					sta destJob2 + 0
-					lda destJob1 + 1
+					sta destJobA + 0
+					sta destJobB + 0
+
+					lda destJobA + 1
 					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH	
-					sta destJob1 + 1	
-					sta destJob2 + 1	
+					sta destJobA + 1	
+					sta destJobB + 1	
+
+					inc destJobB + 0
+					bne !+
+					inc destJobB + 1	
+				!:
 
 				dex 
-				bne !-
+				bne !loop-
+
+				
 				rts 
 
 		}
