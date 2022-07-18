@@ -1,6 +1,6 @@
 
 /**
- * .data IO
+ * .var IO
  * 
  * The IO registers for a standard screen layer<br><br>
  * Note: You can retrieve the base address of this layers
@@ -12,7 +12,7 @@
  * 
  * @addr {word} Layer_IOGotoX The GOTOX value to apply to this layer
  */
-.const Layer_IOGotoX = $00
+.var Layer_IOGotoX = $00
 
 
 

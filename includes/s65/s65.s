@@ -1,9 +1,8 @@
 /**
  * .global S65
  * 
- * Shallan65 macro toolkit for the MEGA65.
- * <br><br>
- * - Uses NCM mode and the raster rewrite buffer to provide
+ * Shallan65 macro toolkit for the MEGA65.<br><br>
+ * - Uses NCM and FCM mode and the raster rewrite buffer to provide
  * a powerful layer and sprite framework<br>
  * - DMA job data macros<br>
  * - SDCard loading
@@ -18,9 +17,6 @@
  */
 .cpu _45gs02
 .const S65_MAX_LAYERS = $10
-
-* = $1400 "Pre BASIC small code"
-#import "includes/s65/sdcard.s"
 
 System_BasicUpstart65(S65_InitComplete)
 * = $2016 "S65 Base page area"
@@ -53,10 +49,13 @@ System_BasicUpstart65(S65_InitComplete)
 	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE) && !_isRegValue(p)
 }
 .function _isAbsX(p) {
-	.return (_isAbs(p) || p.getType() == AT_ABSOLUTEX) && !_isRegValue(p)
+	.return (p.getType() == AT_ABSOLUTEX) && !_isRegValue(p)
 }
 .function _isAbsXY(p) {
 	.return (_isAbsX(p) || p.getType() == AT_ABSOLUTEY) && !_isRegValue(p)
+}
+.function _isAbsY(p) {
+	.return (p.getType() == AT_ABSOLUTEY) && !_isRegValue(p)
 }
 .function _isAbsImm(p) {
 	.return (_isAbs(p) || _isImm(p)) && !_isRegValue(p)
@@ -64,10 +63,15 @@ System_BasicUpstart65(S65_InitComplete)
 .function _isImmOrNone(p) {
 	.return (_isImm(p) || _isNone(p)) && !_isRegValue(p)
 } 
+.function _isImmOrReg(p) {
+	.return (_isImm(p) || _isReg(p))
+} 
 .function _isAbsImmOrNone(p) {
 	.return (_isAbs(p) || _isNone(p) || _isImm(p)) && !_isRegValue(p)
 }
-
+.function _isAbsImmOrReg(p) {
+	.return (_isAbs(p) || _isReg(p) || _isImm(p))
+}
 
 
 .macro _saveIfReg(p , addr) {
@@ -94,27 +98,57 @@ System_BasicUpstart65(S65_InitComplete)
 ////////////////////////////////////////////
 //Base page vars
 ////////////////////////////////////////////
-.align $20 //Ensure theres enough room in the page for the base vars
+.align $40 //Ensure theres enough room in the page for the base vars
 .var 		S65_BASEPAGE = [* >> 8]		//Gets the page# of this address
-				
+			
+/** 
+ * .var ScreenRamPointer
+ * 
+ * S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set
+ * at all times so can be used to access the screen ram using 32bit indirect z addressing.
+ * DO NOT change bytes 2 and 3!<br><br>
+ * 
+ * For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary
+ * and aligned to page boundarys as the engine assumes this for speed<br><br>
+ * 
+ * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or 
+ * <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a>
+ * to correctly set up the base page
+ * before using indirect indexed adressing modes.
+ */			
+			S65_ScreenRamPointer: .dword $00000000
+/** 
+ * .var ColorRamPointer
+ * 
+ * S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set
+ * at all times so can be used to access the color ram using 32bit indirect z addressing.
+ * DO NOT change bytes 2 and 3!<br><br>
+ * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or 
+ * <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a>
+ * to correctly set up the base page
+ * before using indirect indexed adressing modes.
+ */	
+			S65_ColorRamPointer: .dword $00000000	
+						
 			S65_BaseScreenRamPointer: .dword $00000000
 			S65_BaseColorRamPointer: .dword $00000000
-			S65_ScreenRamPointer: .dword $00000000
-			S65_ColorRamPointer: .dword $00000000
 
 			S65_DynamicLayerData: .word $0000
- 			S65_PseudoReg:	.byte $00,$00,$00,$00
+ 			S65_PseudoReg:	
+ 				.byte $00,$00,$00,$00
+ 				.byte $00,$00,$00,$00
  			S65_LastBasePage: .byte $00
 
  			S65_TempDword1:	.dword $00000000
  			S65_TempDword2:	.dword $00000000
  			S65_TempWord1:	.word $0000
  			S65_TempByte1:	.byte $00
+ 			S65_TempByte2:	.byte $00
 
 
-///////////////////////////////////////////// 31 bytes
+///////////////////////////////////////////// 32 of 64 bytes
 
-				
+#import "includes/s65/sdcard.s"		
 #import "includes/s65/common.s"
 #import "includes/s65/layer.s"
 #import "includes/s65/system.s"

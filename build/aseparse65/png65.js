@@ -58,31 +58,7 @@ function setOutputPath(pathName) {
     return outputPath;
 }
 
-function getPaletteData(png) {
-    let palette = [];
-    for (var c = 0; c < png.palette.length; c++) {
-    	let color = png.palette[c]
-        let pal = {
-            red: color[0],
-            green: color[1],
-            blue: color[2],
-            alpha: color[3],
-            useCount: 0,
-            originalIndex: palette.length
-        };
-        palette.push(pal);
-    }
-    console.log("Palette size: " + palette.length + " colors");
 
-    let pal = { r: [], g: [], b: [] }
-    for(var i=0;i<palette.length; i++) {
-        let color = palette[i]
-        pal.r.push(nswap(color.red))
-        pal.g.push(nswap(color.green))
-        pal.b.push(nswap(color.blue))
-    }
-    return {palette, pal}
-}
 
 function getIndexedCharData(png) {
 
@@ -115,17 +91,14 @@ function getFCMData(png, palette) {
 function getNCMData(png, palette) {
     let data = []
     let charColors = []
+    let originalPalIndex = []
     for(var y=0; y<png.height; y+=8) {
         for(var x=0; x<png.width; x+=16) {
             let charCols = []
             for(var r=0; r<8; r++) {
                 for(var c=0; c<16; c+=2) {
                     let i = ((y + r) * (png.width * 4) + ((x + c) * 4))
-                    let j = ((y + r) * (png.width * 4) + ((x + c + 1) * 4))
-
-                    let byte = 0x00
-
-                                
+                    let j = i + 4
                     //find the color
                     let col1 = palette.findIndex(a => {
                         return (
@@ -137,6 +110,7 @@ function getNCMData(png, palette) {
                     })
                     if(charCols.indexOf(col1) === -1)  charCols.push(col1)  
                     let nyb1 = charCols.indexOf(col1)
+                    originalPalIndex.push(col1)
 
                     let col2 = palette.findIndex(a => {
                         return (
@@ -152,7 +126,7 @@ function getNCMData(png, palette) {
                     if(nyb1 > 0xf || nyb2 > 0xf) {
                         throw(new Error(`Too many colors in this char: $${data.length.toString(16)}`))
                     }
-                    data.push((nyb2 << 4) | nyb1)
+                    data.push(( nyb2 << 4 ) + nyb1)
                 }
             }
             charCols = charCols.sort((a,b) => a-b)
@@ -160,8 +134,109 @@ function getNCMData(png, palette) {
         }
     }
 
-    return { data, charColors }
+    return { data, charColors, originalPalIndex }
 }
+
+function getPaletteData(png) {
+    let palette = [];
+    for (var c = 0; c < png.palette.length; c++) {
+        let color = png.palette[c]
+        let pal = {
+            red: color[0],
+            green: color[1],
+            blue: color[2],
+            alpha: color[3]
+        };
+        palette.push(pal);
+    }
+    console.log("Palette size: " + palette.length + " colors");
+
+    let pal = { r: [], g: [], b: [] }
+    for(var i=0;i<palette.length; i++) {
+        let color = palette[i]
+        pal.r.push(nswap(color.red))
+        pal.g.push(nswap(color.green))
+        pal.b.push(nswap(color.blue))
+    }
+    return {palette, pal}
+}
+
+function findBestFitForCharColors(inp, out) {
+        let max=0
+        let best=-1
+        let unq = null
+        for(var i=0; i<out.length; i++) {
+            let matches = inp.filter(a => out[i].includes(a));
+            let uniques = inp.filter(a => !out[i].includes(a));
+            if( matches.length > best && //most matches in this palette slice
+                uniques.length + out[i].length <= 16) {
+                best = i 
+                max = matches.length
+                unq = uniques
+            }
+        }
+        if(best === -1) {
+            throw(new Error("There is not enough room in the palette to sort these colors"))
+        }
+
+        out[best] = out[best].concat(unq).sort((a,b) => a-b)
+        return out
+}
+
+function sortNCMPalette(charData, paletteData, charColors) {
+        let sortedArray = new Array(16).fill([0])
+
+        for(var i=0; i<charData.charColors.length; i++) {
+
+            let colors = charData.charColors[i]
+            sortedArray = findBestFitForCharColors(colors, sortedArray)
+        }
+       
+        let palette = [];
+        let pal = { r: [], g: [], b: [] }
+        for(var s = 0; s<16; s++){
+            for(var i=0; i<16; i++){
+                var col = sortedArray[s][i]
+
+                if(typeof col !== 'undefined') {
+                    let color = paletteData.palette[col]
+                    palette.push(color)
+                    pal.r.push(nswap(color.red))
+                    pal.g.push(nswap(color.green))
+                    pal.b.push(nswap(color.blue))
+                } else {
+                    palette.push({
+                        red: 0,
+                        green: 0,
+                        blue: 0,
+                        alpha: 0
+                    }); 
+                    pal.r.push(0)
+                    pal.g.push(0)
+                    pal.b.push(0)                   
+                }
+            }
+        }
+
+        paletteData.palette = palette
+        paletteData.pal = pal
+
+        // //remap the chardata
+        for(var i=0; i<charData.charColors.length ; i++) {
+            for(var j=0; j<sortedArray.length; j++) {
+                var colors = charData.charColors[i]
+                let matches = sortedArray[j].filter(a => colors.includes(a));
+                if(matches.length === colors.length) {
+                    charData.charColors[i] =  j << 4
+                    break;
+                }
+            }
+        }
+
+        //return a palette
+        return {paletteData, sortedArray, charColors: charData.charColors}
+}
+
 
 
 
@@ -205,13 +280,16 @@ async function runCharMapper(argv) {
         charData = getFCMData(png, paletteData.palette)
     }
     if(argv.ncm) {
-        convertedPal = paletteData.pal
         charData = getNCMData(png, paletteData.palette)
+        sortedPalette = sortNCMPalette(charData, paletteData, charData.charColors)
+        paletteData = sortedPalette.paletteData
+
+        convertedPal = paletteData.pal
+
+        //save NCM color table
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
     }
 
-    
-
-        
 
     //SAVE PALETTE
     fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))

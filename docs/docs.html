@@ -163,7 +163,7 @@ h4 {
 	
 			<div class='categoryHeader' id='Global'><span><h4>Namespace<h2>Global (S65)</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Global_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Global_Vars'><div class='sectionButton'>Vars</div></a></span>
-			<div class='categoryDescription'> Shallan65 macro toolkit for the MEGA65. <br><br> - Uses NCM mode and the raster rewrite buffer to provide a powerful layer and sprite framework<br> - DMA job data macros<br> - SDCard loading <br> <br> The Global(S65) namespace is mostly used internally by the engine, however some methods and vars may be of use.  </div>
+			<div class='categoryDescription'> Shallan65 macro toolkit for the MEGA65.<br><br> - Uses NCM and FCM mode and the raster rewrite buffer to provide a powerful layer and sprite framework<br> - DMA job data macros<br> - SDCard loading <br> <br> The Global(S65) namespace is mostly used internally by the engine, however some methods and vars may be of use.  </div>
 			<br>
 		
 				<div class='macroHeader' id='Global_Macros'>Macros</div>
@@ -190,7 +190,7 @@ h4 {
 								<span  style='display:inline-flex;'></span>
 							</div>
 						</div>
-						<div class='macroItemDescription'> Measures the byte size of a block of assembly and records it in the memory report output by <a href="S65_MemoryReport">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both   </div>
+						<div class='macroItemDescription'> Measures the byte size of a block of assembly and records it in the memory report output by <a href="#Global_MemoryReport">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_AddToMemoryReport(<i>name</i>)</div>
 						
@@ -342,6 +342,8 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Global_COLOR_RAM'>COLOR_RAM</a></div>
 				
+					<div class='macroIndex'><a href='#Global_ColorRamPointer'>ColorRamPointer</a></div>
+				
 					<div class='macroIndex'><a href='#Global_SCREEN_LOGICAL_ROW_WIDTH'>SCREEN_LOGICAL_ROW_WIDTH</a></div>
 				
 					<div class='macroIndex'><a href='#Global_SCREEN_RAM'>SCREEN_RAM</a></div>
@@ -349,6 +351,8 @@ h4 {
 					<div class='macroIndex'><a href='#Global_SCREEN_ROW_WIDTH'>SCREEN_ROW_WIDTH</a></div>
 				
 					<div class='macroIndex'><a href='#Global_SCREEN_TERMINATOR_OFFSET'>SCREEN_TERMINATOR_OFFSET</a></div>
+				
+					<div class='macroIndex'><a href='#Global_ScreenRamPointer'>ScreenRamPointer</a></div>
 				
 					<div class='macroIndex'><a href='#Global_VISIBLE_SCREEN_CHAR_HEIGHT'>VISIBLE_SCREEN_CHAR_HEIGHT</a></div>
 				
@@ -358,47 +362,59 @@ h4 {
 						<div class='macroItemHeader' id='Global_COLOR_RAM'>COLOR_RAM</div>
 						<div class='macroItemDescription'>Defaults to $ff80000 </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_COLOR_RAM</div>						
+						<div class='macroUsage'>S65_COLOR_RAM</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_ColorRamPointer'>ColorRamPointer</div>
+						<div class='macroItemDescription'> S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_ColorRamPointer</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_LOGICAL_ROW_WIDTH'>SCREEN_LOGICAL_ROW_WIDTH</div>
 						<div class='macroItemDescription'>Number of bytes that make up an entire screen row </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_SCREEN_LOGICAL_ROW_WIDTH</div>						
+						<div class='macroUsage'>S65_SCREEN_LOGICAL_ROW_WIDTH</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_RAM'>SCREEN_RAM</div>
 						<div class='macroItemDescription'>Defaults to $0800 </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_SCREEN_RAM</div>						
+						<div class='macroUsage'>S65_SCREEN_RAM</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_ROW_WIDTH'>SCREEN_ROW_WIDTH</div>
 						<div class='macroItemDescription'>Number of characters that make up an entire screen row </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_SCREEN_ROW_WIDTH</div>						
+						<div class='macroUsage'>S65_SCREEN_ROW_WIDTH</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_TERMINATOR_OFFSET'>SCREEN_TERMINATOR_OFFSET</div>
 						<div class='macroItemDescription'>Screen row offset for the row terminator bytes </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_SCREEN_TERMINATOR_OFFSET</div>						
+						<div class='macroUsage'>S65_SCREEN_TERMINATOR_OFFSET</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_ScreenRamPointer'>ScreenRamPointer</div>
+						<div class='macroItemDescription'> S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_ScreenRamPointer</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_VISIBLE_SCREEN_CHAR_HEIGHT'>VISIBLE_SCREEN_CHAR_HEIGHT</div>
 						<div class='macroItemDescription'>Height of the visible screen background layer in characters </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_VISIBLE_SCREEN_CHAR_HEIGHT</div>						
+						<div class='macroUsage'>S65_VISIBLE_SCREEN_CHAR_HEIGHT</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_VISIBLE_SCREEN_CHAR_WIDTH'>VISIBLE_SCREEN_CHAR_WIDTH</div>
 						<div class='macroItemDescription'>Width of the visible screen background layer in characters </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Global_VISIBLE_SCREEN_CHAR_WIDTH</div>						
+						<div class='macroUsage'>S65_VISIBLE_SCREEN_CHAR_WIDTH</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='DMA'><span><h4>Namespace<h2>DMA</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#DMA_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#DMA_Data'><div class='sectionButton'>Data</div></a></span>
-			<div class='categoryDescription'> API for controlling the configuration and execution of DMagic jobs. Uses the <a href="#DMA_F018_DMA_11_byte_format">F018 11 byte data format</a>. throughout.  </div>
+			<div class='categoryDescription'> API for controlling the configuration and execution of DMagic jobs. Uses the <a href="##DMA_F018_DMA_11_byte_format">F018 11 byte data format</a>. throughout.  </div>
 			<br>
 		
 				<div class='macroHeader' id='DMA_Pseudocommands'>Pseudocommands</div>
@@ -614,7 +630,7 @@ h4 {
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='DMA_F018_DMA_11_byte_format'>F018_DMA_11_byte_format</div>
-						<div class='macroItemDescription'> Offsets into the DMagic job for the <a target="_blank" href="https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format">F018 11 byte data format</a>.  </div>
+						<div class='macroItemDescription'> Offsets into the DMagic job for the <a target="_blank" href="#https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format">F018 11 byte data format</a>.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_F018_DMA_11_byte_format</div>						
 						
@@ -668,11 +684,17 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Layer_AddText'>AddText</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_AdvanceScreenPointers'>AdvanceScreenPointers</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_ClearAllLayers'>ClearAllLayers</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_ClearLayer'>ClearLayer</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_SetScreenPointersXY'>SetScreenPointersXY</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_UpdateLayerOffsets'>UpdateLayerOffsets</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_WriteToScreen'>WriteToScreen</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_AddText'>AddText
@@ -716,6 +738,43 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX|ABY} color - Color to write to color ram</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_AdvanceScreenPointers'>AdvanceScreenPointers
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Advances the S65 Basepage dword values for <a href="#Global_ColorRamPointer">ColorRamPointer<a> and <a href="#Global_ScreenRamPointer">ScreenRamPointer<a> by the given byte offset.<br><br>  Note: This method assumes you are already in the S65 base page, this is true after a <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_AdvanceScreenPointers <i>Optional</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {REG|IMM} Optional - byte offset (defaults to S65_SCREEN_LOGICAL_ROW_WIDTH)</div></span>
 						</div>
 					
 						
@@ -796,6 +855,53 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SetScreenPointersXY'>SetScreenPointersXY
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+			<td >B</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets the basepage to point to the S65 base page area and then sets screen and color ram pointers <a href="#Global_ScreenRamPointer">ScreenRamPointer<a> and <a href="#Global_ColorRamPointer">ColorRamPointer<a> to point to the given layers x and y co-ordinate   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SetScreenPointersXY <i>layer</i> : <i>xpos</i> : <i>ypos</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layer - Layer to get pointer to</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM} xpos - Optional xposition on layer</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM} ypos - Optional yposition on layer</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_UpdateLayerOffsets'>UpdateLayerOffsets
 							
 							<div class='macroItemSubHeader'>
@@ -823,6 +929,35 @@ h4 {
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_UpdateLayerOffsets </div>
 						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_WriteToScreen'>WriteToScreen
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Copys up to 256 bytes from the source addresses to the locations pointed at by <a href="#Global_ScreenRamPointer">ScreenRamPointer<a> and optionally <a href="#Global_ColorRamPointer">ColorRamPointer<a>. Does NOT change the contents of the screen and color ram pointers.<br> If immediate values are used for source then this byte is written directly<br><br> Note: This method assumes you are already in the S65 base page, this is true after a <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations<br> If ABSY mode is used for either source then the y register is added to the address before writing. Additionally upon completion the Y register will be incremented by the amount of bytes written<br><br> Note: Writing past the end of your layers right edge can cause RRB and memory issues please use <a href="#Layer_AdvanceScreenPointers">Layer_AdvanceScreenPointers<a> to move the pointers safely to the next row    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_WriteToScreen <i>screenSource</i> : <i>colorSource</i> : <i>size</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {ABSY|IMM|REG} screenSource - The color source data address to use or a value to use if IMM defaults to #$00</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {ABSY|IMM|REG} colorSource - The color source data address to use or a value to use if IMM defaults to #$00</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM} size - The lengh of the data in CHARS (so bytes/2)</div></span>
+						</div>
+					
 						
 						
 					</div><br>
@@ -885,7 +1020,7 @@ h4 {
 								<span  style='display:inline-flex;'></span>
 							</div>
 						</div>
-						<div class='macroItemDescription'> Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched horizontally to fit the width of the display. <a href="#Layer_InitScreen">Layer_InitScreen</a> will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>  NOTE:<br> - charHeight above 32 will use V400 mode and disable any RRB double buffering and double rate RRB<br> - charWidth above 42 will use H640 mode<br>   </div>
+						<div class='macroItemDescription'> Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched horizontally to fit the width of the display. <a href="##Layer_InitScreen">Layer_InitScreen</a> will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>  NOTE:<br> - charHeight above 32 will use V400 mode and disable any RRB double buffering and double rate RRB<br> - charWidth above 42 will use H640 mode<br>   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_DefineResolution(<i>charWidth</i>, <i>charHeight</i>, <i>stretchWide</i>)</div>
 						
@@ -1090,8 +1225,6 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_GotoXPositions'>GotoXPositions</a></div>
 				
-					<div class='macroIndex'><a href='#Layer_IO'>IO</a></div>
-				
 					<div class='macroIndex'><a href='#Layer_LayerWidth'>LayerWidth</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_LogicalWidth'>LogicalWidth</a></div>
@@ -1133,18 +1266,6 @@ h4 {
 					
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_IO'>IO</div>
-						<div class='macroItemDescription'> The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.   </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_IO</div>						
-						
-						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} Layer_IOGotoX - The GOTOX value to apply to this layer</div></span>
-						
-						</div>
-					
-					</div>
-					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_LayerWidth'>LayerWidth</div>
 						<div class='macroItemDescription'> Table of start address offsets for each layer   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
@@ -1174,6 +1295,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_DynamicDataIndex'>DynamicDataIndex</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_IO'>IO</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_RowAddressLSB'>RowAddressLSB</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_RowAddressMSB'>RowAddressMSB</a></div>
@@ -1189,6 +1312,12 @@ h4 {
 						<div class='macroItemDescription'> A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_DynamicDataIndex</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_IO'>IO</div>
+						<div class='macroItemDescription'> The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_IO</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_RowAddressLSB'>RowAddressLSB</div>
@@ -1261,7 +1390,7 @@ h4 {
 					</div><br><br>
 			<div class='categoryHeader' id='Palette'><span><h4>Namespace<h2>Palette</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Palette_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Palette_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Palette_Vars'><div class='sectionButton'>Vars</div></a></span>
-			<div class='categoryDescription'> API for manipulating the <a href="#MEGA65_Palette">MEGA65 Palettes</a>  </div>
+			<div class='categoryDescription'> API for manipulating the <a href="##MEGA65_Palette">MEGA65 Palettes</a>  </div>
 			<br>
 		
 				<div class='macroHeader' id='Palette_Pseudocommands'>Pseudocommands</div>

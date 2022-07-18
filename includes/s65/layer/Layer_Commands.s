@@ -30,7 +30,6 @@
 
 		.if(!_isAbsXY(color) && !_isImm(color) && !_isReg(color)) .error "Layer_AddText:"+ S65_TypeError
 			
-
 		_saveIfReg(color,	SMcolor)
 		_saveIfReg(xpos, 	S65_PseudoReg + 1)
 		_saveIfReg(ypos, 	S65_PseudoReg + 2)
@@ -134,6 +133,7 @@
 		S65_RestoreRegisters()
 		S65_AddToMemoryReport("Layer_AddText")
 }
+
 _Layer_AddText: {
 			.const TEXT_PTR = S65_TempWord1
 
@@ -430,4 +430,369 @@ _Layer_UpdateLayerOffsets: {
 }
 
 
+/**
+* .pseudocommand AdvanceScreenPointers
+*
+* Advances the S65 Basepage dword values for
+* <a href="#Global_ColorRamPointer">ColorRamPointer<a> and
+* <a href="#Global_ScreenRamPointer">ScreenRamPointer<a>
+* by the given byte offset.<br><br>
+* 
+* Note: This method assumes you are already in the S65 base page, this is true after a 
+* <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> command, 
+* be careful not to use this command if base page is not set, otherwise it will likely write to 
+* unintended locations
+* 
+* @namespace Layer
+*
+* @param {byte?} {REG|IMM} Optional byte offset (defaults to S65_SCREEN_LOGICAL_ROW_WIDTH)
+*
+* @registers A
+* @flags nzc
+*/
+.pseudocommand Layer_AdvanceScreenPointers offset {
+	S65_AddToMemoryReport("Layer_AdvanceScreenPointers")
+	.if(!_isImmOrNone(offset) && !_isReg(offset)) .error "Layer_AdvanceScreenPointers:" +S65_TypeError
+	_saveIfReg(offset, S65_PseudoReg)
 
+
+		.if(_isReg(offset)) {
+			lda S65_PseudoReg + 0
+			sta BRANCH_REGORB8BIT + 4 //Byte offset as lables wont work through the if
+		}
+		BRANCH_REGORB8BIT:
+		.if(!_isNone(offset) && (offset.getValue() < $100 || _isReg(offset))){
+				clc
+				lda.z S65_ScreenRamPointer + 0
+				adc #offset.getValue()
+				sta.z S65_ScreenRamPointer + 0
+				sta.z S65_ColorRamPointer + 0
+				bcc !+
+				inc.z S65_ScreenRamPointer + 1
+				inc.z S65_ColorRamPointer + 1
+			!:
+
+		} else {
+			.if(_isNone(offset)) {
+				.if(S65_SCREEN_LOGICAL_ROW_WIDTH < $100) {
+					clc
+					lda.z S65_ScreenRamPointer + 0
+					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
+					sta.z S65_ScreenRamPointer + 0
+					sta.z S65_ColorRamPointer + 0
+					bcc !+
+					inc.z S65_ScreenRamPointer + 1
+					inc.z S65_ColorRamPointer + 1
+				!:	
+				} else {
+
+					clc
+					lda.z S65_ScreenRamPointer + 0
+					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
+					sta.z S65_ScreenRamPointer + 0
+					sta.z S65_ColorRamPointer + 0
+
+					lda.z S65_ScreenRamPointer + 1
+					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
+					sta.z S65_ScreenRamPointer + 1
+					bcc !+
+					lda.z S65_ColorRamPointer + 1
+					adc #[[>S65_SCREEN_LOGICAL_ROW_WIDTH]-1]
+					sta.z S65_ColorRamPointer + 1
+				!:
+				}
+
+
+			} else {
+				clc
+				lda.z S65_ScreenRamPointer + 0
+				adc #<offset.getValue()
+				sta.z S65_ScreenRamPointer + 0
+				sta.z S65_ColorRamPointer + 0
+				lda.z S65_ScreenRamPointer + 1
+				adc #>offset.getValue()
+				sta.z S65_ScreenRamPointer + 1
+				bcc !+
+				lda.z S65_ColorRamPointer + 1
+				adc #[[>offset.getValue()] -1]
+				sta.z S65_ColorRamPointer + 1	
+			!:
+			}
+
+		}
+	S65_AddToMemoryReport("Layer_AdvanceScreenPointers")
+}
+
+/**
+* .pseudocommand WriteToScreen
+*
+* Copys up to 256 bytes from the source addresses to the locations
+* pointed at by
+* <a href="#Global_ScreenRamPointer">ScreenRamPointer<a> and optionally
+* <a href="#Global_ColorRamPointer">ColorRamPointer<a>. Does NOT change the contents of
+* the screen and color ram pointers.<br>
+* If immediate values are used for source then this byte is written directly<br><br>
+* Note: This method assumes you are already in the S65 base page, this is true after a 
+* <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> command, 
+* be careful not to use this command if base page is not set, otherwise it will likely write to 
+* unintended locations<br>
+* If ABSY mode is used for either source then the y register is added to the address before
+* writing. Additionally upon completion the Y register will be incremented
+* by the amount of bytes written<br><br>
+* Note: Writing past the end of your layers right edge can cause RRB and memory issues
+* please use <a href="#Layer_AdvanceScreenPointers">Layer_AdvanceScreenPointers<a> to move 
+* the pointers safely to the next row
+* 
+* @namespace Layer
+*
+* @param {byte} {ABSY|IMM|REG} screenSource The color source data address to use or a value to use if IMM defaults to #$00
+* @param {byte?} {ABSY|IMM|REG} colorSource The color source data address to use or a value to use if IMM defaults to #$00
+* @param {byte} {REG|IMM} size The lengh of the data in CHARS (so bytes/2)
+*
+* @registers
+* @flags
+*/
+.pseudocommand Layer_WriteToScreen screenSource : colorSource : size {
+	S65_AddToMemoryReport("Layer_WriteToScreen")
+	.if(!_isAbsImmOrReg(screenSource) && !_isAbsY(screenSource)) .error "Layer_WriteToScreen:"+ S65_TypeError
+	.if(!_isAbsImmOrReg(colorSource) && !_isNone(colorSource) && !_isAbsY(colorSource)) .error "Layer_WriteToScreen:"+ S65_TypeError
+	.if(!_isImmOrReg(size)) .error "Layer_WriteToScreen:"+ S65_TypeError
+	phz
+	phx
+	phy	
+
+	_saveIfReg(size, S65_PseudoReg + 0)
+	_saveIfReg(screenSource, S65_PseudoReg + 1)
+	_saveIfReg(colorSource, S65_PseudoReg + 2)
+
+	.if(_isAbsY(screenSource)) {
+		tya 
+		clc 
+		adc #<screenSource.getValue()		
+		sta BRANCH_ABSY_SCREEN + 3
+		lda #>screenSource.getValue()
+		adc #$00
+		sta BRANCH_ABSY_SCREEN + 4
+	}	
+
+	.if(_isAbsY(colorSource)) {
+		tya 
+		lsr
+		clc 
+		adc #<colorSource.getValue()		
+		sta BRANCH_ABSY_COLOR + 7
+		lda #>colorSource.getValue()
+		adc #$00
+		sta BRANCH_ABSY_COLOR + 8
+	}	
+
+			.if(_isReg(size)) {
+				asl.z S65_PseudoReg + 0
+			}
+
+
+			ldz #$00
+			ldx #$00  //offset index 
+		!layerloop:
+		BRANCH_ABSY_SCREEN:
+			//screen ABSY
+			.if(_isAbsY(screenSource)) {
+					ldy #$02
+				!:
+					lda SMsource:$BEEF, x //char lsb
+					sta.z ((S65_ScreenRamPointer)), z 
+					inz 
+					inx 
+					dey 
+					bne !-
+					dex 
+					dez
+
+			} else {
+				//screen ABS
+				.if(_isAbs(screenSource)) {
+					lda screenSource.getValue(), x //char lsb
+					sta.z ((S65_ScreenRamPointer)), z 
+					inz 
+					inx 
+					lda screenSource.getValue(), x //char msb
+					sta.z ((S65_ScreenRamPointer)), z 	
+				} else {
+					//scewen REG
+					.if(_isReg(screenSource)) {
+						lda S65_PseudoReg + 1 //char lsb
+						sta.z ((S65_ScreenRamPointer)), z 
+						inz 
+						inx 
+						lda #$00 //char msb
+						sta.z ((S65_ScreenRamPointer)), z 		
+					} else {
+						//screen IMM
+						lda #screenSource.getValue()
+						sta.z ((S65_ScreenRamPointer)), z 
+						inz 
+						inx 
+						lda #$00 //char msb
+						sta.z ((S65_ScreenRamPointer)), z 					
+					}
+				}
+			}
+			
+
+			//X=+1, Z=+1
+
+		BRANCH_ABSY_COLOR:
+			.if(!_isNone(colorSource)) {
+				.if(_isAbsY(colorSource)) {					
+						stx RestX1
+						txa 
+						lsr 
+						tax 
+
+						lda SMcolor:$BEEF, x //char lsb
+						sta.z ((S65_ColorRamPointer)), z 
+						ldx RestX1:#$BEEF	
+				} else {
+					.if(_isAbs(colorSource)) {
+						lda colorSource.getValue(), x
+						sta.z ((S65_ColorRamPointer)), z 	
+					} else {
+						.if(_isReg(colorSource)) {
+							lda S65_PseudoReg + 2
+							sta.z ((S65_ColorRamPointer)), z 	
+						} else {
+							lda #colorSource.getValue()
+							sta.z ((S65_ColorRamPointer)), z 				
+						}				
+					}
+				}
+			}
+
+			inz 
+			inx 	
+			.if(_isReg(size)) {
+				cpz.z S65_PseudoReg + 0
+			} else {
+				cpz #[size.getValue() * 2]  //Layer width * 2 because 16bit chars
+			}
+			bne !layerloop-
+
+	ply
+
+		.if(_isAbsY(screenSource)||_isAbsY(colorSource)) {
+			sty ADDSM
+			tza 
+			clc 
+			adc ADDSM:#$BEEF 
+			tay 
+		}
+
+	plx
+	plz
+	S65_AddToMemoryReport("Layer_WriteToScreen")			
+}
+
+
+
+/**
+* .pseudocommand SetScreenPointersXY
+*
+* Sets the basepage to point to the S65 base page area
+* and then sets screen and color ram pointers
+* <a href="#Global_ScreenRamPointer">ScreenRamPointer<a> and 
+* <a href="#Global_ColorRamPointer">ColorRamPointer<a>
+* to point to the given layers x and y co-ordinate
+* @namespace Layer
+*
+* @param {byte} {IMM} layer Layer to get pointer to
+* @param {byte} {REG|IMM} xpos Optional xposition on layer
+* @param {byte} {REG|IMM} ypos Optional yposition on layer
+*
+* @registers AB
+* @flags nzc
+*/
+	// .var Layer_RowAddressLSB = $0000
+	// .var Layer_RowAddressMSB = $0000
+
+.pseudocommand Layer_SetScreenPointersXY layer : xpos : ypos {
+	S65_AddToMemoryReport("Layer_SetScreenPointersXY")
+	S65_SetBasePage()
+	.if(!_isImm(layer)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
+	.if(!_isImmOrReg(xpos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
+	.if(!_isImmOrReg(ypos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
+	_saveIfReg(xpos, S65_PseudoReg + 0)
+	_saveIfReg(ypos, S65_PseudoReg + 1)
+	phx 
+
+		.var address = S65_SCREEN_RAM
+		.if(!_isReg(ypos)) .eval address += ypos.getValue() * S65_SCREEN_LOGICAL_ROW_WIDTH
+		.if(!_isReg(xpos)) .eval address += xpos.getValue() * 2
+		.eval address += Layer_LayerList.get(layer.getValue()).get("startAddr")
+
+		.if(!_isReg(xpos) && !_isReg(ypos)) {
+				lda #<address 
+				sta.z S65_ScreenRamPointer + 0
+				sta.z S65_ColorRamPointer + 0	
+				lda #>address 
+				sta.z S65_ScreenRamPointer + 1
+				lda #>[address - S65_SCREEN_RAM]
+				sta.z S65_ColorRamPointer + 1	
+					
+		} else {
+
+				.if(_isReg(xpos) && _isReg(ypos)) {
+						ldx S65_PseudoReg + 1 //YPOS
+						clc 
+						lda Layer_RowAddressLSB, x 
+						adc S65_PseudoReg + 0 //XPOS
+						php
+						clc
+						adc #<address
+						sta.z S65_ScreenRamPointer + 0
+						sta.z S65_ColorRamPointer + 0
+						lda Layer_RowAddressMSB, x 
+						adc #>address
+						plp 
+						adc #$00
+						sta.z S65_ScreenRamPointer + 1
+						sec 
+						sbc #<S65_SCREEN_RAM 
+						sta.z S65_ColorRamPointer + 1
+
+
+				} else {
+					.if(_isReg(ypos)) {
+						ldx S65_PseudoReg + 1
+						clc 
+						lda Layer_RowAddressLSB, x 
+						adc #<address
+						sta.z S65_ScreenRamPointer + 0
+						sta.z S65_ColorRamPointer + 0
+						lda Layer_RowAddressMSB, x 
+						adc #>address
+						sta.z S65_ScreenRamPointer + 1
+						sec 
+						sbc #<S65_SCREEN_RAM 
+						sta.z S65_ColorRamPointer + 1
+
+					} else {
+						clc 
+						lda #<address 
+						adc S65_PseudoReg + 0 //XPOS
+						sta.z S65_ScreenRamPointer + 0
+						sta.z S65_ColorRamPointer + 0
+						lda Layer_RowAddressMSB, x 
+						adc #$00
+						sta.z S65_ScreenRamPointer + 1
+						sec 
+						sbc #<S65_SCREEN_RAM 
+						sta.z S65_ColorRamPointer + 1
+					}
+				}
+
+		}
+
+	plx
+	S65_AddToMemoryReport("Layer_SetScreenPointersXY")
+	//DO NOT RESTORE BASE PAGE 	
+}

@@ -6,7 +6,7 @@
             "annotation": "name",
             "contents": "S65_AddToMemoryReport(${1:name})",
             "kind": "snippet",
-            "details": "Measures the byte size of a block of assembly and records it in the memory report output by <a href=\"S65_MemoryReport\">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both"
+            "details": "Measures the byte size of a block of assembly and records it in the memory report output by <a href=\"#Global_MemoryReport\">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both"
         },
         {
             "trigger": "S65_MemoryReport",
@@ -64,6 +64,12 @@
             "details": "Defaults to $ff80000"
         },
         {
+            "trigger": "S65_ColorRamPointer",
+            "annotation": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
+            "kind": "snippet",
+            "details": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+        },
+        {
             "trigger": "S65_SCREEN_LOGICAL_ROW_WIDTH",
             "annotation": "Number of bytes that make up an entire screen row",
             "kind": "snippet",
@@ -86,6 +92,12 @@
             "annotation": "Screen row offset for the row terminator bytes",
             "kind": "snippet",
             "details": "Screen row offset for the row terminator bytes"
+        },
+        {
+            "trigger": "S65_ScreenRamPointer",
+            "annotation": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
+            "kind": "snippet",
+            "details": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
         },
         {
             "trigger": "S65_VISIBLE_SCREEN_CHAR_HEIGHT",
@@ -150,9 +162,9 @@
         },
         {
             "trigger": "DMA_F018_DMA_11_byte_format",
-            "annotation": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>.",
+            "annotation": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"#https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>.",
             "kind": "snippet",
-            "details": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>."
+            "details": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"#https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>."
         },
         {
             "trigger": "Layer_AddText",
@@ -160,6 +172,13 @@
             "contents": "Layer_AddText ${1:layer} : ${2:xpos} : ${3:ypos} : ${4:textPtr} : ${5:color}",
             "kind": "snippet",
             "details": "Writes a string of bytes to the given layer and co-ordinate. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: As layer screen rows are interlaced in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
+        },
+        {
+            "trigger": "Layer_AdvanceScreenPointers",
+            "annotation": "Optional",
+            "contents": "Layer_AdvanceScreenPointers ${1:Optional}",
+            "kind": "snippet",
+            "details": "Advances the S65 Basepage dword values for <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> and <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> by the given byte offset.<br><br>  Note: This method assumes you are already in the S65 base page, this is true after a <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations"
         },
         {
             "trigger": "Layer_ClearAllLayers",
@@ -176,11 +195,25 @@
             "details": "Fills the screen RAM area for the layer with a given 16bit value."
         },
         {
+            "trigger": "Layer_SetScreenPointersXY",
+            "annotation": "layer:xpos:ypos",
+            "contents": "Layer_SetScreenPointersXY ${1:layer} : ${2:xpos} : ${3:ypos}",
+            "kind": "snippet",
+            "details": "Sets the basepage to point to the S65 base page area and then sets screen and color ram pointers <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> to point to the given layers x and y co-ordinate"
+        },
+        {
             "trigger": "Layer_UpdateLayerOffsets",
             "annotation": "",
             "contents": "Layer_UpdateLayerOffsets ",
             "kind": "snippet",
             "details": "Updates the RRB GotoX markers for all but the RRB sprite layers"
+        },
+        {
+            "trigger": "Layer_WriteToScreen",
+            "annotation": "screenSource:colorSource:size",
+            "contents": "Layer_WriteToScreen ${1:screenSource} : ${2:colorSource} : ${3:size}",
+            "kind": "snippet",
+            "details": "Copys up to 256 bytes from the source addresses to the locations pointed at by <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and optionally <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a>. Does NOT change the contents of the screen and color ram pointers.<br> If immediate values are used for source then this byte is written directly<br><br> Note: This method assumes you are already in the S65 base page, this is true after a <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations<br> If ABSY mode is used for either source then the y register is added to the address before writing. Additionally upon completion the Y register will be incremented by the amount of bytes written<br><br> Note: Writing past the end of your layers right edge can cause RRB and memory issues please use <a href=\"#Layer_AdvanceScreenPointers\">Layer_AdvanceScreenPointers<a> to move the pointers safely to the next row"
         },
         {
             "trigger": "Layer_DefineRRBSpriteLayer",
@@ -194,7 +227,7 @@
             "annotation": "charWidth,charHeight,stretchWide",
             "contents": "Layer_DefineResolution(${1:charWidth}, ${2:charHeight}, ${3:stretchWide})",
             "kind": "snippet",
-            "details": "Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched horizontally to fit the width of the display. <a href=\"#Layer_InitScreen\">Layer_InitScreen</a> will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>  NOTE:<br> - charHeight above 32 will use V400 mode and disable any RRB double buffering and double rate RRB<br> - charWidth above 42 will use H640 mode<br>"
+            "details": "Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched horizontally to fit the width of the display. <a href=\"##Layer_InitScreen\">Layer_InitScreen</a> will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>  NOTE:<br> - charHeight above 32 will use V400 mode and disable any RRB double buffering and double rate RRB<br> - charWidth above 42 will use H640 mode<br>"
         },
         {
             "trigger": "Layer_DefineScreenLayer",
@@ -257,12 +290,6 @@
             "details": "Table of current GOTOX positions for all the layers"
         },
         {
-            "trigger": "Layer_IO",
-            "annotation": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.",
-            "kind": "snippet",
-            "details": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
-        },
-        {
             "trigger": "Layer_LayerWidth",
             "annotation": "Table of start address offsets for each layer",
             "kind": "snippet",
@@ -285,6 +312,12 @@
             "annotation": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory",
             "kind": "snippet",
             "details": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory"
+        },
+        {
+            "trigger": "Layer_IO",
+            "annotation": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.",
+            "kind": "snippet",
+            "details": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
         },
         {
             "trigger": "Layer_RowAddressLSB",

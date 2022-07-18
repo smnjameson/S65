@@ -1,7 +1,7 @@
 /**
  * .namespace Palette
  * 
- * API for manipulating the <a href="#MEGA65_Palette">MEGA65 Palettes</a>
+ * API for manipulating the <a href="##MEGA65_Palette">MEGA65 Palettes</a>
  * 
  * .data MEGA65_Palette
  * 

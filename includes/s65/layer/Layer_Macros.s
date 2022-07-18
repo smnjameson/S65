@@ -2,7 +2,7 @@
  * .macro DefineResolution
  *
  * Defines the screen resolution in 8x8 charachters (regardless if NCM is being used) and if it should be stretched
- * horizontally to fit the width of the display. <a href="#Layer_InitScreen">Layer_InitScreen</a>
+ * horizontally to fit the width of the display. <a href="##Layer_InitScreen">Layer_InitScreen</a>
  * will configure the borders and TEXTXPOS and TEXTYPOS to center the screen on the display.<br><br>
  * 
  * NOTE:<br>
@@ -379,8 +379,8 @@
 	}
 
 	.if(LAYER_RESOLUTION_STRETCHED) {
-		.var textXpos = $3e
-		.var borderSide = textXpos + 1
+		.var textXpos = $3c
+		.var borderSide = textXpos + 3
 
 		.var hscale = ((S65_VISIBLE_SCREEN_CHAR_WIDTH  * ncmMult)/ (Layer_MAX_SCREEN_WIDTH - 0.5)) * $78
 		.if(S65_VISIBLE_SCREEN_CHAR_WIDTH <= (Layer_SCREEN_HORIZ_BREAK / ncmMult)) {
@@ -603,7 +603,7 @@
 				lda Layer_src, y
 				sta ((S65_ColorRamPointer)), z 
 				inz 
-				lda #$00
+				lda #$ff
 				sta ((S65_ColorRamPointer)), z 
 				inz 
 				tza

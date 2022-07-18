@@ -725,7 +725,7 @@ function onClose(line){
 			for(var j=0; j<cat.var.length; j++) {
 				let name = cat.var[j].name 
 				let desc = cat.var[j].description
-				let usage = (cat.name || globalNamespace) + "_" + name
+				let usage = (cat.name !== "Global" ? cat.name : globalNamespace) + "_" + name
 				var fullcmd = (cat.name !== "Global" ? cat.name : globalNamespace) + "_" + name
 
 				html += `

@@ -19,14 +19,16 @@ set KICK=java -cp build\kickass.jar kickass.KickAssembler65CE02 -vicesymbols -sh
 set PNG65=node build\aseparse65\png65.js
 
 
-
-
+echo GENERATING ASSETS
+%PNG65% chars --ncm --input "assets\source\test2.png" --output "assets\bin"
 
 echo ASSEMBLING SOURCES...
 %KICK% main.s -odir ./bin
 
-echo DEPLOYING...
-rem node Z:\Projects\JS\M65Debugger\client.js ./bin/main.prg
-
 echo GENERATING ASSETS
-%PNG65% chars --ncm --input "assets\source\dankwarsFCM.png" --output "assets\bin"
+%PNG65% chars --ncm --input "assets\source\test2.png" --output "assets\bin"
+
+echo DEPLOYING...
+node Z:\Projects\JS\M65Debugger\client.js ./bin/main.prg
+
+

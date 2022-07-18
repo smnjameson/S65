@@ -181,7 +181,7 @@ _S65_SetBasePage: {
 * .macro AddToMemoryReport
 *
 * Measures the byte size of a block of assembly and records
-* it in the memory report output by <a href="S65_MemoryReport">S65_MemoryReport</a><br><br>
+* it in the memory report output by <a href="#Global_MemoryReport">S65_MemoryReport</a><br><br>
 * Called at the start and the end of the code block you wish to measure by passing the same name
 * in both
 * 
