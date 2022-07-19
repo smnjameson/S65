@@ -248,50 +248,69 @@ _Layer_AddText: {
 *
 * @param {byte} {REG|IMM} layer The layer number to clear
 * @param {word?} {REG|IMM} clearChar The 16bit char value to clear with, defaults to $0000
+* @param {word?} {REG|IMM} clearColor The 8bit char value to clear with, defaults to $00
 *
 * @registers AXY
 * @flags nzc
 * 
 * @return {byte} A <add description here> 
 */
-.pseudocommand Layer_ClearLayer layer : clearChar {
+.pseudocommand Layer_ClearLayer layer : clearChar : clearColor {
 	S65_AddToMemoryReport("Layer_ClearLayer")
-		.if(_isReg(layer)) {
-			 _saveIfReg(layer, SMlayer)
-		} else {
-			.if(!_isImmOrNone(layer)) .error "Layer_ClearLayer:"+ S65_TypeError
-		}
-		.if(_isReg(clearChar)) {
-			 _saveIfReg(clearChar, S65_PseudoReg + 0)
-		} else {
-			.if(!_isImmOrNone(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
-		}
+		.if(!_isImmOrNone(layer)) .error "Layer_ClearLayer:"+ S65_TypeError
+		.if(!_isImmOrNone(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
+		.if(!_isImmOrNone(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
+		
 
 		_saveIfReg(layer, SMlayer)
+		_saveIfReg(clearChar, S65_PseudoReg + 0)
+		_saveIfReg(clearChar, S65_PseudoReg + 1)
+		
 
 		//X=charLo, Y=charHi, A = layer
-		
-			
 		//REGISTER
-		.if(_isReg(clearChar)) {
-			lda S65_PseudoReg + 0
-			tax 
-			ldy #$00
-		}  else {
-			ldx #<clearChar.getValue()
-
-			ldy #>clearChar.getValue()
-
+		.if(_isNone(clearChar)) {
+				ldx #$00
+				ldy #$00
+		} else {
+			.if(_isReg(clearChar)) {
+				lda S65_PseudoReg + 0
+				tax 
+				ldy #$00
+			}  else {
+				ldx #<clearChar.getValue()
+				ldy #>clearChar.getValue()
+			}
 		}
 		lda SMlayer:#[layer.getValue()]
+		.if(!_isNone(clearColor)) {
+			pha
+		}
 		jsr Layer_DMAClear
+		
+		.if(!_isNone(clearColor)) {
+
+			.if(_isReg(clearColor)) {
+				lda S65_PseudoReg + 1
+				tax 
+				ldx #$00
+			}  else {
+.print ("clearColor.getValue(): $" + toHexString(clearColor.getValue()))
+				ldx #<clearColor.getValue()
+			}
+			pla
+			jsr Layer_DMAClearColor
+		}		
+
+		
+
 	S65_AddToMemoryReport("Layer_ClearLayer")
 }
 
 
 
 /**
-* .pseudocommand UpdateLayerOffsets
+* .pseudocommand Update
 *
 * Updates the RRB GotoX markers for all but the 
 * RRB sprite layers
@@ -301,12 +320,12 @@ _Layer_AddText: {
 * @registers A
 * @flags znc
 */
-.pseudocommand Layer_UpdateLayerOffsets {
-		S65_AddToMemoryReport("Layer_UpdateLayerOffsets")
-		jsr _Layer_UpdateLayerOffsets
-		S65_AddToMemoryReport("Layer_UpdateLayerOffsets")
+.pseudocommand Layer_Update {
+		S65_AddToMemoryReport("Layer_Update")
+		jsr _Layer_Update
+		S65_AddToMemoryReport("Layer_Update")
 }
-_Layer_UpdateLayerOffsets: {
+_Layer_Update: {
 		phx 
 		phy
 		phz

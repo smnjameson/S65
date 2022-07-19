@@ -1,216 +1,202 @@
 /**
- * .global S65
+* .var SCREEN_RAM
+* Defaults to $0800
+*/
+.var 		S65_SCREEN_RAM = $0800
+
+/**
+* .var COLOR_RAM
+* Defaults to $ff80000
+*/
+.var 		S65_COLOR_RAM = $ff80000
+
+/**
+* .var VISIBLE_SCREEN_CHAR_WIDTH
+* Width of the visible screen background layer in characters
+*/
+.var 		S65_VISIBLE_SCREEN_CHAR_WIDTH = 84 //692x512
+
+/**
+* .var VISIBLE_SCREEN_CHAR_HEIGHT
+* Height of the visible screen background layer in characters
+*/
+.var 		S65_VISIBLE_SCREEN_CHAR_HEIGHT = 64 //MUST start with this value as its the MAX possible height
+
+/**
+* .var SCREEN_ROW_WIDTH
+* Number of characters that make up an entire screen row
+*/
+.var 		S65_SCREEN_ROW_WIDTH = 0
+
+/**
+* .var SCREEN_LOGICAL_ROW_WIDTH
+* Number of bytes that make up an entire screen row
+*/
+.var 		S65_SCREEN_LOGICAL_ROW_WIDTH = 0
+
+/**
+* .var SCREEN_TERMINATOR_OFFSET
+* Screen row offset for the row terminator bytes
+*/
+.var 		S65_SCREEN_TERMINATOR_OFFSET = 0
+
+
+/**
+ * .macro Trace
  * 
- * Shallan65 macro toolkit for the MEGA65.<br><br>
- * - Uses NCM and FCM mode and the raster rewrite buffer to provide
- * a powerful layer and sprite framework<br>
- * - DMA job data macros<br>
- * - SDCard loading
- * <br>
- * <br>
- * The Global(S65) namespace is mostly used internally
- * by the engine, however some methods and vars may be of
- * use.
- *
- * @author     Shallan50k
- * @date       13/07/2022
+ * Outputs a string to the kick assembler console at build time
+ * 
+ * @param {string} str The string to output in the console
  */
-.cpu _45gs02
-.const S65_MAX_LAYERS = $10
-
-System_BasicUpstart65(S65_InitComplete)
-* = $2016 "S65 Base page area"
-
-//Constants and functions for use with the pseudocommandsystem
-.const AT_IMMEDIATE16 = -6
-.const REGA = $f0128ceee1
-.const REGX = $f0128ceee2
-.const REGY = $f0128ceee3
-.const REGZ = $f0128ceee4
-
-.const S65_TypeError = " does not support this addressing mode."
-
-.const TRUE = 1
-.const FALSE = 0
-
-.function _isReg(p) {
-	.return ((p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE || p.getType() == AT_ABSOLUTE) && _isRegValue(p))
-}
-.function _isRegValue(p) {
-	.return (p.getValue() >=REGA && p.getValue() <= REGZ)
-}
-.function _isNone(p) {
-	.return (p.getType() == AT_NONE) && !_isRegValue(p)
-}
-.function _isAbs(p) {
-	.return (p.getType() == AT_ABSOLUTE)
-}
-.function _isImm(p) {
-	.return (p.getType() == AT_IMMEDIATE16 || p.getType() == AT_IMMEDIATE) && !_isRegValue(p)
-}
-.function _isAbsX(p) {
-	.return (p.getType() == AT_ABSOLUTEX) && !_isRegValue(p)
-}
-.function _isAbsXY(p) {
-	.return (_isAbsX(p) || p.getType() == AT_ABSOLUTEY) && !_isRegValue(p)
-}
-.function _isAbsY(p) {
-	.return (p.getType() == AT_ABSOLUTEY) && !_isRegValue(p)
-}
-.function _isAbsImm(p) {
-	.return (_isAbs(p) || _isImm(p)) && !_isRegValue(p)
-}
-.function _isImmOrNone(p) {
-	.return (_isImm(p) || _isNone(p)) && !_isRegValue(p)
-} 
-.function _isImmOrReg(p) {
-	.return (_isImm(p) || _isReg(p))
-} 
-.function _isAbsImmOrNone(p) {
-	.return (_isAbs(p) || _isNone(p) || _isImm(p)) && !_isRegValue(p)
-}
-.function _isAbsImmOrReg(p) {
-	.return (_isAbs(p) || _isReg(p) || _isImm(p))
+.macro S65_Trace(str) {
+    #if NODEBUG
+    #else
+	   .print "-=[S65]=- "+str
+    #endif
 }
 
 
-.macro _saveIfReg(p , addr) {
-	.if(_isReg(p)) {
-		.if(p.getValue() == REGA) sta addr
-		.if(p.getValue() == REGX) stx addr
-		.if(p.getValue() == REGY) sty addr
-		.if(p.getValue() == REGZ) stz addr
-	}
-}
-.macro _saveIfRegOrNone(p , addr) {
-	.if(_isReg(p)) {
-		.if(p.getValue() == REGA) sta addr
-		.if(p.getValue() == REGX) stx addr
-		.if(p.getValue() == REGY) sty addr
-		.if(p.getValue() == REGZ) stz addr
-	} 
-	.if(_isNone(p)) {
-		lda #$00
-		sta addr
-	}	
-}
-
-////////////////////////////////////////////
-//Base page vars
-////////////////////////////////////////////
-.align $40 //Ensure theres enough room in the page for the base vars
-.var 		S65_BASEPAGE = [* >> 8]		//Gets the page# of this address
-			
-/** 
- * .var ScreenRamPointer
+/**
+ * .macro SetBasePage
  * 
- * S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set
- * at all times so can be used to access the screen ram using 32bit indirect z addressing.
- * DO NOT change bytes 2 and 3!<br><br>
+ * Saves the current base page in S65_LastBasePage and sets the
+ * base page to the S65 Base page area
  * 
- * For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary
- * and aligned to page boundarys as the engine assumes this for speed<br><br>
+ * @registers AB
+ * @flags nz
+ */
+.macro S65_SetBasePage() {
+        jsr _S65_SetBasePage
+}
+_S65_SetBasePage: {
+		tba 
+		sta S65_LastBasePage
+		lda #S65_BASEPAGE
+		tab 
+        rts
+}
+
+/**
+ * .macro RestoreBasePage
  * 
- * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or 
- * <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a>
- * to correctly set up the base page
- * before using indirect indexed adressing modes.
- */			
-			S65_ScreenRamPointer: .dword $00000000
-/** 
- * .var ColorRamPointer
+ * Restores the base page from S65_LastBasePage
  * 
- * S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set
- * at all times so can be used to access the color ram using 32bit indirect z addressing.
- * DO NOT change bytes 2 and 3!<br><br>
- * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or 
- * <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a>
- * to correctly set up the base page
- * before using indirect indexed adressing modes.
- */	
-			S65_ColorRamPointer: .dword $00000000	
-						
-			S65_BaseScreenRamPointer: .dword $00000000
-			S65_BaseColorRamPointer: .dword $00000000
+ * @registers AB
+ * @flags nz
+ */
+.macro S65_RestoreBasePage() {
+		lda.z S65_LastBasePage
+		tab 
+}
 
-			S65_DynamicLayerData: .word $0000
- 			S65_PseudoReg:	
- 				.byte $00,$00,$00,$00
- 				.byte $00,$00,$00,$00
- 			S65_LastBasePage: .byte $00
-
- 			S65_TempDword1:	.dword $00000000
- 			S65_TempDword2:	.dword $00000000
- 			S65_TempWord1:	.word $0000
- 			S65_TempByte1:	.byte $00
- 			S65_TempByte2:	.byte $00
-
-
-///////////////////////////////////////////// 32 of 64 bytes
-
-#import "includes/s65/sdcard.s"		
-#import "includes/s65/common.s"
-#import "includes/s65/layer.s"
-#import "includes/s65/system.s"
-#import "includes/s65/dma.s"
-#import "includes/s65/palette.s"
-
-S65: {
-	Init: {
-			sei 
-			lda #$35
-			sta $01
-			//Disable CIA interrupts
-			lda #$7f
-			sta $dc0d
-			sta $dd0d
-
-			System_Enable40Mhz()
-			System_EnableVIC4()
-			System_DisableC65ROM()
-
-			//Disable IRQ raster interrupts
-			//because C65 uses raster interrupts in the ROM
-			lda #$00
-			sta $d01a
-
-			//Unmap C65 Roms $d030 by clearing bits 3-7
-			lda #%11111000
-			trb $d030
-			cli
-
-			//Disable hot register so VIC2 registers 
-			//turn off bit 7 
-			lda #$80		
-			trb $d05d		//wont destroy VIC4 values (bit 7)
-
-
-			//Disable VIC3 ATTR register to enable 8bit color
-			lda #$20 
-			trb $d031
-
-			//Enable RAM palettes
-			lda #$04
-			tsb $d030
-
-			//Turn on FCM mode and
-			//16bit per char number
-			//bit 0 = Enable 16 bit char numbers
-			//bit 1 = Enable Fullcolor for chars <=$ff
-			//bit 2 = Enable Fullcolor for chars >$ff
-			lda #$05
-			sta $d054
-
-
-			
-			rts
-	}
-
-
+/**
+* .macro SaveRegisters
+*
+* Pushes the AXYZ registers onto the stack
+* 
+* @namespace S65
+*/
+.macro S65_SaveRegisters() {
+    pha 
+    phx 
+    phy 
+    phz
 }
 
 
-//This label S65_InitComplete MUST always be at the end of the library 
-//as it is where the program continues execution when initialised
-S65_InitComplete:
+/**
+* .macro RestoreRegisters
+*
+* Pulls the AXYZ registers off the stack
+* 
+* @namespace S65
+*/
+.macro S65_RestoreRegisters() {
+    plz 
+    ply 
+    plx 
+    pla
+}
 
+/**
+* .macro Text16
+*
+* Generates a string of 16 bit words based on the text input.
+* The upper nybblwe of each word is $00 and the lower nybble 
+* is the normal 8 bit .screencode encoded value. terminates the string with $ffff
+*
+* @param {byte} str The string to convert
+*/
+.macro S65_Text16(str) {
+    .for(var i=0; i<str.size(); i++) {
+        .byte str.charAt(i), $00
+    }
+    .word $ffff
+}
+
+
+
+
+
+
+/**
+* .macro MemoryReport
+*
+* Called at the very end of your program code this macro will
+* produce a report of the memory used in each of the framework calls
+* 
+* @namespace S65
+*/
+.macro S65_MemoryReport() {
+
+    S65_Trace("Memory Report")
+    S65_Trace("============================")
+    S65_Trace("Total   Count:Avg     Method")
+    S65_Trace("-----   ---------     ------")
+    .var keys = _MemoryReport.keys()
+    .var libCallsTotal = 0
+    .for (var i=0; i<keys.size(); i++) {
+        .var ht = _MemoryReport.get(keys.get(i))
+        .if(keys.get(i) != "Layer_DynamicDataAndIO") {
+            S65_Trace("$"+toHexString(ht.get("bytes"),4)+"  ($"+toHexString(ht.get("count"),2)+":$"+toHexString(floor(ht.get("bytes") / ht.get("count")),4) + ")    "+keys.get(i))
+            .eval libCallsTotal += ht.get("bytes")
+        }
+    }
+    S65_Trace("")   
+    S65_Trace("Summary:")
+    S65_Trace("    S65 Base Library $2001-$"+ toHexString( S65_InitComplete) + " ($" + toHexString( S65_InitComplete - $2001) + " bytes)")
+    S65_Trace("    Total program memory used $"+ toHexString( * - S65_InitComplete))
+    S65_Trace("        of which:")
+    .var _dynamicDataIO = _MemoryReport.get("Layer_DynamicDataAndIO")
+    S65_Trace("        Library calls       $"+toHexString(libCallsTotal))
+    S65_Trace("        Layer IO and data   $"+toHexString(_dynamicDataIO.get("bytes")))
+    // S65_Trace("        Other program code  $"+toHexString( (* - S65_InitComplete) - (_dynamicDataIO.get("bytes") + libCallsTotal) ))
+    S65_Trace("============================")    
+}
+.const _MemoryReport = Hashtable()
+
+/**
+* .macro AddToMemoryReport
+*
+* Measures the byte size of a block of assembly and records
+* it in the memory report output by <a href="#Global_MemoryReport">S65_MemoryReport</a><br><br>
+* Called at the start and the end of the code block you wish to measure by passing the same name
+* in both
+* 
+* @namespace S65
+*
+* @param {string} name The StringID you wish to appear in the report
+*/
+.macro S65_AddToMemoryReport(name) {
+    .if(_MemoryReport.containsKey(name) == false ) {
+        .eval _MemoryReport.put(name, Hashtable().put("count",0).put("bytes",0).put("start", 0))
+    }
+    .if(_MemoryReport.get(name).get("start") == 0) {
+        .eval _MemoryReport.get(name).put("start", *)
+    } else {
+        .var count = _MemoryReport.get(name).get("count") + 1
+        .var b = _MemoryReport.get(name).get("bytes") + [* - _MemoryReport.get(name).get("start")]
+        .eval _MemoryReport.get(name).put("count",count).put("bytes",b)
+        .eval _MemoryReport.get(name).put("start", 0)
+    }
+}

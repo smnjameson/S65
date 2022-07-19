@@ -1,16 +1,13 @@
 
 /**
- * .var IO
+ * .var IOGotoX
  * 
- * The IO registers for a standard screen layer<br><br>
- * Note: You can retrieve the base address of this layers
- * IO registers with the
+ * {word} The IO register index for this layers GOTOX value. Retrieve the
+ * absolute address by passing it to the
  * <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a>
  * function.
  * 
  * @namespace Layer
- * 
- * @addr {word} Layer_IOGotoX The GOTOX value to apply to this layer
  */
 .var Layer_IOGotoX = $00
 
@@ -72,12 +69,21 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	/**
 	* .var DMAClear
 	*
-	* Pointer to a dma subroutine that clears the layer, A=layer, X=charLo, Y=charHi
+	* Pointer to a dma subroutine that clears the screen ram layer, A=layer, X=charLo, Y=charHi
 	* 
 	* @namespace Layer
 	*
 	*/
 	.var Layer_DMAClear  = $0000
+	/**
+	* .var DMADMAClearColor
+	*
+	* Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color
+	* 
+	* @namespace Layer
+	*
+	*/
+	.var Layer_DMAClearColor  = $0000
 
 	.var Layer_src = $0000
 	.var Layer_width = $0000

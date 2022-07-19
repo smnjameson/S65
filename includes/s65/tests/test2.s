@@ -1,6 +1,7 @@
 
 //////////////////////////////////////////////////
-// NCM Asset pipeline, Hi res and Layering test
+// NCM Asset pipeline, stretched 336x240 res 
+// and Layering test
 //////////////////////////////////////////////////
 
 // #define NODEBUG
@@ -99,5 +100,5 @@
 
 S65_MemoryReport()
 
-*=$4000
+*=$4000 "Char set"
 	.import binary "assets/bin/test2_chars.bin"

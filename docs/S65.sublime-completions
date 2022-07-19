@@ -100,6 +100,12 @@
             "details": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
         },
         {
+            "trigger": "S65_SpareBasePage",
+            "annotation": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page",
+            "kind": "snippet",
+            "details": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page"
+        },
+        {
             "trigger": "S65_VISIBLE_SCREEN_CHAR_HEIGHT",
             "annotation": "Height of the visible screen background layer in characters",
             "kind": "snippet",
@@ -189,8 +195,8 @@
         },
         {
             "trigger": "Layer_ClearLayer",
-            "annotation": "layer:clearChar",
-            "contents": "Layer_ClearLayer ${1:layer} : ${2:clearChar}",
+            "annotation": "layer:clearChar:clearColor",
+            "contents": "Layer_ClearLayer ${1:layer} : ${2:clearChar} : ${3:clearColor}",
             "kind": "snippet",
             "details": "Fills the screen RAM area for the layer with a given 16bit value."
         },
@@ -202,9 +208,9 @@
             "details": "Sets the basepage to point to the S65 base page area and then sets screen and color ram pointers <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> to point to the given layers x and y co-ordinate"
         },
         {
-            "trigger": "Layer_UpdateLayerOffsets",
+            "trigger": "Layer_Update",
             "annotation": "",
-            "contents": "Layer_UpdateLayerOffsets ",
+            "contents": "Layer_Update ",
             "kind": "snippet",
             "details": "Updates the RRB GotoX markers for all but the RRB sprite layers"
         },
@@ -303,9 +309,15 @@
         },
         {
             "trigger": "Layer_DMAClear",
-            "annotation": "Pointer to a dma subroutine that clears the layer, A=layer, X=charLo, Y=charHi",
+            "annotation": "Pointer to a dma subroutine that clears the screen ram layer, A=layer, X=charLo, Y=charHi",
             "kind": "snippet",
-            "details": "Pointer to a dma subroutine that clears the layer, A=layer, X=charLo, Y=charHi"
+            "details": "Pointer to a dma subroutine that clears the screen ram layer, A=layer, X=charLo, Y=charHi"
+        },
+        {
+            "trigger": "Layer_DMADMAClearColor",
+            "annotation": "Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color",
+            "kind": "snippet",
+            "details": "Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color"
         },
         {
             "trigger": "Layer_DynamicDataIndex",
@@ -314,10 +326,10 @@
             "details": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory"
         },
         {
-            "trigger": "Layer_IO",
-            "annotation": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.",
+            "trigger": "Layer_IOGotoX",
+            "annotation": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.",
             "kind": "snippet",
-            "details": "The IO registers for a standard screen layer<br><br> Note: You can retrieve the base address of this layers IO registers with the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
+            "details": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
         },
         {
             "trigger": "Layer_RowAddressLSB",

@@ -108,9 +108,10 @@ function getNCMData(png, palette) {
                             png.data[i+3] === a.alpha
                         );
                     })
+                    originalPalIndex.push(col1)
                     if(charCols.indexOf(col1) === -1)  charCols.push(col1)  
                     let nyb1 = charCols.indexOf(col1)
-                    originalPalIndex.push(col1)
+                    
 
                     let col2 = palette.findIndex(a => {
                         return (
@@ -120,8 +121,14 @@ function getNCMData(png, palette) {
                             png.data[j+3] === a.alpha
                         );
                     })   
+                     originalPalIndex.push(col2)
                     if(charCols.indexOf(col2) === -1)  charCols.push(col2) 
                     let nyb2 = charCols.indexOf(col2)
+
+                    //push colors in this order so they can be turned into bytes easily alter
+
+                   
+                    
 
                     if(nyb1 > 0xf || nyb2 > 0xf) {
                         throw(new Error(`Too many colors in this char: $${data.length.toString(16)}`))
@@ -133,6 +140,10 @@ function getNCMData(png, palette) {
             charColors.push(charCols)
         }
     }
+
+    // console.log(charColors)
+    // console.log("===================")
+    // console.log(originalPalIndex)
 
     return { data, charColors, originalPalIndex }
 }
@@ -169,7 +180,7 @@ function findBestFitForCharColors(inp, out) {
             let matches = inp.filter(a => out[i].includes(a));
             let uniques = inp.filter(a => !out[i].includes(a));
             if( matches.length > best && //most matches in this palette slice
-                uniques.length + out[i].length <= 16) {
+                uniques.length + out[i].length <= 15) {
                 best = i 
                 max = matches.length
                 unq = uniques
@@ -183,7 +194,7 @@ function findBestFitForCharColors(inp, out) {
         return out
 }
 
-function sortNCMPalette(charData, paletteData, charColors) {
+function sortNCMPalette(charData, paletteData) {
         let sortedArray = new Array(16).fill([0])
 
         for(var i=0; i<charData.charColors.length; i++) {
@@ -191,11 +202,13 @@ function sortNCMPalette(charData, paletteData, charColors) {
             let colors = charData.charColors[i]
             sortedArray = findBestFitForCharColors(colors, sortedArray)
         }
-       
+      
         let palette = [];
         let pal = { r: [], g: [], b: [] }
         for(var s = 0; s<16; s++){
+             
             for(var i=0; i<16; i++){
+
                 var col = sortedArray[s][i]
 
                 if(typeof col !== 'undefined') {
@@ -216,22 +229,68 @@ function sortNCMPalette(charData, paletteData, charColors) {
                     pal.b.push(0)                   
                 }
             }
+
+
+            if(sortedArray[s].reduce((p, a) => p + a, 0)) {
+                console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
+            }
         }
+
+        
+
 
         paletteData.palette = palette
         paletteData.pal = pal
 
-        // //remap the chardata
+
+        //Get the color table for NCM
+        charData.slices = []
+        
         for(var i=0; i<charData.charColors.length ; i++) {
             for(var j=0; j<sortedArray.length; j++) {
                 var colors = charData.charColors[i]
                 let matches = sortedArray[j].filter(a => colors.includes(a));
-                if(matches.length === colors.length) {
+
+                if(matches && matches.length === colors.length) {
                     charData.charColors[i] =  j << 4
-                    break;
+                    charData.slices.push(j)
+
+                    break
                 }
             }
+
         }
+
+        console.log(charData.originalPalIndex.length)
+
+        //with the palette found and the color table and slcie array done,
+        //now need to change every pixels data to 
+        //reflect the new color indices changing each nybble
+        for(var i=0; i<charData.originalPalIndex.length; i+=2) {
+
+            //get old value
+            let orig = charData.originalPalIndex[i]
+            //find its new index
+            var s= charData.slices[Math.floor(i/128)]
+            var palSlice = sortedArray[ s ]
+            var index = palSlice.indexOf(orig)
+
+            var out = index 
+
+            //get next value
+            orig = charData.originalPalIndex[i+1]
+            //find its new index
+            s= charData.slices[Math.floor(i/128)]
+            palSlice = sortedArray[ s ]
+            index = palSlice.indexOf(orig)
+
+            out += (index  <<4)
+
+            charData.data[Math.floor(i/2)] = out
+        }
+        
+
+        
 
         //return a palette
         return {paletteData, sortedArray, charColors: charData.charColors}
@@ -281,7 +340,7 @@ async function runCharMapper(argv) {
     }
     if(argv.ncm) {
         charData = getNCMData(png, paletteData.palette)
-        sortedPalette = sortNCMPalette(charData, paletteData, charData.charColors)
+        sortedPalette = sortNCMPalette(charData, paletteData)
         paletteData = sortedPalette.paletteData
 
         convertedPal = paletteData.pal

@@ -1,0 +1,103 @@
+{
+    "scope": "source.assembly.kickassembler",
+    "completions": [
+        {
+            "trigger": "_RestoreBasePage",
+            "annotation": "",
+            "contents": "_RestoreBasePage()",
+            "kind": "snippet",
+            "details": "Restores the base page from S65_LastBasePage"
+        },
+        {
+            "trigger": "_SetBasePage",
+            "annotation": "",
+            "contents": "_SetBasePage()",
+            "kind": "snippet",
+            "details": "Saves the current base page in S65_LastBasePage and sets the base page to the S65 Base page area"
+        },
+        {
+            "trigger": "_Text16",
+            "annotation": "str",
+            "contents": "_Text16(${1:str})",
+            "kind": "snippet",
+            "details": "Generates a string of 16 bit words based on the text input. The upper nybblwe of each word is $00 and the lower nybble is the normal 8 bit .screencode encoded value. terminates the string with $ffff"
+        },
+        {
+            "trigger": "_Trace",
+            "annotation": "str",
+            "contents": "_Trace(${1:str})",
+            "kind": "snippet",
+            "details": "Outputs a string to the kick assembler console at build time"
+        },
+        {
+            "trigger": "_COLOR_RAM",
+            "annotation": "Defaults to $ff80000",
+            "kind": "snippet",
+            "details": "Defaults to $ff80000"
+        },
+        {
+            "trigger": "_SCREEN_LOGICAL_ROW_WIDTH",
+            "annotation": "Number of bytes that make up an entire screen row",
+            "kind": "snippet",
+            "details": "Number of bytes that make up an entire screen row"
+        },
+        {
+            "trigger": "_SCREEN_RAM",
+            "annotation": "* Defaults to $0800",
+            "kind": "snippet",
+            "details": "* Defaults to $0800"
+        },
+        {
+            "trigger": "_SCREEN_ROW_WIDTH",
+            "annotation": "Number of characters that make up an entire screen row",
+            "kind": "snippet",
+            "details": "Number of characters that make up an entire screen row"
+        },
+        {
+            "trigger": "_SCREEN_TERMINATOR_OFFSET",
+            "annotation": "Screen row offset for the row terminator bytes",
+            "kind": "snippet",
+            "details": "Screen row offset for the row terminator bytes"
+        },
+        {
+            "trigger": "_VISIBLE_SCREEN_CHAR_HEIGHT",
+            "annotation": "Height of the visible screen background layer in characters",
+            "kind": "snippet",
+            "details": "Height of the visible screen background layer in characters"
+        },
+        {
+            "trigger": "_VISIBLE_SCREEN_CHAR_WIDTH",
+            "annotation": "Width of the visible screen background layer in characters",
+            "kind": "snippet",
+            "details": "Width of the visible screen background layer in characters"
+        },
+        {
+            "trigger": "_AddToMemoryReport",
+            "annotation": "name",
+            "contents": "_AddToMemoryReport(${1:name})",
+            "kind": "snippet",
+            "details": "Measures the byte size of a block of assembly and records it in the memory report output by <a href=\"#Global_MemoryReport\">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both"
+        },
+        {
+            "trigger": "_MemoryReport",
+            "annotation": "",
+            "contents": "_MemoryReport()",
+            "kind": "snippet",
+            "details": "Called at the very end of your program code this macro will produce a report of the memory used in each of the framework calls"
+        },
+        {
+            "trigger": "_RestoreRegisters",
+            "annotation": "",
+            "contents": "_RestoreRegisters()",
+            "kind": "snippet",
+            "details": "Pulls the AXYZ registers off the stack"
+        },
+        {
+            "trigger": "_SaveRegisters",
+            "annotation": "",
+            "contents": "_SaveRegisters()",
+            "kind": "snippet",
+            "details": "Pushes the AXYZ registers onto the stack"
+        }
+    ]
+}

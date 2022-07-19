@@ -1,5 +1,9 @@
+//////////////////////////////////////////////////
+// Resolution, scaling and FCM layering test
+//////////////////////////////////////////////////
+
 // #define NODEBUG
-#import "includes/s65/s65.s"
+#import "includes/s65/start.s"
 
 	jmp Start 
 
@@ -36,7 +40,7 @@
 
 		Layer_AddText #1 : #0 : #8 : message : #$0f
 
-		Layer_UpdateLayerOffsets 
+		Layer_Update 
 
 !loop:
 	System_WaitForRaster($0ff)
@@ -49,7 +53,7 @@
 	!:
 
 		//Update all gotox markers
-		Layer_UpdateLayerOffsets 
+		Layer_Update 
 
 	System_BorderDebug($10)
 	jmp !loop-

@@ -458,9 +458,9 @@
 		_configureCharModes()
 
 		lda #[Layer_LayerList.size() * 2]
-		sta _Layer_UpdateLayerOffsets.ListSize0
+		sta _Layer_Update.ListSize0
 		lda #[Layer_LayerList.size() * 2 + 2]
-		sta _Layer_UpdateLayerOffsets.ListSize1
+		sta _Layer_Update.ListSize1
 
 
 
@@ -635,22 +635,30 @@
 			DMA_Header 
 			DMA_Step #$0100 : #$0200
 
-			.var lengthJob1 = * + $02
+			.var lengthJobA = * + $02
 			.var destJobA = * + $07
 			.var jobDataA = * + $04
+			.var jobChainA = * + $04
 			DMA_FillJob #$0000 : S65_SCREEN_RAM + 0: #$00 : #TRUE
 
-			.var lengthJob2 = * + $02
+			.var lengthJobB = * + $02
 			.var destJobB = * + $07
 			.var jobDataB = * + $04
 			DMA_FillJob #$0000 : S65_SCREEN_RAM + 1: #$00 : #FALSE
 
+		dmaClearJob2:	
+			DMA_Header #$00 : #$ff
+			DMA_Step #$0100 : #$0200
+			.var lengthJobC= * + $02
+			.var destJobC = * + $07
+			.var jobDataC = * + $04
+			DMA_FillJob #$0000 : S65_COLOR_RAM : #$00 : #FALSE
 
 		//generate DMA lists for clearing a layer
 		.eval Layer_DMAClear = *
 		DMAClear: {
 				//X=charLo, Y=charHi, A = layer
-				stx jobDataA
+				stx jobDataA + 0
 				sty jobDataB + 0
 				asl 
 				tay
@@ -673,12 +681,12 @@
 			
 				//Layer length 
 				lda Layer_LayerWidth, y 
-				sta lengthJob1 + 0				
-				sta lengthJob2 + 0				
+				sta lengthJobA + 0				
+				sta lengthJobB + 0				
 
 				lda Layer_LayerWidth + 1, y
-				sta lengthJob1 + 1
-				sta lengthJob2 + 1
+				sta lengthJobA + 1
+				sta lengthJobB + 1
 
 
 				ldx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
@@ -709,7 +717,51 @@
 				rts 
 
 		}
+		.eval Layer_DMAClearColor = *
+		DMAClearColor: {
+				//X=color,  A = layer
+				stx jobDataC + 0
+				asl 
+				tay
 
+				clc 
+				lda Layer_AddrOffsets, y 	
+				adc #<[S65_COLOR_RAM + 3]				
+				sta destJobC + 0
+				lda Layer_AddrOffsets + 1, y 
+				adc #>[S65_COLOR_RAM + 3]					
+				sta destJobC + 1	
+				
+			
+				//Layer length 
+				lda Layer_LayerWidth, y 			
+				sta lengthJobC + 0				
+
+				lda Layer_LayerWidth + 1, y
+				sta lengthJobC + 1
+
+
+				ldx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+			!loop:
+				
+				DMA_Execute dmaClearJob2
+
+					lda destJobC + 0	
+					clc 
+					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH		
+					sta destJobC + 0
+
+					lda destJobC + 1
+					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH		
+					sta destJobC + 1	
+
+				dex 
+				bne !loop-
+
+				
+				rts 
+
+		}
 
 	end:
 		S65_RestoreBasePage()
