@@ -24,11 +24,18 @@
 		Layer_DefineResolution(42, 30, true)		//Resolution
 
 		.const LYR_BG = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(32, 0, true)  			//layer 1
+		Layer_DefineScreenLayer(21, 0, true)  			
+
 		.const LYR_LV = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(32, 0, true)  			//layer 1
+		Layer_DefineScreenLayer(16, 0, true)  			
+
+		.const LYR_SP = Layer_GetLayerCount()
+		Layer_DefineRRBSpriteLayer(1, 256) 			
+		
 		.const LYR_UI = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(30, 0, false)  			//layer 2
+		Layer_DefineScreenLayer(30, 0, false)  		
+
+	
 		Layer_InitScreen($8000)							//Initialize
 	
 		Palette_SetPalettes #$03 : #$00 : #$00
@@ -40,11 +47,12 @@
 		//clear screen
 		.const BLANK = $100
 		.const BRICK = $106
+
 		//Clear all layers to blank
 		Layer_ClearAllLayers #BLANK 
+
 		//Then fill the background with briick in color #$01
 		Layer_ClearLayer #LYR_BG : #BRICK : #$01
-		// Layer_ClearLayer #LYR_BG : #$002e
 
 		//Add some text to UI layer
 		Layer_AddText #LYR_UI : #0 : #12 : message : #1
@@ -58,19 +66,17 @@
 		//Now draw the char set 4 times slightly offset each time
 		ldz #$04
 	!charsetloop:
-			//Draw full charset
+	
+			//Draw full charset (128 ncm chars) to screen
 			ldy #$00 //Source offset
 			ldx #$08 //How many rows to draw
 		!rowloop:	
-				//draw a row at current position (updates y register)
+				//draw a row at current position 16 chars wide (updates y register)
 				Layer_WriteToScreen testScreenChars,y  : testScreenColors, y : #$10
 				//Advance screen pointers to next row (defaults to LOGICAL ROW SIZE)
 				Layer_AdvanceScreenPointers 
-			!:
 			dex 
 			bne !rowloop-
-
-		Layer_AdvanceScreenPointers #$04	//Move the screen pointer across 4 bytes/2 chars for the next charset
 		dez 
 		lbne !charsetloop-
 
@@ -80,16 +86,16 @@
 	System_BorderDebug($01)
 
 		//Move the BG Layer
-		inc Layer_GetIOAddress(LYR_LV, Layer_IOGotoX) + 0
+		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 0
 		bne !+
-		inc Layer_GetIOAddress(LYR_LV, Layer_IOGotoX) + 1
+		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 1
 	!:
 		//Move the UI layer
-		lda Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 0
+		lda Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
 		bne !+
-		dec Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 1
+		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 1
 	!:
-		dec Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 0
+		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
 
 		//Update - Call once per frame, its expensive!!
 		Layer_Update

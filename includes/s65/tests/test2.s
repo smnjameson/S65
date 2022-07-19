@@ -81,16 +81,16 @@
 	System_BorderDebug($01)
 
 		//Move the BG Layer
-		inc Layer_GetIOAddress(LYR_LV, Layer_IOGotoX) + 0
+		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 0
 		bne !+
-		inc Layer_GetIOAddress(LYR_LV, Layer_IOGotoX) + 1
+		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 1
 	!:
 		//Move the UI layer
-		lda Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 0
+		lda Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
 		bne !+
-		dec Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 1
+		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 1
 	!:
-		dec Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 0
+		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
 
 		//Update - Call once per frame, its expensive!!
 		Layer_Update

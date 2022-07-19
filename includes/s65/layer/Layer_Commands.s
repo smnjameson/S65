@@ -295,7 +295,6 @@ _Layer_AddText: {
 				tax 
 				ldx #$00
 			}  else {
-.print ("clearColor.getValue(): $" + toHexString(clearColor.getValue()))
 				ldx #<clearColor.getValue()
 			}
 			pla
@@ -333,10 +332,12 @@ _Layer_Update: {
 		.const DYN_TABLE = S65_TempWord1
 		S65_SetBasePage()
 			//Transfer the GOTOX values from the dynamic IO
-			ldy #$00
-			ldx #$00
-			ldz #$00
+			lda #$00
+			tax 
+			tay 
+			taz
 		!loop:
+.print ("S65_DynamicLayerData: $" + toHexString(S65_DynamicLayerData))
 			lda (S65_DynamicLayerData), y
 			iny
 			sta.z DYN_TABLE + 0
@@ -344,9 +345,10 @@ _Layer_Update: {
 			dey
 			sta.z DYN_TABLE + 1
 
-			//yreg = 0 {word} Layer_IOGotoX
+			//yreg = 0 {word} Layer_IOgotoX
 			lda (DYN_TABLE), z
 			inz
+.print ("Layer_GotoXPositions: $" + toHexString(Layer_GotoXPositions))
 			sta Layer_GotoXPositions, y
 			inx 
 			iny
@@ -371,20 +373,21 @@ _Layer_Update: {
 			adc.z S65_BaseColorRamPointer + 0
 			inx
 			sta.z S65_ColorRamPointer + 0
+			sta.z S65_ScreenRamPointer + 0
+			php
 			lda Layer_AddrOffsets, x//1
 			adc.z S65_BaseColorRamPointer + 1
 			sta.z S65_ColorRamPointer + 1
-			dex
-
-			clc 
-			lda Layer_AddrOffsets, x//0
-			adc.z S65_BaseScreenRamPointer + 0
-			inx
-			sta.z S65_ScreenRamPointer + 0
+			plp
 			lda Layer_AddrOffsets, x//1
 			adc.z S65_BaseScreenRamPointer + 1
 			sta.z S65_ScreenRamPointer + 1
 			dex
+
+			// 	cpx #$06
+			// 	bne !+
+			// 	jmp *
+			// !:
 
 				ldy #S65_VISIBLE_SCREEN_CHAR_HEIGHT
 			!loop:
@@ -724,8 +727,8 @@ _Layer_Update: {
 * @namespace Layer
 *
 * @param {byte} {IMM} layer Layer to get pointer to
-* @param {byte} {REG|IMM} xpos Optional xposition on layer
-* @param {byte} {REG|IMM} ypos Optional yposition on layer
+* @param {byte} {REG|IMM} xpos x position on layer
+* @param {byte} {REG|IMM} ypos y position on layer
 *
 * @registers AB
 * @flags nzc

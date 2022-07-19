@@ -49,16 +49,16 @@
 }
 
 /**
-* .function GetIOAddress
+* .function GetIO
 *
-* Returns the base address plus an optional offset for the given layers IO registers.<br>
-* See <a href='#Layer_IO'>Layer_IO<a> for register list
-* 
+* Returns the base address for the given layer & register.<br>
+* See <a href='#Layer_Vars'>Layer_IO<a> for register list
+*  
 * @namespace Layer
 *
 * @param {byte} layerNumber The layer number to fetch
-* @param {word} offset The byte offset into the IO register to fetch
+* @param {word} register The register to fetch
 */
-.function Layer_GetIOAddress(layerNumber, offset) {
-	.return Layer_LayerList.get(layerNumber).get("dynamicDataAddr") + offset
+.function Layer_GetIO(layerNumber, register) {
+	.return Layer_LayerList.get(layerNumber).get("dynamicDataAddr") + register
 }

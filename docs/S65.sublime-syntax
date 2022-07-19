@@ -9,10 +9,12 @@ contexts:
   main:
     - match: \b(DMA_CopyJob|DMA_DisableTransparency|DMA_EnableTransparency|DMA_Execute|DMA_FillJob|DMA_Header|DMA_Step|Layer_AddText|Layer_AdvanceScreenPointers|Layer_ClearAllLayers|Layer_ClearLayer|Layer_SetScreenPointersXY|Layer_Update|Layer_WriteToScreen|Palette_LoadFromMem|Palette_LoadFromSD|Palette_Map|Palette_SetPalettes|SDCard_LoadToAtticRam|SDCard_LoadToChipRam)\b
       scope: storage.type.macro
-    - match: \b(Layer_GetColorAddress|Layer_GetIOAddress|Layer_GetLayerCount|Layer_GetScreenAddress)\b
+    - match: \b(Layer_GetColorAddress|Layer_GetIO|Layer_GetLayerCount|Layer_GetScreenAddress)\b
       scope: constant.language.pseudocommand
-    - match: \b(S65_AddToMemoryReport|S65_MemoryReport|S65_RestoreBasePage|S65_RestoreRegisters|S65_SaveRegisters|S65_SetBasePage|S65_Text16|S65_Trace|Layer_DefineRRBSpriteLayer|Layer_DefineResolution|Layer_DefineScreenLayer|Layer_InitScreen|System_BasicUpstart65|System_BorderDebug|System_DisableC65ROM|System_Enable40Mhz|System_EnableFastRRB|System_EnableVIC4|System_WaitForRaster)\b
+    - match: \b(S65_AddToMemoryReport|S65_MemoryReport|S65_RestoreBasePage|S65_RestoreRegisters|S65_SaveRegisters|S65_SetBasePage|S65_Text16|S65_Trace|Layer_DefineRRBSpriteLayer|Layer_DefineResolution|Layer_DefineScreenLayer|Layer_InitScreen|Sprite_GenerateLayerData|System_BasicUpstart65|System_BorderDebug|System_DisableC65ROM|System_Enable40Mhz|System_EnableFastRRB|System_EnableVIC4|System_WaitForRaster)\b
       scope: support.function.3d
+    - match: \b(S65_COLOR_RAM|S65_ColorRamPointer|S65_SCREEN_LOGICAL_ROW_WIDTH|S65_SCREEN_RAM|S65_SCREEN_ROW_WIDTH|S65_SCREEN_TERMINATOR_OFFSET|S65_ScreenRamPointer|S65_SpareBasePage|S65_VISIBLE_SCREEN_CHAR_HEIGHT|S65_VISIBLE_SCREEN_CHAR_WIDTH|Layer_DMAClear|Layer_DMADMAClearColor|Layer_DynamicDataIndex|Layer_IOgotoX|Layer_IOmaxCharsRRB|Layer_Layer_IOrowCountTableRRB|Layer_RowAddressLSB|Layer_RowAddressMSB|Palette_0|Palette_1|Palette_2|Palette_3|Sprite_IOxlsb|Sprite_IOxmsb|Sprite_IOylsb|Sprite_IOymsb)\b
+      scope: constant.numeric.hex      
     - match: '#TRUE'
       scope: constant.language.pseudocommand
     - match: '#FALSE'

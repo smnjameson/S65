@@ -257,11 +257,11 @@
             "details": "Returns the address of the color RAM at the given position on this screen layer"
         },
         {
-            "trigger": "Layer_GetIOAddress",
-            "annotation": "layerNumber,offset",
-            "contents": "Layer_GetIOAddress(${1:layerNumber}, ${2:offset})",
+            "trigger": "Layer_GetIO",
+            "annotation": "layerNumber,register",
+            "contents": "Layer_GetIO(${1:layerNumber}, ${2:register})",
             "kind": "snippet",
-            "details": "Returns the base address plus an optional offset for the given layers IO registers.<br> See <a href='#Layer_IO'>Layer_IO<a> for register list"
+            "details": "Returns the base address for the given layer & register.<br> See <a href='#Layer_Vars'>Layer_IO<a> for register list"
         },
         {
             "trigger": "Layer_GetLayerCount",
@@ -326,10 +326,22 @@
             "details": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory"
         },
         {
-            "trigger": "Layer_IOGotoX",
-            "annotation": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function.",
+            "trigger": "Layer_IOgotoX",
+            "annotation": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
             "kind": "snippet",
-            "details": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a> function."
+            "details": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+        },
+        {
+            "trigger": "Layer_IOmaxCharsRRB",
+            "annotation": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
+            "kind": "snippet",
+            "details": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+        },
+        {
+            "trigger": "Layer_Layer_IOrowCountTableRRB",
+            "annotation": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
+            "kind": "snippet",
+            "details": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
         },
         {
             "trigger": "Layer_RowAddressLSB",
@@ -414,6 +426,37 @@
             "contents": "SDCard_LoadToChipRam ${1:addr} : ${2:filePtr}",
             "kind": "snippet",
             "details": "Loads a file from the SDCard into chip RAM"
+        },
+        {
+            "trigger": "Sprite_GenerateLayerData",
+            "annotation": "",
+            "contents": "Sprite_GenerateLayerData()",
+            "kind": "snippet",
+            "details": ""
+        },
+        {
+            "trigger": "Sprite_IOxlsb",
+            "annotation": "{word} The IO register string for looking up the a sprites xlsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "{word} The IO register string for looking up the a sprites xlsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+        },
+        {
+            "trigger": "Sprite_IOxmsb",
+            "annotation": "{word} The IO register string for looking up the a sprites Xmsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "{word} The IO register string for looking up the a sprites Xmsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+        },
+        {
+            "trigger": "Sprite_IOylsb",
+            "annotation": "{word} The IO register string for looking up the a sprites ylsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "{word} The IO register string for looking up the a sprites ylsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+        },
+        {
+            "trigger": "Sprite_IOymsb",
+            "annotation": "{word} The IO register string for looking up the a sprites Ymsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "{word} The IO register string for looking up the a sprites Ymsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
         },
         {
             "trigger": "System_BasicUpstart65",

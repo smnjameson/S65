@@ -1,16 +1,42 @@
 
 /**
- * .var IOGotoX
+ * .var IOgotoX
  * 
  * {word} The IO register index for this layers GOTOX value. Retrieve the
  * absolute address by passing it to the
- * <a href='#Layer_GetIOAddress'>Layer_GetIOAddress</a>
+ * <a href='#Layer_GetIO'>Layer_GetIO</a>
  * function.
  * 
  * @namespace Layer
  */
-.var Layer_IOGotoX = $00
+.var Layer_IOgotoX = $00
 
+
+/**
+ * .var IOmaxCharsRRB
+ * 
+ * {word} RRB SPRITE LAYER ONLY. The IO register index for this 
+ * layers maximum chars per line value. <br>
+ * Retrieve the absolute address by passing it to the
+ * <a href='#Layer_GetIO'>Layer_GetIO</a>
+ * function.
+ * 
+ * @namespace Layer
+ */
+.var Layer_IOmaxCharsRRB = $01
+
+/**
+ * .var Layer_IOrowCountTableRRB 
+ * 
+ * {word} RRB SPRITE LAYER ONLY. The IO register index for this layers 
+ * RRB sprite rowCharCount table, used internally by the RRB sprite system.<br>
+ * Retrieve the absolute address by passing it to the
+ * <a href='#Layer_GetIO'>Layer_GetIO</a>
+ * function.
+ * 
+ * @namespace Layer
+ */
+.var Layer_IOrowCountTableRRB = $02
 
 
 /**

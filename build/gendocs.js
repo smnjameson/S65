@@ -311,6 +311,7 @@ function onClose(line){
 	let keywords = []
 	let funcs=[]
 	let macs=[]
+	let vars=[]
 
 	let lastCategory = ""
 	let sortedCategorys = Object.keys(comments).sort();
@@ -741,7 +742,9 @@ function onClose(line){
 		            "annotation": `${desc.trim()}`,
 		            "kind": "snippet",
 		            "details": `${desc.trim()}`
-        		})						
+        		})		
+
+        		vars.push(fullcmd)				
 			}	
 			html += '<br>'
 		}
@@ -879,6 +882,8 @@ contexts:
       scope: constant.language.pseudocommand
     - match: \\b(${macs.join('|')})\\b
       scope: support.function.3d
+    - match: \\b(${vars.join('|')})\\b
+      scope: constant.numeric.hex      
     - match: '#TRUE'
       scope: constant.language.pseudocommand
     - match: '#FALSE'

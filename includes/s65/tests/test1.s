@@ -47,9 +47,9 @@
 	System_BorderDebug($01)
 
 		//Increment the GOTOX for the UI Layer
-		inc Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 0
+		inc Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
 		bne !+
-		inc Layer_GetIOAddress(LYR_UI, Layer_IOGotoX) + 1
+		inc Layer_GetIO(LYR_UI, Layer_IOgotoX) + 1
 	!:
 
 		//Update all gotox markers

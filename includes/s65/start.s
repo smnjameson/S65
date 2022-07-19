@@ -98,7 +98,7 @@ System_BasicUpstart65(S65_InitComplete)
 ////////////////////////////////////////////
 //Base page vars
 ////////////////////////////////////////////
-.align $40 //Ensure theres enough room in the page for the base vars
+.align $20 //Ensure theres enough room in the page for the base vars
 .var 		S65_BASEPAGE = [* >> 8]		//Gets the page# of this address
 			
 /** 
@@ -161,6 +161,7 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/system.s"
 #import "includes/s65/dma.s"
 #import "includes/s65/palette.s"
+#import "includes/s65/sprite.s"
 
 S65: {
 	Init: {

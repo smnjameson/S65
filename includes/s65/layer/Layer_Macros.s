@@ -154,6 +154,7 @@
 	.eval Layer_LayerList.get(index).put("gotoX", S65_SCREEN_LOGICAL_ROW_WIDTH )
 	.eval Layer_LayerList.get(index).put("offsetX", $02a0)
 	.eval Layer_LayerList.get(index).put("ncm", true)
+	.eval Layer_LayerList.get(index).put("io", Hashtable())
 
 	lda #<charsPerLine 
 	sta [Layer_LayerWidth + index * 2]
@@ -165,7 +166,7 @@
 	lda #>S65_SCREEN_LOGICAL_ROW_WIDTH
 	sta [Layer_AddrOffsets + index * 2 + 1]
 
-	.eval S65_SCREEN_ROW_WIDTH += charsPerLine
+	.eval S65_SCREEN_ROW_WIDTH += charsPerLine 
 	.eval S65_SCREEN_LOGICAL_ROW_WIDTH = S65_SCREEN_ROW_WIDTH * 2 //16bit chars	
 
 	//screen ram
@@ -523,13 +524,15 @@
 	.eval Layer_DynamicDataIndex = *
 	.for(var i=0; i<layerAddr.size(); i++) {
 		.word layerAddr.get(i)
-		// .if(Layer_LayerList.get(i).get("rrbSprites") == true) {
-		// 	//rrb only
-			
-		// } else {
-		// 		//screenlayer only
+		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
+			S65_AddToMemoryReport("Layer_DynamicDataAndIO")
+			Sprite_GenerateLayerData(i)
+			S65_AddToMemoryReport("Layer_DynamicDataAndIO")
+
+		} else {
+			//screenlayer only
 				
-		// }
+		}
 	}
 
 	//Screen row address table
