@@ -498,9 +498,9 @@
         },
         {
             "trigger": "Sprite_IOflags",
-            "annotation": "Flags for the state of this sprite  bit 7 = enabled",
+            "annotation": "Flags for the state of this sprite  bit 7 = Enabled bit 6 = Flip H (Not yet implemented) bit 5 = Flip V (Not yet implemented)",
             "kind": "snippet",
-            "details": "Flags for the state of this sprite  bit 7 = enabled"
+            "details": "Flags for the state of this sprite  bit 7 = Enabled bit 6 = Flip H (Not yet implemented) bit 5 = Flip V (Not yet implemented)"
         },
         {
             "trigger": "Sprite_IOheight",

@@ -10,7 +10,6 @@
 		.var count = layer.get("maxSprites")
 		.var charPerLine = layer.get("charWidth") 
 
-.print ("count: $" + toHexString(count)+"   "+toHexString(*-2))
 		//$00 - gotoX from parent macro
 		//Start with whole layer specific static sized data
 
@@ -42,8 +41,12 @@
 		.var startAddr = *
 		//sprite data
 		.fill Sprite_SpriteIOLength * count, $00
-
 		
+		
+		.eval offset = *
+.print ("spriteIOOffsets Table: $" + toHexString(*))
+		.eval io.put("spriteIOOffsets", offset)
+		.fill count, [<[startAddr + i * Sprite_SpriteIOLength], >[startAddr + i * Sprite_SpriteIOLength] ]
 
 
 	S65_Trace("      Register dimensions $"+toHexString(count)+ " x $"+toHexString((*-startAddr)/count))	

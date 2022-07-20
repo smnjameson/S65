@@ -14,7 +14,9 @@
  * 
  * Flags for the state of this sprite
  * 
- * bit 7 = enabled
+ * bit 7 = Enabled
+ * bit 6 = Flip H (Not yet implemented)
+ * bit 5 = Flip V (Not yet implemented)
  * 
  * @namespace Sprite
  */
@@ -92,4 +94,7 @@
  .var Sprite_IOcolor = Sprite_SpriteIOLength
  .eval Sprite_SpriteIOLength += 1
 
+
+//Pad out the array so it aligns to allow faster access
+.eval Sprite_SpriteIOLength = $10
 

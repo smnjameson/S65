@@ -1,5 +1,65 @@
+
 // #define ROWMASK_FIXED
 
+.pseudocommand Sprite_Enable layerNum : sprNum : xpos : ypos {
+		phx
+			ldx layerNum
+			jsr _getSprIOoffsetForLayer
+			jmp *
+		plx
+}
+.pseudocommand Sprite_SetPosition layerNum : sprNum : xpos : ypos {
+
+}
+.pseudocommand Sprite_SetPointer layerNum : sprNum : pointer {
+	
+}
+.pseudocommand Sprite_SetDimensions layerNum : sprNum : width : height {
+	
+}
+.pseudocommand Sprite_SetColor layerNum : sprNum : color {
+	
+}
+_lastFetchedLayer: .byte $ff
+_lastFetchedSprite: .byte $ff 
+
+_getSprIOoffsetForLayer: {	//Layer = x, Sprite = y
+	
+		//Only fetch if we dont already have it
+		cpx _lastFetchedLayer
+		bne !+
+		cpy  _lastFetchedSprite
+		bne !+
+		bra !exit+
+
+	!:	
+	S65_SetBasePage()
+		lda #$00
+		sta.z S65_LastSpriteIOPointer + 1
+		tya 
+		asl 
+		rol S65_LastSpriteIOPointer + 1		
+		asl 
+		rol S65_LastSpriteIOPointer + 1
+		asl 
+		rol S65_LastSpriteIOPointer + 1		
+		asl 
+		rol S65_LastSpriteIOPointer + 1
+		sta.z S65_LastSpriteIOPointer + 0
+		clc
+		adc Layer_SpriteIOAddrLSB, x
+		sta.z S65_LastSpriteIOPointer + 0
+		lda S65_LastSpriteIOPointer + 1
+		adc Layer_SpriteIOAddrMSB, x
+		sta.z S65_LastSpriteIOPointer + 1
+		
+		
+	S65_SetBasePage()
+	!exit:
+
+		rts
+
+}
 
 /**
 * .pseudocommand Update
@@ -106,8 +166,9 @@ MaskRowValue:
 
 				//Figure out its screen row (ypos /8) and set screen/col pointers
 				ldy #Sprite_IOy + 1
-				and #$03
+
 				lda (SprIO), y //MSB
+				and #$03
 				sta S65_TempByte1
 				dey
 				lda (SprIO), y //LSB
@@ -200,16 +261,18 @@ MaskRowValue:
 			!nextrow:
 				//If this row is off screen then skip this row
 				ldy S65_SpriteRowTablePtr
-				cpy #[S65_VISIBLE_SCREEN_CHAR_HEIGHT + 3]
+				cpy #[S65_VISIBLE_SCREEN_CHAR_HEIGHT + Layer_IOrowCountTableRRB]
 				bcc !continue+
 					clc 
 					ldy #Sprite_IOwidth
 					lda (SprIO), y	
-					adc.z S65_SpritePointerTemp + 0
+					adc.z S65_SpritePointerOld + 0
 					sta.z S65_SpritePointerTemp + 0
-					bcc !+
-					inc.z S65_SpritePointerTemp + 1
-				!:
+					lda.z S65_SpritePointerOld + 0
+					adc #$00
+					sta.z S65_SpritePointerTemp + 0
+					inc.z S65_SpritePointerTemp + 0
+					inc.z S65_SpritePointerOld + 0
 				jmp !skiprow+
 			!continue:
 
@@ -237,6 +300,7 @@ MaskRowValue:
 				iny //$02
 				inz
 				lda (SprIO), y
+				and #$03
 				ora YscrollOffset:#$BEEF	
 				sta ((S65_ScreenRamPointer)), z //scr byte 1
 				lda RowMask
@@ -351,16 +415,19 @@ MaskRowValue:
 			inc S65_SpriteRowTablePtr	
 			ldy S65_SpriteRowTablePtr
 			
+
+
 			cpy #[$80 + Layer_IOrowCountTableRRB]
 			bne !noreset+
 			//We are at the last row so reset screen pointers
-			
+
 			
 			ldy #$00
 
 			jsr ResetScreenPointer
 			ldy #Layer_IOrowCountTableRRB
 			sty S65_SpriteRowTablePtr
+
 			// jmp *
 		!noreset:	
 			jmp !nextrow-

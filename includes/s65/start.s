@@ -156,7 +156,9 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpriteRowCounter:	.byte $00
 			S65_SpriteRowTablePtr:	.byte $0000
 
-
+.print ("S65_LastSpriteIOPointer: $" + toHexString(S65_LastSpriteIOPointer))
+			S65_LastSpriteIOPointer: .word $0000
+			
  			S65_Counter: .word $0000
  			S65_SpriteFineY: .byte $00
 

@@ -26,14 +26,14 @@
 
 		.const BLANK = $200
 		.const BRICK = $206
-		.const NUM_SPRITES = 32
+		.const NUM_SPRITES = 128
 		//Define and initlayers
 		.const LYR_BG = Layer_GetLayerCount()
 		Layer_DefineScreenLayer(20, 0, true)  			
 		.const LYR_LV = Layer_GetLayerCount()
 		Layer_DefineScreenLayer(16, 200, true)  			
 		.const LYR_SP = Layer_GetLayerCount()
-		Layer_DefineRRBSpriteLayer(20, NUM_SPRITES + 1) 		
+		Layer_DefineRRBSpriteLayer(64, NUM_SPRITES) 		
 		.const LYR_UI = Layer_GetLayerCount()
 		Layer_DefineScreenLayer(32, 0, false) 
 		Layer_InitScreen($10000)							//Initialize
@@ -49,7 +49,6 @@
 		//Clear layers
 		Layer_ClearAllLayers #BLANK
 		Layer_ClearLayer #LYR_BG : #BRICK : #$01
-		// Layer_ClearLayer #LYR_SP : #BRICK : #$00
 
 
 		//Add some text to UI layer
@@ -75,63 +74,64 @@
 
 		//Add some RRB sprites
 
-		// .for(var i=0; i<NUM_SPRITES; i++) {
-		// 	lda #[random() * 200]
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOx)	+ 0
-		// 	lda #[random() * 200]	
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOy)	+ 0
-		// 	lda #$00
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1	
+		.for(var i=0; i<NUM_SPRITES; i++) {
+			lda #[random() * 256]
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOx)	+ 0
+			lda #[random() * 256]	
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOy)	+ 0
+			lda #[random() * 4]	
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
+			lda #[random() * 4]	
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1	
 
-		// 	//set pointer for sprite 0
-		// 	lda #$61
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOptr) + 0	
-		// 	lda #$02
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOptr) + 1
+			//set pointer for sprite 0
+			lda #$61
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOptr) + 0	
+			lda #$02
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOptr) + 1
 
-		// 	//enable
-		// 	lda #$80	
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOflags)	
-		// 	//width
-		// 	lda #$01
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOwidth)	
-		// 	//height
-		// 	lda #$02
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOheight)	
-		// 	//color
-		// 	lda #$03
-		// 	sta Sprite_GetIO(LYR_SP, i, Sprite_IOcolor)
-		// }
+			//enable
+			lda #$80	
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOflags)	
+			//width
+			lda #$01
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOwidth)	
+			//height
+			lda #$02
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOheight)	
+			//color
+			lda #$03
+			sta Sprite_GetIO(LYR_SP, i, Sprite_IOcolor)
+		}
 
-		//Now lets make one using helper commands	
-		lda #$40
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOx)	+ 0	
-		lda #$00
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOx) + 1
+		// //Now lets make one using helper commands	
+		// lda #$d0
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOx)	+ 0	
+		// lda #$00
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOx) + 1
 
-		lda #$04
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOy)	+ 0
-		lda #$00
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOy) + 1	
+		// lda #$fc
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOy)	+ 0
+		// lda #$03
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOy) + 1	
 
-		lda #$61
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOptr) + 0	
-		lda #$01
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOptr) + 1
+		// lda #$61
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOptr) + 0	
+		// lda #$02
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOptr) + 1
 
-		//enable
-		lda #$80	
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOflags)	
-		//width
-		lda #$02
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOwidth)			
-		//height
-		lda #$02
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOheight)
-		// color	
-		lda #$03
-		sta Sprite_GetIO(LYR_SP, 1, Sprite_IOcolor)
+		// //enable
+		// lda #$80	
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOflags)	
+		// //width
+		// lda #$01
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOwidth)			
+		// //height
+		// lda #$02
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOheight)
+		// // color	
+		// lda #$03
+		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOcolor)
 		
 !loop:
 	System_WaitForRaster($100)
@@ -149,18 +149,37 @@
 	!:
 		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
  
-		// .for(var i=0; i<NUM_SPRITES; i++) {
-		// 	//Move the UI layer
-		// 		inc Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0
-		// 		bne !+
-		// 		inc Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
-		// 	!:
-		// 	//Move the UI layer
-		// 		inc Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0
-		// 		bne !+
-		// 		inc Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1
-		// 	!:			
-		// }
+		.for(var i=0; i<NUM_SPRITES; i++) {
+			.if(mod(i,2) == 0) {
+					inc Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0
+					bne !+
+					inc Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1
+				!:
+			} else {
+					lda Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0
+					bne !+
+					dec Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1
+				!:
+					dec Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0			
+			}	
+
+				// 	inc Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0
+				// 	bne !+
+				// 	inc Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
+				// !:
+
+					lda Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0
+					bne !+
+					dec Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
+				!:
+					dec Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0			
+							
+		}
+
+
+
+	!noUp:
+
 
 
 		//Update - Call once per frame, its expensive!!

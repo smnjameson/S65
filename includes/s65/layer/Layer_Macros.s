@@ -565,6 +565,7 @@
 		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("rrbSprites") == true ? >Layer_LayerList.get(i).get("spriteIOAddr") : 0
 	.eval Layer_IsRRBSprite = *
 		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("rrbSprites") == true ? 1 : 0
+	
 
 	//Tables
 	.eval Layer_src = *

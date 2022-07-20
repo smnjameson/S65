@@ -152,6 +152,7 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	.var Layer_IsRRBSprite = $0000
 
 
+
 	/**
 	* .var DMAClear
 	*
