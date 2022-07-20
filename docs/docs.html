@@ -939,7 +939,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Updates the RRB GotoX markers for all but the RRB sprite layers   </div>
+						<div class='macroItemDescription'> Updates the all the layers Note: this is an expensive operation in both memory and cpu, try to call it once only per frame and put it in a subroutine if you need to call it from more than one place   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_Update </div>
 						
@@ -1295,7 +1295,9 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_DMAClear'>DMAClear</a></div>
 				
-					<div class='macroIndex'><a href='#Layer_DMADMAClearColor'>DMADMAClearColor</a></div>
+					<div class='macroIndex'><a href='#Layer_DMAClearColor'>DMAClearColor</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_DMAClearColorRRB'>DMAClearColorRRB</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_DynamicDataTable'>DynamicDataTable</a></div>
 				
@@ -1334,10 +1336,16 @@ h4 {
 						<div class='macroUsage'>Layer_DMAClear</div>						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_DMADMAClearColor'>DMADMAClearColor</div>
+						<div class='macroItemHeader' id='Layer_DMAClearColor'>DMAClearColor</div>
 						<div class='macroItemDescription'> Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DMADMAClearColor</div>						
+						<div class='macroUsage'>Layer_DMAClearColor</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_DMAClearColorRRB'>DMAClearColorRRB</div>
+						<div class='macroItemDescription'> Pointer to a dma subroutine that clears the color ram layer for RRB sprites, A=layer   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_DMAClearColorRRB</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_DynamicDataTable'>DynamicDataTable</div>
@@ -1919,7 +1927,7 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOheight'>IOheight</div>
-						<div class='macroItemDescription'> The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.  </div>
+						<div class='macroItemDescription'> The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, top to bottom, left to right.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_IOheight</div>						
 					</div>
@@ -1931,7 +1939,7 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOwidth'>IOwidth</div>
-						<div class='macroItemDescription'> The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.  </div>
+						<div class='macroItemDescription'> The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, top to bottom, left to right.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_IOwidth</div>						
 					</div>

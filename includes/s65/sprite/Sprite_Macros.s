@@ -8,7 +8,7 @@
 		.var io = layer.get("io")
 
 		.var count = layer.get("maxSprites")
-		.var charPerLine = layer.get("charWidth")
+		.var charPerLine = layer.get("charWidth") 
 
 .print ("count: $" + toHexString(count)+"   "+toHexString(*-2))
 		//$00 - gotoX from parent macro
@@ -41,20 +41,10 @@
 		.eval Layer_LayerList.get(layerNum).put("spriteIOAddr", *)
 		.var startAddr = *
 		//sprite data
-		// .fill Sprite_SpriteIOLength, $00
-		.for(var i =0 ; i<count; i++) {
-			//xpos of sprite
-			.word $0000
+		.fill Sprite_SpriteIOLength * count, $00
 
-			//ypos of sprite
-			.word $0000
+		
 
-			//pointer 
-			.word $0000
-			.word $0000
-			.word $0000
-		}
-	
 
 	S65_Trace("      Register dimensions $"+toHexString(count)+ " x $"+toHexString((*-startAddr)/count))	
 }

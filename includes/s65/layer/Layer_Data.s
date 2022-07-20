@@ -161,8 +161,9 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	*
 	*/
 	.var Layer_DMAClear  = $0000
+
 	/**
-	* .var DMADMAClearColor
+	* .var DMAClearColor
 	*
 	* Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color
 	* 
@@ -170,6 +171,16 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	*
 	*/
 	.var Layer_DMAClearColor  = $0000
+
+	/**
+	* .var DMAClearColorRRB
+	*
+	* Pointer to a dma subroutine that clears the color ram layer for RRB sprites, A=layer
+	* 
+	* @namespace Layer
+	*
+	*/
+	.var Layer_DMAClearColorRRB  = $0000
 
 	.var Layer_src = $0000
 	.var Layer_width = $0000

@@ -64,7 +64,7 @@
  * .var IOwidth
  *  
  * The width in chars for this sprite, sprites will automatically advance
- * through the char set as they are drawn in pieces, Left to right, top to bottom.
+ * through the char set as they are drawn in pieces, top to bottom, left to right.
  * 
  * @namespace Sprite
  */
@@ -75,7 +75,7 @@
  * .var IOheight
  *  
  * The height in chars for this sprite, sprites will automatically advance
- * through the char set as they are drawn in pieces, Left to right, top to bottom.
+ * through the char set as they are drawn in pieces, top to bottom, left to right.
  * 
  * @namespace Sprite
  */

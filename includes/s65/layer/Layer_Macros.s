@@ -683,7 +683,18 @@
 			.var lengthJobC= * + $02
 			.var destJobC = * + $07
 			.var jobDataC = * + $04
-			DMA_FillJob #$0000 : S65_COLOR_RAM : #$00 : #FALSE
+			DMA_FillJob #$0000 : S65_COLOR_RAM + 0: #$00 : #FALSE
+
+		dmaClearJob3:	
+			DMA_Header #$00 : #$ff
+			DMA_Step #$0100 : #$0200
+			.var lengthJobD= * + $02
+			.var destJobD = * + $07
+			DMA_FillJob #$0090 : S65_COLOR_RAM + 0: #$00 : #TRUE
+			.var lengthJobE= * + $02
+			.var destJobE = * + $07			
+			DMA_FillJob #$0000 : S65_COLOR_RAM + 1: #$00 : #FALSE
+
 
 		//generate DMA lists for clearing a layer
 		.eval Layer_DMAClear = *
@@ -712,10 +723,12 @@
 			
 				//Layer length 
 				lda Layer_LayerWidth, y 
+				
 				sta lengthJobA + 0				
 				sta lengthJobB + 0				
 
 				lda Layer_LayerWidth + 1, y
+
 				sta lengthJobA + 1
 				sta lengthJobB + 1
 
@@ -748,6 +761,66 @@
 				rts 
 
 		}
+
+		.eval Layer_DMAClearColorRRB = *
+		DMAClearColorRRB: {
+				//X=color,  A = layer
+				asl 
+				tay
+
+				clc 
+				lda Layer_AddrOffsets, y 	
+				adc #<[S65_COLOR_RAM]				
+				sta destJobD + 0
+				sta destJobE + 0
+				lda Layer_AddrOffsets + 1, y 
+				adc #>[S65_COLOR_RAM]					
+				sta destJobD + 1	
+				sta destJobE + 1	
+				
+				inc destJobE + 0
+				bne !+
+				inc destJobE + 1	
+			!:
+
+				//Layer length 
+			
+
+				lda Layer_LayerWidth + 1, y
+				sta lengthJobD + 1
+				sta lengthJobE + 1
+
+				lda Layer_LayerWidth, y 		
+				sta lengthJobD + 0				
+				sta lengthJobE + 0	
+
+				ldx #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+			!loop:
+				
+				DMA_Execute dmaClearJob3
+
+					lda destJobD + 0	
+					clc 
+					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH		
+					sta destJobD + 0
+					sta destJobE + 0
+
+					lda destJobD + 1
+					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH		
+					sta destJobD + 1	
+					sta destJobE + 1	
+
+					inc destJobE + 0
+					bne !+
+					inc destJobE + 1	
+				!:
+				dex 
+				bne !loop-
+
+				
+				rts 			
+		}
+
 		.eval Layer_DMAClearColor = *
 		DMAClearColor: {
 				//X=color,  A = layer

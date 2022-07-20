@@ -1,3 +1,5 @@
+// #define ROWMASK_FIXED
+
 
 /**
 * .pseudocommand Update
@@ -11,8 +13,18 @@
 		lbeq !nextlayer+
 		phx 
 			//WE ARE IN AN RRB LAYER
+			
 			//clear the layer
-			// Layer_ClearLayer #REGX : #$100 : #$01
+				phx 
+				txa 
+				ldx #$a0
+				ldy #$02
+				jsr Layer_DMAClear
+				pla 
+				pha 		
+				jsr Layer_DMAClearColorRRB	
+				plx
+
 
 			//Prep the base addresses 
 
@@ -66,6 +78,9 @@
 		cpx #ListSize.getValue()
 		lbne !layerloop-
 }
+.print ("MaskRowValue: $" + toHexString(MaskRowValue))
+MaskRowValue:
+		.fill 8, 255 - pow(2, 8-i) 
 
 //As much as I want this next bit to be a base library method, it has to stay a macro due to
 //references to addresses not defined until AFTER Layer_InitScreen
@@ -90,12 +105,13 @@
 				//Sprite is active so add an entry to the RRB
 
 				//Figure out its screen row (ypos /8) and set screen/col pointers
-				 
 				ldy #Sprite_IOy + 1
+				and #$03
 				lda (SprIO), y //MSB
 				sta S65_TempByte1
 				dey
 				lda (SprIO), y //LSB
+		pha 	//store so we can grab the 0-7 fine Y
 				lsr S65_TempByte1
 				ror 
 				lsr S65_TempByte1
@@ -104,32 +120,25 @@
 				ror 
 				tay 
 
-				clc
-				lda Layer_RowAddressBaseLSB, y
-				adc Layer_AddrOffsets + 0, x 
-				sta.z S65_ScreenRamPointer + 0
-				sta.z S65_ColorRamPointer + 0
+				jsr ResetScreenPointer
 
-				lda Layer_RowAddressBaseMSB, y
-				adc Layer_AddrOffsets + 1, x 
-				sta.z S65_ScreenRamPointer + 1	
+
+				//y is the row number store it (+3 = Layer_IOrowCountTableRRB to save adding later)
+				tya 
 				clc 
-				adc #>[S65_COLOR_RAM - S65_SCREEN_RAM]						
-				sta.z S65_ColorRamPointer+ 1
+				adc #Layer_IOrowCountTableRRB
+				sta.z S65_SpriteRowTablePtr
 
-				//y is the row number stopre it (+3 = Layer_IOrowCountTableRRB to save adding later)
-				iny
-				iny
-				iny
-				sty.z S65_SpriteRowTablePtr
 
 				//get and store base pointer
 				ldy #Sprite_IOptr
 				lda (SprIO), y	
 				sta.z S65_SpritePointerTemp + 0 //byte 0
+				sta.z S65_SpritePointerOld + 0 //byte 0
 				iny
 				lda (SprIO), y	
 				sta.z S65_SpritePointerTemp + 1 //byte 1
+				sta.z S65_SpritePointerOld + 1 //byte 1
 
 
 			///////////////////
@@ -139,7 +148,71 @@
 			lda (SprIO), y
 			sta.z S65_SpriteRowCounter
 
+			lda #$00
+			sta MaskEnable
+			sta RowMask
+
+				//retrieve the ypos lsb and use it to get the inverse 0-7 fine y
+		pla 
+				and #$07
+				sta YscrollOffset
+				sta S65_SpriteFineY
+
+#if ROWMASK_FIXED
+//TODO on HW	//Disabled row mask until its working
+//ENABLE THIS BLOCK WHEN ROWMASK WORKS
+				pha 
+					tay 
+					lda MaskRowValue, y 
+					sta RowMask
+				pla 
+#endif
+
+
+
+				beq !nextrow+
+				eor #$07
+				clc 
+				adc #$01
+				sta S65_SpriteFineY
+				lsr 	//Have to move to bits 5-7
+				ror 
+				ror 
+				ror 
+				sta YscrollOffset
+				beq !nextrow+
+
+				//finey!=0 so We are spanning 1 extra row 
+				inc S65_SpriteRowCounter
+				//And that means we need to fetch 1 char back instead
+				ldy #Sprite_IOwidth
+				dew.z S65_SpritePointerTemp + 0 //byte 0
+				dew.z S65_SpritePointerOld + 0 //byte 0
+
+				
+#if ROWMASK_FIXED
+//TODO on HW	//Disabled row mask until its working
+				// //And set the first row mask on //ENABLE THIS BLOCK WHEN ROWMASK WORKS
+				lda #$08 //bit 3 (for color ram byte 0 ROWMASK)
+				sta MaskEnable
+#endif
+			!:
 			!nextrow:
+				//If this row is off screen then skip this row
+				ldy S65_SpriteRowTablePtr
+				cpy #[S65_VISIBLE_SCREEN_CHAR_HEIGHT + 3]
+				bcc !continue+
+					clc 
+					ldy #Sprite_IOwidth
+					lda (SprIO), y	
+					adc.z S65_SpritePointerTemp + 0
+					sta.z S65_SpritePointerTemp + 0
+					bcc !+
+					inc.z S65_SpritePointerTemp + 1
+				!:
+				jmp !skiprow+
+			!continue:
+
 				//Where do we start? get offset from rowcount table into z
 				//and double it to give the byte offset
 				ldz S65_SpriteRowTablePtr //RowCountTable y position offset
@@ -148,7 +221,7 @@
 					ldy #Layer_IOmaxCharsRRB
 					cmp (LayerIO), y
 					// jmp *
-					bcs !nextsprite+ 
+					lbcs !nextsprite+ 
 				asl
 				taz 
 
@@ -158,13 +231,15 @@
 				lda (SprIO), y	
 				sta ((S65_ScreenRamPointer)), z //scr byte 0
 				//and color ram
-				lda #$90 //transparent and gotox	
+				lda #$90 //transparent and gotox
+				ora MaskEnable:#$BEEF	
 				sta ((S65_ColorRamPointer)), z //col byte 0				
 				iny //$02
 				inz
-				lda (SprIO), y	
+				lda (SprIO), y
+				ora YscrollOffset:#$BEEF	
 				sta ((S65_ScreenRamPointer)), z //scr byte 1
-				lda #$00
+				lda RowMask
 				sta ((S65_ColorRamPointer)), z //col byte 1
 				inz 
 
@@ -183,20 +258,67 @@
 						!charwidthLoop:
 							//CHAR RAM 
 							lda.z S65_SpritePointerTemp + 0
-							sta ((S65_ScreenRamPointer)), z //byte 0
+							sta ((S65_ScreenRamPointer)), z //scr byte 0
+							lda #$08
+							sta ((S65_ColorRamPointer)), z //col byte 0
+
 							inz
 							lda.z S65_SpritePointerTemp + 1	
-							sta ((S65_ScreenRamPointer)), z //byte 1
+							sta ((S65_ScreenRamPointer)), z //scr byte 1
+
 							// inz
 							// COLOR RAM 
-							lda #$20
-							sta ((S65_ColorRamPointer)), z //byte 1
+							ldy #Sprite_IOcolor
+							lda (SprIO), y	
+							sta ((S65_ColorRamPointer)), z //col byte 1
 							inz
-													
-							//increment pointer
-							inw.z S65_SpritePointerTemp
+								
+
+							//increment pointer to next column
+							ldy #Sprite_IOwidth
+							lda (SprIO), y
+							cmp #$01
+							beq !+
+#if ROWMASK_FIXED
+//TODO on HW				//Disabled row mask until its working
+							clc //SWITCH SEC for CLC THIS WHEN ROWMASK WORKS	
+#else 
+							sec //Using SEC isntead of CLC so we add an extra 1 
+#endif
+							lda.z S65_SpritePointerTemp + 0
+							adc (SprIO), y			
+							sta.z S65_SpritePointerTemp + 0
+							bcc !+
+							inc.z S65_SpritePointerTemp + 1
+						!:
+
 							dex 
-							bne !charwidthLoop-				
+							bne !charwidthLoop-		
+
+
+							//set pointer to next row
+							inw.z S65_SpritePointerOld
+							lda.z S65_SpritePointerOld + 0		
+							sta.z S65_SpritePointerTemp + 0
+							lda.z S65_SpritePointerOld + 1		
+							sta.z S65_SpritePointerTemp + 1
+
+// 							ldy #Sprite_IOheight
+// 							clc //Using CLC isntead of SEC so we subtract an extra 1 
+
+// 							lda.z S65_SpritePointerTemp + 0
+// 							sbc (SprIO), y			
+// 							sta.z S65_SpritePointerTemp + 0
+// 							bcs !+
+// 							dec.z S65_SpritePointerTemp + 1
+// 						!:		
+// #if ROWMASK_FIXED
+// #else
+// //TODO on HW				//Disabled row mask until its working
+// 							dew.z S65_SpritePointerTemp + 0 //DISABLE THIS WHEN ROWMASK WORKS
+// 							dew.z S65_SpritePointerTemp + 0 //DISABLE THIS WHEN ROWMASK WORKS
+// #endif
+
 						plx
 
 				//increment row count table entry by width + 1
@@ -208,33 +330,56 @@
 				adc #$01
 				sta (LayerIO), z
 				
-
+		!skiprow:
 			dec.z S65_SpriteRowCounter
 			beq !nextsprite+		//Sprite is complete
-				//Increment for next row
-				clc 
-				lda S65_ScreenRamPointer + 0
-				adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta S65_ScreenRamPointer + 0
-				sta S65_ColorRamPointer + 0
-				php
-				lda S65_ScreenRamPointer + 1
-				adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta S65_ScreenRamPointer + 1
-				plp
-				lda S65_ColorRamPointer + 1
-				adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-				sta S65_ColorRamPointer + 1	
+			//Increment for next row
+			clc 
+			lda S65_ScreenRamPointer + 0
+			adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
+			sta S65_ScreenRamPointer + 0
+			sta S65_ColorRamPointer + 0
+			php
+			lda S65_ScreenRamPointer + 1
+			adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
+			sta S65_ScreenRamPointer + 1
+			plp
+			lda S65_ColorRamPointer + 1
+			adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
+			sta S65_ColorRamPointer + 1	
 
-				inc S65_SpriteRowTablePtr		
+			inc S65_SpriteRowTablePtr	
+			ldy S65_SpriteRowTablePtr
+			
+			cpy #[$80 + Layer_IOrowCountTableRRB]
+			bne !noreset+
+			//We are at the last row so reset screen pointers
+			
+			
+			ldy #$00
+
+			jsr ResetScreenPointer
+			ldy #Layer_IOrowCountTableRRB
+			sty S65_SpriteRowTablePtr
+			// jmp *
+		!noreset:	
 			jmp !nextrow-
 
 
 
 					
 	!nextsprite:
+		lda.z S65_SpriteFineY
+		beq !+
+		lda.z S65_SpriteRowCounter
+		cmp #$01 //Last row??
+		bne !+
+		lda RowMask:#$ff
+		eor #$ff 
+		sta RowMask
+	!:
 
-		//icnrement sprite IO pointer
+		//increment sprite IO pointer
 		clc 
 		lda.z SprIO + 0
 		adc #Sprite_SpriteIOLength
@@ -249,7 +394,25 @@
 		cpz MaxSprites:#$BEEF
 		lbne !spriteloop-
 		///////////////////
+		jmp End 
 
 
-		
+	ResetScreenPointer:
+		clc
+		lda Layer_RowAddressBaseLSB, y
+		adc Layer_AddrOffsets + 0, x 
+		sta.z S65_ScreenRamPointer + 0
+		sta.z S65_ColorRamPointer + 0
+
+		lda Layer_RowAddressBaseMSB, y
+		adc Layer_AddrOffsets + 1, x 
+		sta.z S65_ScreenRamPointer + 1	
+		clc 
+		adc #>[S65_COLOR_RAM - S65_SCREEN_RAM]						
+		sta.z S65_ColorRamPointer+ 1
+		rts
+
+	End:
+		//Now clear the remaining space
+	
 }

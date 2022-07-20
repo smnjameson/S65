@@ -228,8 +228,12 @@ _Layer_AddText: {
 				.label Job2_Source = * + $04		
 				DMA_FillJob #>clearChar.getValue() : S65_SCREEN_RAM + 1 : #SCREEN_BYTE_SIZE/2 : #FALSE
 
+				// DMA_FillJob #$00 : S65_COLOR_RAM + 0 : #SCREEN_BYTE_SIZE/2 : #TRUE
+				// DMA_FillJob #$00 : S65_COLOR_RAM + 1 : #SCREEN_BYTE_SIZE/2 : #FALSE
+
 			} else {
 				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
+				// DMA_FillJob #$00 : S65_COLOR_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
 			}
 		end:
 	pla
@@ -311,8 +315,9 @@ _Layer_AddText: {
 /**
 * .pseudocommand Update
 *
-* Updates the RRB GotoX markers for all but the 
-* RRB sprite layers
+* Updates the all the layers 
+* Note: this is an expensive operation in both memory and cpu, try to call it once only per frame
+* and put it in a subroutine if you need to call it from more than one place
 * 
 * @namespace Layer
 *
@@ -321,14 +326,18 @@ _Layer_AddText: {
 */
 
 .pseudocommand Layer_Update {
+
 		S65_AddToMemoryReport("Layer_Update")
 		phx 
 		phy
 		phz
 
 		S65_SetBasePage()
+		System_BorderDebug($01)
 			jsr _Layer_Update
+		System_BorderDebug($03)
 			Sprite_Update Layer_LayerList.size()
+		System_BorderDebug($0f)
 		S65_RestoreBasePage()		
 
 		plz
@@ -356,6 +365,7 @@ _Layer_Update: {
 
 
 			lda (DYN_TABLE), z
+.print ("Layer_GotoXPositions: $" + toHexString(Layer_GotoXPositions))
 			sta Layer_GotoXPositions, y
 
 			iny
@@ -383,10 +393,12 @@ _Layer_Update: {
 			inx
 			sta.z S65_ColorRamPointer + 0
 			sta.z S65_ScreenRamPointer + 0
+
 			php
 			lda Layer_AddrOffsets, x//1
 			adc.z S65_BaseColorRamPointer + 1
 			sta.z S65_ColorRamPointer + 1
+
 			plp
 			lda Layer_AddrOffsets, x//1
 			adc.z S65_BaseScreenRamPointer + 1

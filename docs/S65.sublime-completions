@@ -212,7 +212,7 @@
             "annotation": "",
             "contents": "Layer_Update ",
             "kind": "snippet",
-            "details": "Updates the RRB GotoX markers for all but the RRB sprite layers"
+            "details": "Updates the all the layers Note: this is an expensive operation in both memory and cpu, try to call it once only per frame and put it in a subroutine if you need to call it from more than one place"
         },
         {
             "trigger": "Layer_WriteToScreen",
@@ -314,10 +314,16 @@
             "details": "Pointer to a dma subroutine that clears the screen ram layer, A=layer, X=charLo, Y=charHi"
         },
         {
-            "trigger": "Layer_DMADMAClearColor",
+            "trigger": "Layer_DMAClearColor",
             "annotation": "Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color",
             "kind": "snippet",
             "details": "Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color"
+        },
+        {
+            "trigger": "Layer_DMAClearColorRRB",
+            "annotation": "Pointer to a dma subroutine that clears the color ram layer for RRB sprites, A=layer",
+            "kind": "snippet",
+            "details": "Pointer to a dma subroutine that clears the color ram layer for RRB sprites, A=layer"
         },
         {
             "trigger": "Layer_DynamicDataTable",
@@ -498,9 +504,9 @@
         },
         {
             "trigger": "Sprite_IOheight",
-            "annotation": "The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.",
+            "annotation": "The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, top to bottom, left to right.",
             "kind": "snippet",
-            "details": "The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom."
+            "details": "The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, top to bottom, left to right."
         },
         {
             "trigger": "Sprite_IOptr",
@@ -510,9 +516,9 @@
         },
         {
             "trigger": "Sprite_IOwidth",
-            "annotation": "The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.",
+            "annotation": "The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, top to bottom, left to right.",
             "kind": "snippet",
-            "details": "The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom."
+            "details": "The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, top to bottom, left to right."
         },
         {
             "trigger": "Sprite_IOx",
