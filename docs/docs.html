@@ -1005,7 +1005,7 @@ h4 {
 	</span>
 							</div>
 						</div>
-						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode. IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.     </div>
+						<div class='macroItemDescription'> Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode (16x8px chars). IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line. During an update each new Sprite uses a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a RRB Sprite hard limit of 256 per RRB Sprite layer.  The majority of the memory and cpu time consumed by the RRB Sprite system is a result of the number of maxSprites. Reducing this number will have the best impact on SpriteIO area memory usage as each sprite slot (regardless if its enabled or not in <a href="#Sprite_IOflags">Sprite_IOflags</a>will use at least 10 bytes each. And every sprite that IS enabled will use some cpu time to update.     </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_DefineRRBSpriteLayer(<i>charsPerLine</i>, <i>maxSprites</i>)</div>
 						
@@ -1233,8 +1233,6 @@ h4 {
 					</div><br>
 				<div class='macroHeader' id='Layer_Data'>Data</div>
 			
-					<div class='macroIndex'><a href='#Layer_AddrOffsets'>AddrOffsets</a></div>
-				
 					<div class='macroIndex'><a href='#Layer_GotoXColorPositions'>GotoXColorPositions</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_GotoXPositions'>GotoXPositions</a></div>
@@ -1243,18 +1241,6 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_LogicalWidth'>LogicalWidth</a></div>
 				
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_AddrOffsets'>AddrOffsets</div>
-						<div class='macroItemDescription'> Table of start address offsets for each layer   </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_AddrOffsets</div>						
-						
-						<div class='macroUsage'>
-						<span><div class='paramHeader'>{word} $00 - Layer start address byte offset</div></span>
-						
-						</div>
-					
-					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_GotoXColorPositions'>GotoXColorPositions</div>
 						<div class='macroItemDescription'> Table of GOTOX Attribute in color ram for each layer   </div>
@@ -1305,22 +1291,42 @@ h4 {
 					</div><br>
 				<div class='macroHeader' id='Layer_Vars'>Vars</div>
 			
+					<div class='macroIndex'><a href='#Layer_AddrOffsets'>AddrOffsets</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_DMAClear'>DMAClear</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_DMADMAClearColor'>DMADMAClearColor</a></div>
 				
-					<div class='macroIndex'><a href='#Layer_DynamicDataIndex'>DynamicDataIndex</a></div>
+					<div class='macroIndex'><a href='#Layer_DynamicDataTable'>DynamicDataTable</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_IOgotoX'>IOgotoX</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_IOmaxCharsRRB'>IOmaxCharsRRB</a></div>
 				
-					<div class='macroIndex'><a href='#Layer_Layer_IOrowCountTableRRB'>Layer_IOrowCountTableRRB</a></div>
+					<div class='macroIndex'><a href='#Layer_IOmaxSpritesRRB'>IOmaxSpritesRRB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_IOrowCountTableRRB'>IOrowCountTableRRB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_IsRRBSprite'>IsRRBSprite</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_RowAddressBaseLSB'>RowAddressBaseLSB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_RowAddressBaseMSB'>RowAddressBaseMSB</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_RowAddressLSB'>RowAddressLSB</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_RowAddressMSB'>RowAddressMSB</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_SpriteIOAddrLSB'>SpriteIOAddrLSB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_SpriteIOAddrMSB'>SpriteIOAddrMSB</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_AddrOffsets'>AddrOffsets</div>
+						<div class='macroItemDescription'> Pointer to Table of start address offsets for each layer   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_AddrOffsets</div>						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_DMAClear'>DMAClear</div>
 						<div class='macroItemDescription'> Pointer to a dma subroutine that clears the screen ram layer, A=layer, X=charLo, Y=charHi   </div>
@@ -1334,28 +1340,52 @@ h4 {
 						<div class='macroUsage'>Layer_DMADMAClearColor</div>						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_DynamicDataIndex'>DynamicDataIndex</div>
+						<div class='macroItemHeader' id='Layer_DynamicDataTable'>DynamicDataTable</div>
 						<div class='macroItemDescription'> A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_DynamicDataIndex</div>						
+						<div class='macroUsage'>Layer_DynamicDataTable</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_IOgotoX'>IOgotoX</div>
-						<div class='macroItemDescription'> {word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
+						<div class='macroItemDescription'> The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_IOgotoX</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_IOmaxCharsRRB'>IOmaxCharsRRB</div>
-						<div class='macroItemDescription'> {word} RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
+						<div class='macroItemDescription'> RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_IOmaxCharsRRB</div>						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Layer_Layer_IOrowCountTableRRB'>Layer_IOrowCountTableRRB</div>
-						<div class='macroItemDescription'> {word} RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
+						<div class='macroItemHeader' id='Layer_IOmaxSpritesRRB'>IOmaxSpritesRRB</div>
+						<div class='macroItemDescription'> RRB SPRITE LAYER ONLY. The IO register index for this layers maximum sprites value.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_Layer_IOrowCountTableRRB</div>						
+						<div class='macroUsage'>Layer_IOmaxSpritesRRB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_IOrowCountTableRRB'>IOrowCountTableRRB</div>
+						<div class='macroItemDescription'> RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_IOrowCountTableRRB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_IsRRBSprite'>IsRRBSprite</div>
+						<div class='macroItemDescription'> Pointer to the table of flags indicating if layers are RRB sprite layer  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_IsRRBSprite</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_RowAddressBaseLSB'>RowAddressBaseLSB</div>
+						<div class='macroItemDescription'> Pointer to the table of LSB values for the address of the start of each screen row directly  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_RowAddressBaseLSB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_RowAddressBaseMSB'>RowAddressBaseMSB</div>
+						<div class='macroItemDescription'> Pointer to the table of MSB values for the address of the start of each screen row directly  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_RowAddressBaseMSB</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_RowAddressLSB'>RowAddressLSB</div>
@@ -1368,6 +1398,18 @@ h4 {
 						<div class='macroItemDescription'> Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_RowAddressMSB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SpriteIOAddrLSB'>SpriteIOAddrLSB</div>
+						<div class='macroItemDescription'> Pointer to the table of LSB values for the address of the start of the layers sprite IO area  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SpriteIOAddrLSB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SpriteIOAddrMSB'>SpriteIOAddrMSB</div>
+						<div class='macroItemDescription'> Pointer to the table of MSB values for the address of the start of the layers sprite IO area  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SpriteIOAddrMSB</div>						
 					</div><br>
 				<div class='macroHeader' id='Layer_Lists'>Lists</div>
 			
@@ -1777,10 +1819,29 @@ h4 {
 						
 					</div><br><br>
 			<div class='categoryHeader' id='Sprite'><span><h4>Namespace<h2>Sprite</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Sprite_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Sprite_Vars'><div class='sectionButton'>Vars</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Sprite_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Sprite_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Sprite_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Sprite_Vars'><div class='sectionButton'>Vars</div></a></span>
 			<div class='categoryDescription'> Contains the API for managing RRB sprites  </div>
 			<br>
 		
+				<div class='macroHeader' id='Sprite_Pseudocommands'>Pseudocommands</div>
+			
+					<div class='macroIndex'><a href='#Sprite_Update'>Update</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_Update'>Update
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_Update </div>
+						
+						
+						
+					</div><br>
 				<div class='macroHeader' id='Sprite_Macros'>Macros</div>
 			
 					<div class='macroIndex'><a href='#Sprite_GenerateLayerData'>GenerateLayerData</a></div>
@@ -1798,39 +1859,99 @@ h4 {
 						
 						
 					</div><br>
+				<div class='macroHeader' id='Sprite_Functions'>Functions</div>
+			
+					<div class='macroIndex'><a href='#Sprite_GetIO'>GetIO</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetIO'>GetIO
+						</div>
+						<div class='macroItemDescription'> Returns the base address for the given layer & IO register.<br> See <a href='#Sprite_Vars'>Sprite_IO<a> for register list   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetIO(<i>layerNumber</i>, <i>spriteNumber</i>, <i>register</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} layerNumber - The layer number to fetch</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} spriteNumber - The sprite number to fetch</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} register - The register to fetch</div></span>
+						</div>
+					
+						
+						
+					</div><br>
 				<div class='macroHeader' id='Sprite_Vars'>Vars</div>
 			
-					<div class='macroIndex'><a href='#Sprite_IOxlsb'>IOxlsb</a></div>
+					<div class='macroIndex'><a href='#Sprite_IOcolor'>IOcolor</a></div>
 				
-					<div class='macroIndex'><a href='#Sprite_IOxmsb'>IOxmsb</a></div>
+					<div class='macroIndex'><a href='#Sprite_IOflags'>IOflags</a></div>
 				
-					<div class='macroIndex'><a href='#Sprite_IOylsb'>IOylsb</a></div>
+					<div class='macroIndex'><a href='#Sprite_IOheight'>IOheight</a></div>
 				
-					<div class='macroIndex'><a href='#Sprite_IOymsb'>IOymsb</a></div>
+					<div class='macroIndex'><a href='#Sprite_IOptr'>IOptr</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOwidth'>IOwidth</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOx'>IOx</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOy'>IOy</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SpriteIOLength'>SpriteIOLength</a></div>
 				
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Sprite_IOxlsb'>IOxlsb</div>
-						<div class='macroItemDescription'> {word} The IO register string for looking up the a sprites xlsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
+						<div class='macroItemHeader' id='Sprite_IOcolor'>IOcolor</div>
+						<div class='macroItemDescription'> The color to apply to all the cahrs in this sprite  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Sprite_IOxlsb</div>						
+						<div class='macroUsage'>Sprite_IOcolor</div>						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Sprite_IOxmsb'>IOxmsb</div>
-						<div class='macroItemDescription'> {word} The IO register string for looking up the a sprites Xmsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
+						<div class='macroItemHeader' id='Sprite_IOflags'>IOflags</div>
+						<div class='macroItemDescription'> Flags for the state of this sprite  bit 7 = enabled  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Sprite_IOxmsb</div>						
+						<div class='macroUsage'>Sprite_IOflags</div>						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Sprite_IOylsb'>IOylsb</div>
-						<div class='macroItemDescription'> {word} The IO register string for looking up the a sprites ylsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
+						<div class='macroItemHeader' id='Sprite_IOheight'>IOheight</div>
+						<div class='macroItemDescription'> The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Sprite_IOylsb</div>						
+						<div class='macroUsage'>Sprite_IOheight</div>						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Sprite_IOymsb'>IOymsb</div>
-						<div class='macroItemDescription'> {word} The IO register string for looking up the a sprites Ymsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
+						<div class='macroItemHeader' id='Sprite_IOptr'>IOptr</div>
+						<div class='macroItemDescription'> The IO register offset for looking up the sprite pointer location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Sprite_IOymsb</div>						
+						<div class='macroUsage'>Sprite_IOptr</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOwidth'>IOwidth</div>
+						<div class='macroItemDescription'> The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOwidth</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOx'>IOx</div>
+						<div class='macroItemDescription'> The IO register offset for looking up the a sprites x position location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOx</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOy'>IOy</div>
+						<div class='macroItemDescription'> The IO register offset for looking up the a sprites y position location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOy</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SpriteIOLength'>SpriteIOLength</div>
+						<div class='macroItemDescription'> The size in bytes of the IO registers for a single sprite   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SpriteIOLength</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='System'><span><h4>Namespace<h2>System</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#System_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#System_Data'><div class='sectionButton'>Data</div></a></span>

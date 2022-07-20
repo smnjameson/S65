@@ -11,5 +11,6 @@
 * @param {word} register The register to fetch
 */
 .function Sprite_GetIO(layerNumber, spriteNumber, register) {
-	.return Layer_LayerList.get(layerNumber).get("dynamicDataAddr") + offset
+	.var base = Layer_LayerList.get(layerNumber).get("spriteIOAddr")
+	.return  [base + [spriteNumber * Sprite_SpriteIOLength] + register]
 }

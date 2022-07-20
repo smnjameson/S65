@@ -4,45 +4,60 @@
 * @namespace Sprite
 */
 .macro Sprite_GenerateLayerData(layerNum) {
-	S65_AddToMemoryReport("Sprite_DynamicDataAndIO_"+layerNum)
-		.print(toHexString(*))
 		.var layer = Layer_LayerList.get(layerNum)
 		.var io = layer.get("io")
+
 		.var count = layer.get("maxSprites")
 		.var charPerLine = layer.get("charWidth")
 
+.print ("count: $" + toHexString(count)+"   "+toHexString(*-2))
 		//$00 - gotoX from parent macro
 		//Start with whole layer specific static sized data
 
-		//$01 - max chars per line
+		//$02 - max chars per line
 		.var offset = *;
+		.var startOffset = *
 		.eval io.put("maxChars", offset)
-		.byte $00
+		.byte charPerLine
 
-		//$02 - rowCharCountTable
+
+		//$03 - max chars per line
+		.eval offset = *;
+		.eval io.put("maxSprites", offset)
+		.byte count
+
+		//$04 - rowCharCountTable
 		//table of row current row counts
 		.eval offset = *
 		.eval io.put("rowCharCountTable", offset)
 		.fill S65_VISIBLE_SCREEN_CHAR_HEIGHT, $00 
 
+		// .eval io.put("spriteIOOffsetsLsb", offset)
+		// .fill count, <[* + count * 2 + i * Sprite_SpriteIOLength] 
+		// .eval io.put("spriteIOOffsetsLsb", offset)
+		// .fill count, >[* + count * 2 + i * Sprite_SpriteIOLength] 
+
+		S65_Trace("      Sprite IO registers for layer "+layerNum+ " at $"+toHexString(*))
+		.eval Layer_LayerList.get(layerNum).put("spriteIOAddr", *)
+		.var startAddr = *
 		//sprite data
-		//xpos of sprite
-		.eval offset = *
-		.eval io.put("xmsb", offset)
-		.fill count, $00
+		// .fill Sprite_SpriteIOLength, $00
+		.for(var i =0 ; i<count; i++) {
+			//xpos of sprite
+			.word $0000
 
-		.eval offset = *
-		.eval io.put("xlsb", offset)
-		.fill count, $00
+			//ypos of sprite
+			.word $0000
 
-		//ypos of sprite
-		.eval offset = *
-		.eval io.put("ymsb", offset)
-		.fill count, $00
+			//pointer 
+			.word $0000
+			.word $0000
+			.word $0000
+		}
+	
 
-		.eval offset = *
-		.eval io.put("ylsb", offset)
-		.fill count, $00
+	S65_Trace("      Register dimensions $"+toHexString(count)+ " x $"+toHexString((*-startAddr)/count))	
+}
 
-	S65_AddToMemoryReport("Sprite_DynamicDataAndIO_"+layerNum)		
-}	
+
+

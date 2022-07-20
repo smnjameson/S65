@@ -1,3 +1,4 @@
+
 /**
  * .macro DefineResolution
  *
@@ -117,15 +118,20 @@
 /**
  * .macro DefineRRBSpriteLayer
  * 
- * Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode.
+ * Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode (16x8px chars).
  * IO for this layer is assigned to the Layer IO dynamic memory area<br>
  * Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>
  * 
  * 
- * RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite 
- * takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite 
+ * RRB Sprite space is a buffer limited by a set amount of chars per line. During an update each new Sprite 
+ * uses a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite 
  * is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br>
- * Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer.
+ * Note: There is a RRB Sprite hard limit of 256 per RRB Sprite layer.
+ * 
+ * The majority of the memory and cpu time consumed by the RRB Sprite system is a result of the number of maxSprites.
+ * Reducing this number will have the best impact on SpriteIO area memory usage as each sprite slot (regardless if its enabled or not in
+ * <a href="#Sprite_IOflags">Sprite_IOflags</a>will use at least 10 bytes each. And every sprite that IS enabled will use some cpu time to 
+ * update.
  * 
  * @namespace Layer
  * 
@@ -140,6 +146,7 @@
 .macro Layer_DefineRRBSpriteLayer (charsPerLine, maxSprites) {
 	S65_AddToMemoryReport("Layer_DefineBGLayer")
 
+	// .eval charsPerLine = maxSprites/2 
 	.var index = Layer_LayerList.size()
 
 	.if(index == 0) {
@@ -458,12 +465,13 @@
 		//FINAL SETUP based on previously unknown values
 		_configureCharModes()
 
-		lda #[Layer_LayerList.size() * 2]
+		lda #[Layer_LayerList.size()]
 		sta _Layer_Update.ListSize0
 		lda #[Layer_LayerList.size() * 2 + 2]
 		sta _Layer_Update.ListSize1
 
-
+		lda #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		sta _Layer_Update.ScreenHeight
 
 		jmp end
 
@@ -481,11 +489,19 @@
 		_configureDynamicData(*)
 		
 	end:
+
 		//Has to be called after the _configureDynamicData call
-		lda #<Layer_DynamicDataIndex 
+		lda #<Layer_DynamicDataTable 
 		sta S65_DynamicLayerData + 0
-		lda #>Layer_DynamicDataIndex
+		lda #>Layer_DynamicDataTable
 		sta S65_DynamicLayerData + 1
+		
+
+
+
+	.if(S65_SCREEN_LOGICAL_ROW_WIDTH > $1f4) {
+		.error "Pixel clock limits S65_SCREEN_LOGICAL_ROW_WIDTH to values <= $1f4, you are using $"+toHexString(S65_SCREEN_LOGICAL_ROW_WIDTH)+" bytes per row.  Please reduce your layer widths..."
+	}
 }
 
 
@@ -499,47 +515,56 @@
 
 	S65_Trace("Configuring dynamic layer memory...")
 	S65_Trace("")
-	S65_Trace("Layer_DynamicDataIndex $"+toHexString(Layer_DynamicDataIndex))	
+
 	S65_Trace("")	
 
-	.var layerAddr = List()
-	
-	.for(var i=0; i<Layer_LayerList.size(); i++) {
-		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
-			//rrb only
-			S65_Trace("#"+i+"    $"+toHexString(*)+" RRB Sprites Layer")
-		} else {
-			//screenlayer only
-			S65_Trace("#"+i+"    $"+toHexString(*)+" Screen Layer")
-		}
-		.eval layerAddr.add(*)
-		//common values
-		.eval Layer_LayerList.get(i).put("dynamicDataAddr", *)
+		//Add layer IO Data
+		.var layerAddr = List()
 
-		.word Layer_LayerList.get(i).get("offsetX") //GOTOX position value
-	}
-	S65_Trace("============================")
+		.for(var i=0; i<Layer_LayerList.size(); i++) {
+			.eval Layer_LayerList.get(i).put("dynamicDataAddr", *)
+			.eval layerAddr.add(*)
+			S65_Trace("#"+i+"    $"+toHexString(*)+" Layer")
+			.word Layer_LayerList.get(i).get("offsetX") //GOTOX position value
+
+			.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
+				//rrb only
+				Sprite_GenerateLayerData(i)
+			} else {
+				//screenlayer only
+				
+			}
+			
+		}
+		S65_Trace("============================")
 
 	//Layer IO address lookup table
-	.eval Layer_DynamicDataIndex = *
-	.for(var i=0; i<layerAddr.size(); i++) {
-		.word layerAddr.get(i)
-		.if(Layer_LayerList.get(i).get("rrbSprites") == true) {
-			S65_AddToMemoryReport("Layer_DynamicDataAndIO")
-			Sprite_GenerateLayerData(i)
-			S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 
-		} else {
-			//screenlayer only
-				
+	.eval Layer_DynamicDataTable = *	
+		.print("Layer_DynamicDataTable $"+toHexString(Layer_DynamicDataTable))	
+		.for(var i=0 ; i< layerAddr.size(); i++) {
+			.print("layerAddr"+i+"   $"+ toHexString(layerAddr.get(i)))
 		}
-	}
-
+		.fill layerAddr.size(), [<layerAddr.get(floor(i)), >layerAddr.get(i)]
+	
 	//Screen row address table
 	.eval Layer_RowAddressLSB = *
 		.fill S65_VISIBLE_SCREEN_CHAR_HEIGHT, <[S65_SCREEN_RAM + i * S65_SCREEN_LOGICAL_ROW_WIDTH + 2]
 	.eval Layer_RowAddressMSB = *
 		.fill S65_VISIBLE_SCREEN_CHAR_HEIGHT, >[S65_SCREEN_RAM + i * S65_SCREEN_LOGICAL_ROW_WIDTH + 2]
+
+	.eval Layer_RowAddressBaseLSB = *
+		.fill S65_VISIBLE_SCREEN_CHAR_HEIGHT, <[S65_SCREEN_RAM + i * S65_SCREEN_LOGICAL_ROW_WIDTH]
+	.eval Layer_RowAddressBaseMSB = *
+		.fill S65_VISIBLE_SCREEN_CHAR_HEIGHT, >[S65_SCREEN_RAM + i * S65_SCREEN_LOGICAL_ROW_WIDTH]
+
+
+	.eval Layer_SpriteIOAddrLSB = *
+		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("rrbSprites") == true ? <Layer_LayerList.get(i).get("spriteIOAddr") : 0
+	.eval Layer_SpriteIOAddrMSB = *
+		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("rrbSprites") == true ? >Layer_LayerList.get(i).get("spriteIOAddr") : 0
+	.eval Layer_IsRRBSprite = *
+		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("rrbSprites") == true ? 1 : 0
 
 	//Tables
 	.eval Layer_src = *
@@ -554,6 +579,9 @@
 			.if( i == Layer_LayerList.size()-1) .byte [[layer.get("charWidth") * 2] + 4]
 			.eval layerOffset = layer.get("startAddr")
 		}		
+
+		
+
 	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 }
 

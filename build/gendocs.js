@@ -883,7 +883,7 @@ contexts:
     - match: \\b(${macs.join('|')})\\b
       scope: support.function.3d
     - match: \\b(${vars.join('|')})\\b
-      scope: constant.numeric.hex      
+      scope: constant.language.color      
     - match: '#TRUE'
       scope: constant.language.pseudocommand
     - match: '#FALSE'

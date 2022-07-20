@@ -1,48 +1,95 @@
 /**
- * .var IOxmsb
+* .var SpriteIOLength
+*
+* The size in bytes of the IO registers for a single sprite
+* 
+* @namespace Sprite
+*
+*/
+.var Sprite_SpriteIOLength = 0
+
+
+/**
+ * .var IOflags
  * 
- * {word} The IO register string for looking up the a sprites Xmsb
- * location in memory. Pass this to the
- * <a href='#Sprite_GetIO'>Sprite_GetIO</a>
- * function, to retrieve the address.
+ * Flags for the state of this sprite
+ * 
+ * bit 7 = enabled
  * 
  * @namespace Sprite
  */
- .var Sprite_IOxmsb = "xmsb"
-
-  /**
- * .var IOxlsb
- * 
- * {word} The IO register string for looking up the a sprites xlsb
- * location in memory. Pass this to the
- * <a href='#Sprite_GetIO'>Sprite_GetIO</a>
- * function, to retrieve the address.
- * 
- * @namespace Sprite
- */
- .var Sprite_IOymsb = "xlsb"
-
+ .var Sprite_IOflags = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 1
 
  /**
- * .var IOymsb
+ * .var IOx
  * 
- * {word} The IO register string for looking up the a sprites Ymsb
+ * The IO register offset for looking up the a sprites x position
  * location in memory. Pass this to the
  * <a href='#Sprite_GetIO'>Sprite_GetIO</a>
  * function, to retrieve the address.
  * 
  * @namespace Sprite
  */
- .var Sprite_IOxlsb = "ymsb"
+ .var Sprite_IOx = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 2
 
-  /**
- * .var IOylsb
+/**
+ * .var IOy
  * 
- * {word} The IO register string for looking up the a sprites ylsb
+ * The IO register offset for looking up the a sprites y position
  * location in memory. Pass this to the
  * <a href='#Sprite_GetIO'>Sprite_GetIO</a>
  * function, to retrieve the address.
  * 
  * @namespace Sprite
  */
- .var Sprite_IOylsb = "ylsb"
+ .var Sprite_IOy = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 2
+
+/**
+ * .var IOptr
+ * 
+ * The IO register offset for looking up the  sprite pointer
+ * location in memory. Pass this to the
+ * <a href='#Sprite_GetIO'>Sprite_GetIO</a>
+ * function, to retrieve the address.
+ * 
+ * @namespace Sprite
+ */
+ .var Sprite_IOptr = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 2
+
+/**
+ * .var IOwidth
+ *  
+ * The width in chars for this sprite, sprites will automatically advance
+ * through the char set as they are drawn in pieces, Left to right, top to bottom.
+ * 
+ * @namespace Sprite
+ */
+ .var Sprite_IOwidth = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 1
+
+/**
+ * .var IOheight
+ *  
+ * The height in chars for this sprite, sprites will automatically advance
+ * through the char set as they are drawn in pieces, Left to right, top to bottom.
+ * 
+ * @namespace Sprite
+ */
+ .var Sprite_IOheight = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 1
+
+/**
+ * .var IOcolor
+ *  
+ * The color to apply to all the cahrs in this sprite
+ * 
+ * @namespace Sprite
+ */
+ .var Sprite_IOcolor = Sprite_SpriteIOLength
+ .eval Sprite_SpriteIOLength += 1
+
+

@@ -226,7 +226,7 @@
             "annotation": "charsPerLine,maxSprites",
             "contents": "Layer_DefineRRBSpriteLayer(${1:charsPerLine}, ${2:maxSprites})",
             "kind": "snippet",
-            "details": "Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode. IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line, each new Sprite takes a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a 256 RRB Sprite hard limit per RRB Sprite layer."
+            "details": "Defines a new RRB Sprite layer in Screen RAM. RRB Sprite layers are always NCM mode (16x8px chars). IO for this layer is assigned to the Layer IO dynamic memory area<br> Note that chars per line is NOT the max sprites per line as a sprite can be any multiple of 16 chars wide<br><br>   RRB Sprite space is a buffer limited by a set amount of chars per line. During an update each new Sprite uses a GOTOX marker and however many RRB chars wide it is. So, for example, a 32x32 RRB sprite is 2 chars wide + a GOTOX marker so will take 3 chars of space.<br><br> Note: There is a RRB Sprite hard limit of 256 per RRB Sprite layer.  The majority of the memory and cpu time consumed by the RRB Sprite system is a result of the number of maxSprites. Reducing this number will have the best impact on SpriteIO area memory usage as each sprite slot (regardless if its enabled or not in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a>will use at least 10 bytes each. And every sprite that IS enabled will use some cpu time to update."
         },
         {
             "trigger": "Layer_DefineResolution",
@@ -278,12 +278,6 @@
             "details": "Returns the address of the char at the given position on this screen layer"
         },
         {
-            "trigger": "Layer_AddrOffsets",
-            "annotation": "Table of start address offsets for each layer",
-            "kind": "snippet",
-            "details": "Table of start address offsets for each layer"
-        },
-        {
             "trigger": "Layer_GotoXColorPositions",
             "annotation": "Table of GOTOX Attribute in color ram for each layer",
             "kind": "snippet",
@@ -308,6 +302,12 @@
             "details": "Contains the current Screen Row Logical Width in bytes"
         },
         {
+            "trigger": "Layer_AddrOffsets",
+            "annotation": "Pointer to Table of start address offsets for each layer",
+            "kind": "snippet",
+            "details": "Pointer to Table of start address offsets for each layer"
+        },
+        {
             "trigger": "Layer_DMAClear",
             "annotation": "Pointer to a dma subroutine that clears the screen ram layer, A=layer, X=charLo, Y=charHi",
             "kind": "snippet",
@@ -320,28 +320,52 @@
             "details": "Pointer to a dma subroutine that clears the color ram layer, A=layer, X=color"
         },
         {
-            "trigger": "Layer_DynamicDataIndex",
+            "trigger": "Layer_DynamicDataTable",
             "annotation": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory",
             "kind": "snippet",
             "details": "A pointer to the table containing the address of each layers dynamic data, this memory is initialised on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant on the screen layer structure, RRB sprite layers use the most memory"
         },
         {
             "trigger": "Layer_IOgotoX",
-            "annotation": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
+            "annotation": "The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
             "kind": "snippet",
-            "details": "{word} The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+            "details": "The IO register index for this layers GOTOX value. Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
         },
         {
             "trigger": "Layer_IOmaxCharsRRB",
-            "annotation": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
+            "annotation": "RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
             "kind": "snippet",
-            "details": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+            "details": "RRB SPRITE LAYER ONLY. The IO register index for this layers maximum chars per line value. <br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
         },
         {
-            "trigger": "Layer_Layer_IOrowCountTableRRB",
-            "annotation": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
+            "trigger": "Layer_IOmaxSpritesRRB",
+            "annotation": "RRB SPRITE LAYER ONLY. The IO register index for this layers maximum sprites value.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
             "kind": "snippet",
-            "details": "{word} RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+            "details": "RRB SPRITE LAYER ONLY. The IO register index for this layers maximum sprites value.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+        },
+        {
+            "trigger": "Layer_IOrowCountTableRRB",
+            "annotation": "RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function.",
+            "kind": "snippet",
+            "details": "RRB SPRITE LAYER ONLY. The IO register index for this layers RRB sprite rowCharCount table, used internally by the RRB sprite system.<br> Retrieve the absolute address by passing it to the <a href='#Layer_GetIO'>Layer_GetIO</a> function."
+        },
+        {
+            "trigger": "Layer_IsRRBSprite",
+            "annotation": "Pointer to the table of flags indicating if layers are RRB sprite layer",
+            "kind": "snippet",
+            "details": "Pointer to the table of flags indicating if layers are RRB sprite layer"
+        },
+        {
+            "trigger": "Layer_RowAddressBaseLSB",
+            "annotation": "Pointer to the table of LSB values for the address of the start of each screen row directly",
+            "kind": "snippet",
+            "details": "Pointer to the table of LSB values for the address of the start of each screen row directly"
+        },
+        {
+            "trigger": "Layer_RowAddressBaseMSB",
+            "annotation": "Pointer to the table of MSB values for the address of the start of each screen row directly",
+            "kind": "snippet",
+            "details": "Pointer to the table of MSB values for the address of the start of each screen row directly"
         },
         {
             "trigger": "Layer_RowAddressLSB",
@@ -354,6 +378,18 @@
             "annotation": "Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX",
             "kind": "snippet",
             "details": "Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX"
+        },
+        {
+            "trigger": "Layer_SpriteIOAddrLSB",
+            "annotation": "Pointer to the table of LSB values for the address of the start of the layers sprite IO area",
+            "kind": "snippet",
+            "details": "Pointer to the table of LSB values for the address of the start of the layers sprite IO area"
+        },
+        {
+            "trigger": "Layer_SpriteIOAddrMSB",
+            "annotation": "Pointer to the table of MSB values for the address of the start of the layers sprite IO area",
+            "kind": "snippet",
+            "details": "Pointer to the table of MSB values for the address of the start of the layers sprite IO area"
         },
         {
             "trigger": "Palette_LoadFromMem",
@@ -428,6 +464,13 @@
             "details": "Loads a file from the SDCard into chip RAM"
         },
         {
+            "trigger": "Sprite_Update",
+            "annotation": "",
+            "contents": "Sprite_Update ",
+            "kind": "snippet",
+            "details": ""
+        },
+        {
             "trigger": "Sprite_GenerateLayerData",
             "annotation": "",
             "contents": "Sprite_GenerateLayerData()",
@@ -435,28 +478,59 @@
             "details": ""
         },
         {
-            "trigger": "Sprite_IOxlsb",
-            "annotation": "{word} The IO register string for looking up the a sprites xlsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "trigger": "Sprite_GetIO",
+            "annotation": "layerNumber,spriteNumber,register",
+            "contents": "Sprite_GetIO(${1:layerNumber}, ${2:spriteNumber}, ${3:register})",
             "kind": "snippet",
-            "details": "{word} The IO register string for looking up the a sprites xlsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+            "details": "Returns the base address for the given layer & IO register.<br> See <a href='#Sprite_Vars'>Sprite_IO<a> for register list"
         },
         {
-            "trigger": "Sprite_IOxmsb",
-            "annotation": "{word} The IO register string for looking up the a sprites Xmsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "trigger": "Sprite_IOcolor",
+            "annotation": "The color to apply to all the cahrs in this sprite",
             "kind": "snippet",
-            "details": "{word} The IO register string for looking up the a sprites Xmsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+            "details": "The color to apply to all the cahrs in this sprite"
         },
         {
-            "trigger": "Sprite_IOylsb",
-            "annotation": "{word} The IO register string for looking up the a sprites ylsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "trigger": "Sprite_IOflags",
+            "annotation": "Flags for the state of this sprite  bit 7 = enabled",
             "kind": "snippet",
-            "details": "{word} The IO register string for looking up the a sprites ylsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+            "details": "Flags for the state of this sprite  bit 7 = enabled"
         },
         {
-            "trigger": "Sprite_IOymsb",
-            "annotation": "{word} The IO register string for looking up the a sprites Ymsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "trigger": "Sprite_IOheight",
+            "annotation": "The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.",
             "kind": "snippet",
-            "details": "{word} The IO register string for looking up the a sprites Ymsb location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+            "details": "The height in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom."
+        },
+        {
+            "trigger": "Sprite_IOptr",
+            "annotation": "The IO register offset for looking up the sprite pointer location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "The IO register offset for looking up the sprite pointer location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+        },
+        {
+            "trigger": "Sprite_IOwidth",
+            "annotation": "The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom.",
+            "kind": "snippet",
+            "details": "The width in chars for this sprite, sprites will automatically advance through the char set as they are drawn in pieces, Left to right, top to bottom."
+        },
+        {
+            "trigger": "Sprite_IOx",
+            "annotation": "The IO register offset for looking up the a sprites x position location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "The IO register offset for looking up the a sprites x position location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+        },
+        {
+            "trigger": "Sprite_IOy",
+            "annotation": "The IO register offset for looking up the a sprites y position location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address.",
+            "kind": "snippet",
+            "details": "The IO register offset for looking up the a sprites y position location in memory. Pass this to the <a href='#Sprite_GetIO'>Sprite_GetIO</a> function, to retrieve the address."
+        },
+        {
+            "trigger": "Sprite_SpriteIOLength",
+            "annotation": "The size in bytes of the IO registers for a single sprite",
+            "kind": "snippet",
+            "details": "The size in bytes of the IO registers for a single sprite"
         },
         {
             "trigger": "System_BasicUpstart65",

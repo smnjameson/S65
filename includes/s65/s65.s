@@ -157,7 +157,7 @@ _S65_SetBasePage: {
     .var libCallsTotal = 0
     .for (var i=0; i<keys.size(); i++) {
         .var ht = _MemoryReport.get(keys.get(i))
-        .if(keys.get(i) != "Layer_DynamicDataAndIO") {
+        .if(keys.get(i) != "Layer_DynamicDataAndIO" && keys.get(i) != "Sprite_DynamicDataAndIO") {
             S65_Trace("$"+toHexString(ht.get("bytes"),4)+"  ($"+toHexString(ht.get("count"),2)+":$"+toHexString(floor(ht.get("bytes") / ht.get("count")),4) + ")    "+keys.get(i))
             .eval libCallsTotal += ht.get("bytes")
         }
@@ -168,8 +168,9 @@ _S65_SetBasePage: {
     S65_Trace("    Total program memory used $"+ toHexString( * - S65_InitComplete))
     S65_Trace("        of which:")
     .var _dynamicDataIO = _MemoryReport.get("Layer_DynamicDataAndIO")
+    .var _dynamicDataIO2 = _MemoryReport.get("Layer_DynamicDataAndIO")
     S65_Trace("        Library calls       $"+toHexString(libCallsTotal))
-    S65_Trace("        Layer IO and data   $"+toHexString(_dynamicDataIO.get("bytes")))
+    S65_Trace("        Layer IO and data   $"+toHexString(_dynamicDataIO.get("bytes")+ _dynamicDataIO2.get("bytes")))
     // S65_Trace("        Other program code  $"+toHexString( (* - S65_InitComplete) - (_dynamicDataIO.get("bytes") + libCallsTotal) ))
     S65_Trace("============================")    
 }

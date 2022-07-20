@@ -2,7 +2,7 @@
 /**
  * .var IOgotoX
  * 
- * {word} The IO register index for this layers GOTOX value. Retrieve the
+ * The IO register index for this layers GOTOX value. Retrieve the
  * absolute address by passing it to the
  * <a href='#Layer_GetIO'>Layer_GetIO</a>
  * function.
@@ -15,7 +15,7 @@
 /**
  * .var IOmaxCharsRRB
  * 
- * {word} RRB SPRITE LAYER ONLY. The IO register index for this 
+ * RRB SPRITE LAYER ONLY. The IO register index for this 
  * layers maximum chars per line value. <br>
  * Retrieve the absolute address by passing it to the
  * <a href='#Layer_GetIO'>Layer_GetIO</a>
@@ -23,12 +23,25 @@
  * 
  * @namespace Layer
  */
-.var Layer_IOmaxCharsRRB = $01
+.var Layer_IOmaxCharsRRB = $02
 
 /**
- * .var Layer_IOrowCountTableRRB 
+ * .var IOmaxSpritesRRB
  * 
- * {word} RRB SPRITE LAYER ONLY. The IO register index for this layers 
+ * RRB SPRITE LAYER ONLY. The IO register index for this 
+ * layers maximum sprites value.<br>
+ * Retrieve the absolute address by passing it to the
+ * <a href='#Layer_GetIO'>Layer_GetIO</a>
+ * function.
+ * 
+ * @namespace Layer
+ */
+.var Layer_IOmaxSpritesRRB = $03
+
+/**
+ * .var IOrowCountTableRRB 
+ * 
+ * RRB SPRITE LAYER ONLY. The IO register index for this layers 
  * RRB sprite rowCharCount table, used internally by the RRB sprite system.<br>
  * Retrieve the absolute address by passing it to the
  * <a href='#Layer_GetIO'>Layer_GetIO</a>
@@ -36,7 +49,9 @@
  * 
  * @namespace Layer
  */
-.var Layer_IOrowCountTableRRB = $02
+.var Layer_IOrowCountTableRRB = $04
+
+
 
 
 /**
@@ -65,7 +80,7 @@
 
 S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	/**
-	* .var DynamicDataIndex
+	* .var DynamicDataTable
 	*
 	* A pointer to the table containing the address of each layers dynamic data, this memory is initialised
 	* on a <a href='#Layer_InitScreen'>Layer_InitScreen</a> it's size is dependant 
@@ -73,7 +88,7 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	* 
 	* @namespace Layer
 	*/
-	.var Layer_DynamicDataIndex = $0000
+	.var Layer_DynamicDataTable = $0000
 
 	/**
 	* .var RowAddressLSB
@@ -91,6 +106,51 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	* @namespace Layer
 	*/
 	.var Layer_RowAddressMSB = $0000
+
+	/**
+	* .var RowAddressBaseLSB
+	*
+	* Pointer to the table of LSB values for the address of the start of each screen row directly
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_RowAddressBaseLSB = $0000
+	/**
+	* .var RowAddressBaseMSB
+	*
+	* Pointer to the table of MSB values for the address of the start of each screen row directly
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_RowAddressBaseMSB = $0000
+
+	/**
+	* .var SpriteIOAddrLSB
+	*
+	* Pointer to the table of LSB values for the address of the start of the layers sprite IO area
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_SpriteIOAddrLSB = $0000
+
+	/**
+	* .var SpriteIOAddrMSB
+	*
+	* Pointer to the table of MSB values for the address of the start of the layers sprite IO area
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_SpriteIOAddrMSB = $0000
+
+	/**
+	* .var IsRRBSprite
+	*
+	* Pointer to the table of flags indicating if layers are RRB sprite layer
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_IsRRBSprite = $0000
+
 
 	/**
 	* .var DMAClear
@@ -153,9 +213,9 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 
 
 	/**
-	 * .data AddrOffsets
+	 * .var AddrOffsets
 	 * 
-	 * Table of start address offsets for each layer
+	 * Pointer to Table of start address offsets for each layer
 	 * 
 	 * @namespace Layer
 	 * 

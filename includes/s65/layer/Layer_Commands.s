@@ -143,17 +143,17 @@ _Layer_AddText: {
 			ldy #$00
 		!loop:
 			iny
-			lda.z (TEXT_PTR), y
+			lda (TEXT_PTR), y
 			cmp #$ff
 			beq !exit+
 			dey
 			
-				lda.z (TEXT_PTR), y
+				lda (TEXT_PTR), y
 				sta ((S65_ScreenRamPointer)), z
 				inz
 				iny
 
-				lda.z (TEXT_PTR), y
+				lda (TEXT_PTR), y
 				sta ((S65_ScreenRamPointer)), z
 				 	
 				lda.z VALUE:#$BEEF
@@ -257,9 +257,9 @@ _Layer_AddText: {
 */
 .pseudocommand Layer_ClearLayer layer : clearChar : clearColor {
 	S65_AddToMemoryReport("Layer_ClearLayer")
-		.if(!_isImmOrNone(layer)) .error "Layer_ClearLayer:"+ S65_TypeError
-		.if(!_isImmOrNone(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
-		.if(!_isImmOrNone(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
+		.if(!_isImmOrNone(layer) && !_isReg(layer)) .error "Layer_ClearLayer:"+ S65_TypeError
+		.if(!_isImmOrNone(clearChar) && !_isReg(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
+		.if(!_isImmOrNone(clearColor) && !_isReg(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
 		
 
 		_saveIfReg(layer, SMlayer)
@@ -319,45 +319,54 @@ _Layer_AddText: {
 * @registers A
 * @flags znc
 */
+
 .pseudocommand Layer_Update {
 		S65_AddToMemoryReport("Layer_Update")
-		jsr _Layer_Update
-		S65_AddToMemoryReport("Layer_Update")
-}
-_Layer_Update: {
 		phx 
 		phy
 		phz
 
+		S65_SetBasePage()
+			jsr _Layer_Update
+			Sprite_Update Layer_LayerList.size()
+		S65_RestoreBasePage()		
+
+		plz
+		ply
+		plx
+		S65_AddToMemoryReport("Layer_Update")
+}
+_Layer_Update: {
+
+
 		.const DYN_TABLE = S65_TempWord1
 		S65_SetBasePage()
 			//Transfer the GOTOX values from the dynamic IO
-			lda #$00
-			tax 
-			tay 
-			taz
+			ldx #$00
+			ldy #$00 
+			ldz #$00 
 		!loop:
-.print ("S65_DynamicLayerData: $" + toHexString(S65_DynamicLayerData))
 			lda (S65_DynamicLayerData), y
 			iny
 			sta.z DYN_TABLE + 0
+
 			lda (S65_DynamicLayerData), y
 			dey
 			sta.z DYN_TABLE + 1
 
-			//yreg = 0 {word} Layer_IOgotoX
+
 			lda (DYN_TABLE), z
-			inz
-.print ("Layer_GotoXPositions: $" + toHexString(Layer_GotoXPositions))
 			sta Layer_GotoXPositions, y
-			inx 
+
 			iny
+			inz 
 			lda (DYN_TABLE), z 
-			dez
 			and #$03 //Clamp the value to only use the first 2 bits	
 			sta Layer_GotoXPositions, y 
+
 			iny
-			inx
+			dez		
+			inx 
 			cpx ListSize0:#$BEEF
 			bne !loop-
 
@@ -389,7 +398,8 @@ _Layer_Update: {
 			// 	jmp *
 			// !:
 
-				ldy #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+.print ("S65_VISIBLE_SCREEN_CHAR_HEIGHT: $" + toHexString(S65_VISIBLE_SCREEN_CHAR_HEIGHT))
+				ldy ScreenHeight:#S65_VISIBLE_SCREEN_CHAR_HEIGHT
 			!loop:
 				//COLOR RAM
 				ldz #$00
@@ -443,11 +453,7 @@ _Layer_Update: {
 			cpx ListSize1:#$BEEF
 			bcc !outerLoop-
 		!end:
-		S65_RestoreBasePage()
 
-		plz
-		ply
-		plx
 		rts
 }
 
@@ -484,6 +490,7 @@ _Layer_Update: {
 		}
 		BRANCH_REGORB8BIT:
 		.if(!_isNone(offset) && (offset.getValue() < $100 || _isReg(offset))){
+
 				clc
 				lda.z S65_ScreenRamPointer + 0
 				adc #offset.getValue()
@@ -495,7 +502,9 @@ _Layer_Update: {
 			!:
 
 		} else {
+
 			.if(_isNone(offset)) {
+
 				.if(S65_SCREEN_LOGICAL_ROW_WIDTH < $100) {
 					clc
 					lda.z S65_ScreenRamPointer + 0
@@ -505,38 +514,49 @@ _Layer_Update: {
 					bcc !+
 					inc.z S65_ScreenRamPointer + 1
 					inc.z S65_ColorRamPointer + 1
+
 				!:	
 				} else {
+
 
 					clc
 					lda.z S65_ScreenRamPointer + 0
 					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
 					sta.z S65_ScreenRamPointer + 0
 					sta.z S65_ColorRamPointer + 0
-
+					
+					php
 					lda.z S65_ScreenRamPointer + 1
 					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
 					sta.z S65_ScreenRamPointer + 1
-					bcc !+
+		
+					plp
 					lda.z S65_ColorRamPointer + 1
-					adc #[[>S65_SCREEN_LOGICAL_ROW_WIDTH]-1]
+					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
 					sta.z S65_ColorRamPointer + 1
+
+
 				!:
 				}
 
 
 			} else {
+
 				clc
 				lda.z S65_ScreenRamPointer + 0
 				adc #<offset.getValue()
 				sta.z S65_ScreenRamPointer + 0
 				sta.z S65_ColorRamPointer + 0
+				bcc !+
+
+				php
 				lda.z S65_ScreenRamPointer + 1
 				adc #>offset.getValue()
 				sta.z S65_ScreenRamPointer + 1
-				bcc !+
+
+				plp
 				lda.z S65_ColorRamPointer + 1
-				adc #[[>offset.getValue()] -1]
+				adc #>offset.getValue()
 				sta.z S65_ColorRamPointer + 1	
 			!:
 			}
@@ -622,7 +642,7 @@ _Layer_Update: {
 					ldy #$02
 				!:
 					lda SMsource:$BEEF, x //char lsb
-					sta.z ((S65_ScreenRamPointer)), z 
+					sta ((S65_ScreenRamPointer)), z 
 					inz 
 					inx 
 					dey 
@@ -634,28 +654,28 @@ _Layer_Update: {
 				//screen ABS
 				.if(_isAbs(screenSource)) {
 					lda screenSource.getValue(), x //char lsb
-					sta.z ((S65_ScreenRamPointer)), z 
+					sta ((S65_ScreenRamPointer)), z 
 					inz 
 					inx 
 					lda screenSource.getValue(), x //char msb
-					sta.z ((S65_ScreenRamPointer)), z 	
+					sta ((S65_ScreenRamPointer)), z 	
 				} else {
 					//scewen REG
 					.if(_isReg(screenSource)) {
 						lda S65_PseudoReg + 1 //char lsb
-						sta.z ((S65_ScreenRamPointer)), z 
+						sta ((S65_ScreenRamPointer)), z 
 						inz 
 						inx 
 						lda #$00 //char msb
-						sta.z ((S65_ScreenRamPointer)), z 		
+						sta ((S65_ScreenRamPointer)), z 		
 					} else {
 						//screen IMM
 						lda #screenSource.getValue()
-						sta.z ((S65_ScreenRamPointer)), z 
+						sta ((S65_ScreenRamPointer)), z 
 						inz 
 						inx 
 						lda #$00 //char msb
-						sta.z ((S65_ScreenRamPointer)), z 					
+						sta ((S65_ScreenRamPointer)), z 					
 					}
 				}
 			}
@@ -672,19 +692,19 @@ _Layer_Update: {
 						tax 
 
 						lda SMcolor:$BEEF, x //char lsb
-						sta.z ((S65_ColorRamPointer)), z 
+						sta ((S65_ColorRamPointer)), z 
 						ldx RestX1:#$BEEF	
 				} else {
 					.if(_isAbs(colorSource)) {
 						lda colorSource.getValue(), x
-						sta.z ((S65_ColorRamPointer)), z 	
+						sta ((S65_ColorRamPointer)), z 	
 					} else {
 						.if(_isReg(colorSource)) {
 							lda S65_PseudoReg + 2
-							sta.z ((S65_ColorRamPointer)), z 	
+							sta ((S65_ColorRamPointer)), z 	
 						} else {
 							lda #colorSource.getValue()
-							sta.z ((S65_ColorRamPointer)), z 				
+							sta ((S65_ColorRamPointer)), z 				
 						}				
 					}
 				}

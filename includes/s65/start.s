@@ -1,3 +1,5 @@
+
+
 /**
  * .global S65
  * 
@@ -133,6 +135,7 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_BaseScreenRamPointer: .dword $00000000
 			S65_BaseColorRamPointer: .dword $00000000
 
+
 			S65_DynamicLayerData: .word $0000
  			S65_PseudoReg:	
  				.byte $00,$00,$00,$00
@@ -142,8 +145,18 @@ System_BasicUpstart65(S65_InitComplete)
  			S65_TempDword1:	.dword $00000000
  			S65_TempDword2:	.dword $00000000
  			S65_TempWord1:	.word $0000
+ 			S65_TempWord2:	.word $0000
+ 			S65_TempWord3:	.word $0000
+ 			S65_TempWord4:	.word $0000
  			S65_TempByte1:	.byte $00
  			S65_TempByte2:	.byte $00
+
+			S65_SpritePointerTemp:	.word $0000
+			S65_SpriteRowCounter:	.byte $00
+			S65_SpriteRowTablePtr:	.byte $0000
+
+
+ 			S65_Counter: .word $0000
 
 /** 
  * .var SpareBasePage
@@ -158,10 +171,11 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/sdcard.s"		
 #import "includes/s65/s65.s"
 #import "includes/s65/layer.s"
+#import "includes/s65/sprite.s"
+
 #import "includes/s65/system.s"
 #import "includes/s65/dma.s"
 #import "includes/s65/palette.s"
-#import "includes/s65/sprite.s"
 
 S65: {
 	Init: {
@@ -221,4 +235,3 @@ S65: {
 //This label S65_InitComplete MUST always be at the end of the library 
 //as it is where the program continues execution when initialised
 S65_InitComplete:
-
