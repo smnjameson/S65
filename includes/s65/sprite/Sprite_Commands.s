@@ -425,7 +425,8 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 /**
 * .pseudocommand SetColor
 *
-* Sets the currently selected sprites color
+* Sets the currently selected sprites color. Note that colors are in the upper nybble in NCM mode,
+* so palette slice $02 is represented as $20
 * 
 * @namespace Sprite
 * @param {byte} {IMM|REG|ABS} color Sprites color
@@ -455,7 +456,9 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 *
 * Returns the color of the currently selected sprite in 
 * <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator
-* Lo byte is color
+* Lo byte is color<br>
+* Note that colors are in the upper nybble in NCM mode,
+* so palette slice $02 is represented as $20
 * 
 * @namespace Sprite
 * @flags nz

@@ -520,7 +520,7 @@
             "annotation": "",
             "contents": "Sprite_GetColor ",
             "kind": "snippet",
-            "details": "Returns the color of the currently selected sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator Lo byte is color"
+            "details": "Returns the color of the currently selected sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator Lo byte is color<br> Note that colors are in the upper nybble in NCM mode, so palette slice $02 is represented as $20"
         },
         {
             "trigger": "Sprite_GetDimensions",
@@ -562,7 +562,7 @@
             "annotation": "color",
             "contents": "Sprite_SetColor ${1:color}",
             "kind": "snippet",
-            "details": "Sets the currently selected sprites color"
+            "details": "Sets the currently selected sprites color. Note that colors are in the upper nybble in NCM mode, so palette slice $02 is represented as $20"
         },
         {
             "trigger": "Sprite_SetDimensions",

@@ -30,8 +30,9 @@
 		Layer_DefineScreenLayer(30, 0, false)  			//layer 2
 		Layer_InitScreen($8000)							//Initialize
 	
-		Palette_SetPalettes #$03 : #$00 : #$00
-		Palette_LoadFromMem #$03 : palette : #256
+		Palette_Assign #$03 : #$00 : #$00
+		Palette_Set #$03
+		Palette_LoadFromMem palette : #$100
 
 
 

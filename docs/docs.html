@@ -1941,7 +1941,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Returns the color of the currently selected sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator Lo byte is color  </div>
+						<div class='macroItemDescription'> Returns the color of the currently selected sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator Lo byte is color<br> Note that colors are in the upper nybble in NCM mode, so palette slice $02 is represented as $20  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_GetColor </div>
 						
@@ -2079,7 +2079,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the currently selected sprites color  </div>
+						<div class='macroItemDescription'> Sets the currently selected sprites color. Note that colors are in the upper nybble in NCM mode, so palette slice $02 is represented as $20  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_SetColor <i>color</i></div>
 						
