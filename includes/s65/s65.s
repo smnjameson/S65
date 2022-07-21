@@ -168,9 +168,6 @@ _S65_SetBasePage: {
     S65_Trace("    Base Library              $"+toHexString(S65_InitComplete - $2001) + " bytes")
     S65_Trace("    Total Library calls       $"+toHexString(libCallsTotal)+" bytes") 
     S65_Trace("    Layer IO and data         $"+toHexString(PostLayerInitScreen - DataLayerInitScreen) +" bytes")
-    S65_Trace("    Other                     $"+toHexString((PostLayerInitScreen - $2001) - (libCallsTotal) - (S65_InitComplete - $2001) - (PostLayerInitScreen - DataLayerInitScreen)) +" bytes")
-    S65_Trace("    ---------------------------------------")
-    S65_Trace("    Total                     $"+toHexString(PostLayerInitScreen - $2001) +" bytes")
     S65_Trace("===========================================")    
 }
 .const _MemoryReport = Hashtable()
