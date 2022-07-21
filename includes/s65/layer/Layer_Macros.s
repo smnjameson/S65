@@ -490,13 +490,22 @@
 		
 	end:
 
-		//Has to be called after the _configureDynamicData call
+		//These have to be called after the _configureDynamicData call
+		//To ensure code sections have the correct addresses instead of $0000
+		
 		lda #<Layer_DynamicDataTable 
 		sta S65_DynamicLayerData + 0
 		lda #>Layer_DynamicDataTable
 		sta S65_DynamicLayerData + 1
 		
-
+		lda #<Layer_SpriteIOAddrLSB 
+		sta S65_SpriteIOAddrLSB + 0
+		lda #>Layer_SpriteIOAddrLSB
+		sta S65_SpriteIOAddrLSB + 1	
+		lda #<Layer_SpriteIOAddrMSB 
+		sta S65_SpriteIOAddrMSB + 0
+		lda #>Layer_SpriteIOAddrMSB
+		sta S65_SpriteIOAddrMSB + 1	
 
 
 	.if(S65_SCREEN_LOGICAL_ROW_WIDTH > $1f4) {

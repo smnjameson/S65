@@ -346,6 +346,10 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Global_ColorRamPointer'>ColorRamPointer</a></div>
 				
+					<div class='macroIndex'><a href='#Global_LastSpriteIOPointer'>LastSpriteIOPointer</a></div>
+				
+					<div class='macroIndex'><a href='#Global_ReturnValue'>ReturnValue</a></div>
+				
 					<div class='macroIndex'><a href='#Global_SCREEN_LOGICAL_ROW_WIDTH'>SCREEN_LOGICAL_ROW_WIDTH</a></div>
 				
 					<div class='macroIndex'><a href='#Global_SCREEN_RAM'>SCREEN_RAM</a></div>
@@ -373,6 +377,18 @@ h4 {
 						<div class='macroItemDescription'> S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_ColorRamPointer</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_LastSpriteIOPointer'>LastSpriteIOPointer</div>
+						<div class='macroItemDescription'> S65 BasePage pointer into to the IO data for the last sprite that was accessed using the Sprite commands<br><br> Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> to correctly set up the base page before using indirect indexed adressing modes on this pointer. </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_LastSpriteIOPointer</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_ReturnValue'>ReturnValue</div>
+						<div class='macroItemDescription'> S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte. </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_ReturnValue</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SCREEN_LOGICAL_ROW_WIDTH'>SCREEN_LOGICAL_ROW_WIDTH</div>
@@ -1833,8 +1849,341 @@ h4 {
 		
 				<div class='macroHeader' id='Sprite_Pseudocommands'>Pseudocommands</div>
 			
+					<div class='macroIndex'><a href='#Sprite_Enable'>Enable</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_GetColor'>GetColor</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_GetDimensions'>GetDimensions</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_GetPointer'>GetPointer</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_GetPositionX'>GetPositionX</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_GetPositionY'>GetPositionY</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetColor'>SetColor</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetDimensions'>SetDimensions</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetPointer'>SetPointer</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetPositionX'>SetPositionX</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetPositionY'>SetPositionY</a></div>
+				
 					<div class='macroIndex'><a href='#Sprite_Update'>Update</a></div>
 				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_Enable'>Enable
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Enables a sprite so that it is rendered in a <a href="#Layer_Update">Layer_Update</a><br> Sets <a href="#Global_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br>    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_Enable <i>layerNum</i> : <i>sprNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABSXY} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetColor'>GetColor
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns the current color of the sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator Lo byte is color   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetColor <i>layerNum</i> : <i>sprNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer number</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetDimensions'>GetDimensions
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns the current dimensionso of the sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a><br> Lo byte is width, Hi byte is height   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetDimensions <i>layerNum</i> : <i>sprNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer number</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetPointer'>GetPointer
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns the current pointer of the sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a>   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetPointer <i>layerNum</i> : <i>sprNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer number</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetPositionX'>GetPositionX
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns the current X position of the sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a>   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetPositionX <i>layerNum</i> : <i>sprNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer number</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetPositionY'>GetPositionY
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns the current Y position of the sprite in <a href="#Global_ReturnValue">S65_ReturnValue</a>   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetPositionY <i>layerNum</i> : <i>sprNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer number</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetColor'>SetColor
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets a sprites color   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetColor <i>layerNum</i> : <i>sprNum</i> : <i>color</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG} color - Sprites color</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetDimensions'>SetDimensions
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets a sprites width and height.     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetDimensions <i>layerNum</i> : <i>sprNum</i> : <i>pointer</i> : <i>layerNum</i> : <i>sprNum</i> : <i>width</i> : <i>height</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} pointer - The y pointer to set</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG} width - Sprite width in chars</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG} height - Sprite height in chars</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetPointer'>SetPointer
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets a sprites pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetPointer <i>layerNum</i> : <i>sprNum</i> : <i>pointer</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} pointer - The y pointer to set</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetPositionX'>SetPositionX
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets a sprites X position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetPositionX <i>layerNum</i> : <i>sprNum</i> : <i>xpos</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} xpos - The x position</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetPositionY'>SetPositionY
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets a sprites Y position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetPositionY <i>layerNum</i> : <i>sprNum</i> : <i>ypos</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} sprNum - The sprite number to enable</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} ypos - The y position</div></span>
+						</div>
+					
+						
+						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_Update'>Update
 							
@@ -1962,10 +2311,46 @@ h4 {
 						<div class='macroUsage'>Sprite_SpriteIOLength</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='System'><span><h4>Namespace<h2>System</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#System_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#System_Data'><div class='sectionButton'>Data</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#System_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#System_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#System_Data'><div class='sectionButton'>Data</div></a></span>
 			<div class='categoryDescription'> Tools and utilities for configuring the processor and launching programs. </div>
 			<br>
 		
+				<div class='macroHeader' id='System_Pseudocommands'>Pseudocommands</div>
+			
+					<div class='macroIndex'><a href='#System_GetRandom16'>GetRandom16</a></div>
+				
+					<div class='macroIndex'><a href='#System_GetRandom8'>GetRandom8</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_GetRandom16'>GetRandom16
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns a random 16 bit number in <a href="#Global_ReturnValue">S65_ReturnValue</a>  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_GetRandom16 </div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_GetRandom8'>GetRandom8
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns a random 8 bit number in <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_GetRandom8 </div>
+						
+						
+						
+					</div><br>
 				<div class='macroHeader' id='System_Macros'>Macros</div>
 			
 					<div class='macroIndex'><a href='#System_BasicUpstart65'>BasicUpstart65</a></div>

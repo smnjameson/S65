@@ -156,9 +156,29 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpriteRowCounter:	.byte $00
 			S65_SpriteRowTablePtr:	.byte $0000
 
+/** 
+ * .var ReturnValue
+ * 
+ * S65 BasePage value that is used as a return for many commands
+ * when the result is a word rather than a byte. 
+ */	
+			S65_ReturnValue:	.word $0000
+
 .print ("S65_LastSpriteIOPointer: $" + toHexString(S65_LastSpriteIOPointer))
+
+/** 
+ * .var LastSpriteIOPointer
+ * 
+ * S65 BasePage pointer into to the IO data for the last sprite that was
+ * accessed using the Sprite commands<br><br>
+ * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a>
+ * to correctly set up the base page
+ * before using indirect indexed adressing modes on this pointer.
+ */	
 			S65_LastSpriteIOPointer: .word $0000
-			
+			S65_SpriteIOAddrLSB: .word $0000
+			S65_SpriteIOAddrMSB: .word $0000
+
  			S65_Counter: .word $0000
  			S65_SpriteFineY: .byte $00
 

@@ -41,13 +41,8 @@
 		.var startAddr = *
 		//sprite data
 		.fill Sprite_SpriteIOLength * count, $00
-		
-		
-		.eval offset = *
-.print ("spriteIOOffsets Table: $" + toHexString(*))
-		.eval io.put("spriteIOOffsets", offset)
-		.fill count, [<[startAddr + i * Sprite_SpriteIOLength], >[startAddr + i * Sprite_SpriteIOLength] ]
 
+		
 
 	S65_Trace("      Register dimensions $"+toHexString(count)+ " x $"+toHexString((*-startAddr)/count))	
 }

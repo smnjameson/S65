@@ -7,49 +7,49 @@
 #import "includes/s65/start.s"
 	jmp Start 
 
-
-
-			//Safest to define all the data before your code to avoid assembler pass errors
-			.encoding "screencode_upper"
-			palette:
-				.import binary "assets/bin/test3_palette.bin"
-			testScreenChars:
-				.fill 16 * 8, [<[$200 + i], >[$200 + i]]
-			testScreenColors:
-				.import binary "assets/bin/test3_ncm.bin"
-			message:
-				S65_Text16("LAYER 2 - THIS IS AN FCM LAYER")
+		//Safest to define all the data before your code to avoid assembler pass errors
+		.encoding "screencode_upper"
+		palette:
+			.import binary "assets/bin/test3_palette.bin"
+		testScreenChars:
+			.fill 16 * 8, [<[$200 + i], >[$200 + i]]
+		testScreenColors:
+			.import binary "assets/bin/test3_ncm.bin"
+		message:
+			S65_Text16("LAYER 2 - THIS IS AN FCM LAYER")
 
 	Start:
-		Layer_DefineResolution(40, 28, false)		//Resolution
-
+		
 
 		.const BLANK = $200
 		.const BRICK = $206
 		.const NUM_SPRITES = 128
+
 		//Define and initlayers
+		Layer_DefineResolution(40, 28, false)		//Resolution
+
 		.const LYR_BG = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(20, 0, true)  			
+		Layer_DefineScreenLayer(20, 0, true) 
+
 		.const LYR_LV = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(16, 200, true)  			
+		Layer_DefineScreenLayer(16, 200, true)  
+
 		.const LYR_SP = Layer_GetLayerCount()
-		Layer_DefineRRBSpriteLayer(64, NUM_SPRITES) 		
+		Layer_DefineRRBSpriteLayer(32, NUM_SPRITES) 
+
 		.const LYR_UI = Layer_GetLayerCount()
 		Layer_DefineScreenLayer(32, 0, false) 
+
 		Layer_InitScreen($10000)							//Initialize
+
+
 	
 		Palette_SetPalettes #$03 : #$00 : #$00
-		Palette_LoadFromMem #$03 : palette : #256
+		Palette_LoadFromMem #$03 : palette : #$100
 
-		lda #$15
-		sta $d021
-
-
-		// jmp *
 		//Clear layers
 		Layer_ClearAllLayers #BLANK
 		Layer_ClearLayer #LYR_BG : #BRICK : #$01
-
 
 		//Add some text to UI layer
 		Layer_AddText #LYR_UI : #0 : #0 : message : #4
@@ -62,80 +62,45 @@
 		ldz #$04
 	!charsetloop:
 			ldy #$00 //Source offset
-			ldx #$08 //How many rows to draw
+			ldx #$00 
 		!rowloop:	
 				Layer_WriteToScreen testScreenChars,y  : testScreenColors, y : #$10
 				Layer_AdvanceScreenPointers 
-			dex 
+			inx 
+			cpx #$08 //How many rows to draw
 			bne !rowloop-
 		dez 
 		lbne !charsetloop-
 
 
 		//Add some RRB sprites
+		S65_SetBasePage()
+		
+			ldx #$00
+		!:	
+				Sprite_Enable #LYR_SP : #REGX
 
-		.for(var i=0; i<NUM_SPRITES; i++) {
-			lda #[random() * 256]
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOx)	+ 0
-			lda #[random() * 256]	
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOy)	+ 0
-			lda #[random() * 4]	
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
-			lda #[random() * 4]	
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1	
+				System_GetRandom16 
+				Sprite_SetPositionX #LYR_SP : #REGX : S65_ReturnValue
 
-			//set pointer for sprite 0
-			lda #$61
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOptr) + 0	
-			lda #$02
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOptr) + 1
+				System_GetRandom16 
+				Sprite_SetPositionY #LYR_SP : #REGX : S65_ReturnValue
+			
+				Sprite_SetPointer #LYR_SP : #REGX : #$0261
+				Sprite_SetDimensions #LYR_SP : #REGX : #$01 : #$02
+				Sprite_SetColor #LYR_SP : #REGX : #$03
 
-			//enable
-			lda #$80	
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOflags)	
-			//width
-			lda #$01
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOwidth)	
-			//height
-			lda #$02
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOheight)	
-			//color
-			lda #$03
-			sta Sprite_GetIO(LYR_SP, i, Sprite_IOcolor)
-		}
+			inx 
+			cpx #NUM_SPRITES
+			lbne !-	
+		S65_RestoreBasePage()
 
-		// //Now lets make one using helper commands	
-		// lda #$d0
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOx)	+ 0	
-		// lda #$00
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOx) + 1
-
-		// lda #$fc
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOy)	+ 0
-		// lda #$03
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOy) + 1	
-
-		// lda #$61
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOptr) + 0	
-		// lda #$02
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOptr) + 1
-
-		// //enable
-		// lda #$80	
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOflags)	
-		// //width
-		// lda #$01
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOwidth)			
-		// //height
-		// lda #$02
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOheight)
-		// // color	
-		// lda #$03
-		// sta Sprite_GetIO(LYR_SP, 1, Sprite_IOcolor)
 		
 !loop:
-	System_WaitForRaster($100)
-	
+	System_WaitForRaster($080)
+
+		//Update - Call once per frame, its expensive!!
+		Layer_Update
 
 		//Move the BG Layer
 		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 0
@@ -148,45 +113,45 @@
 		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 1
 	!:
 		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
- 
-		.for(var i=0; i<NUM_SPRITES; i++) {
-			.if(mod(i,2) == 0) {
-					inc Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0
-					bne !+
-					inc Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1
-				!:
-			} else {
-					lda Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0
-					bne !+
-					dec Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 1
-				!:
-					dec Sprite_GetIO(LYR_SP, i, Sprite_IOy) + 0			
-			}	
+ 		
 
-				// 	inc Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0
-				// 	bne !+
-				// 	inc Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
-				// !:
+ 		S65_SetBasePage()
+ 		System_BorderDebug($11)
+	 		ldx #$00
+	 	!:	
+	 		txa 
+	 		and #$01
+	 		lbeq !direction2+
+	 	!direction1:
+	 		Sprite_GetPositionX #LYR_SP : #REGX 
+	 		dew.z S65_ReturnValue
+	 		Sprite_SetPositionX #LYR_SP : #REGX : S65_ReturnValue
 
-					lda Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0
-					bne !+
-					dec Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 1
-				!:
-					dec Sprite_GetIO(LYR_SP, i, Sprite_IOx) + 0			
-							
-		}
+	 		Sprite_GetPositionY #LYR_SP : #REGX 
+	 		dew.z S65_ReturnValue
+	 		Sprite_SetPositionY #LYR_SP : #REGX : S65_ReturnValue
+	 		jmp !directiondone+
+
+	 	!direction2:
+	 		Sprite_GetPositionX #LYR_SP : #REGX 
+	 		inw.z S65_ReturnValue
+	 		Sprite_SetPositionX #LYR_SP : #REGX : S65_ReturnValue
+
+	 		Sprite_GetPositionY #LYR_SP : #REGX 
+	 		inw.z S65_ReturnValue
+	 		Sprite_SetPositionY #LYR_SP : #REGX : S65_ReturnValue
+
+	 	!directiondone:			 		
+	 		inx 
+	 		cpx #NUM_SPRITES
+	 		lbne !-
+	 	System_BorderDebug($0f)
+ 		S65_RestoreBasePage()
 
 
 
-	!noUp:
-
-
-
-		//Update - Call once per frame, its expensive!!
-		Layer_Update
-
-	
 	jmp !loop-
+
 
 S65_MemoryReport()
 

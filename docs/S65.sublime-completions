@@ -70,6 +70,18 @@
             "details": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
         },
         {
+            "trigger": "S65_LastSpriteIOPointer",
+            "annotation": "S65 BasePage pointer into to the IO data for the last sprite that was accessed using the Sprite commands<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> to correctly set up the base page before using indirect indexed adressing modes on this pointer.",
+            "kind": "snippet",
+            "details": "S65 BasePage pointer into to the IO data for the last sprite that was accessed using the Sprite commands<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> to correctly set up the base page before using indirect indexed adressing modes on this pointer."
+        },
+        {
+            "trigger": "S65_ReturnValue",
+            "annotation": "S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte.",
+            "kind": "snippet",
+            "details": "S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte."
+        },
+        {
             "trigger": "S65_SCREEN_LOGICAL_ROW_WIDTH",
             "annotation": "Number of bytes that make up an entire screen row",
             "kind": "snippet",
@@ -470,6 +482,83 @@
             "details": "Loads a file from the SDCard into chip RAM"
         },
         {
+            "trigger": "Sprite_Enable",
+            "annotation": "layerNum:sprNum",
+            "contents": "Sprite_Enable ${1:layerNum} : ${2:sprNum}",
+            "kind": "snippet",
+            "details": "Enables a sprite so that it is rendered in a <a href=\"#Layer_Update\">Layer_Update</a><br> Sets <a href=\"#Global_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br>"
+        },
+        {
+            "trigger": "Sprite_GetColor",
+            "annotation": "layerNum:sprNum",
+            "contents": "Sprite_GetColor ${1:layerNum} : ${2:sprNum}",
+            "kind": "snippet",
+            "details": "Returns the current color of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator Lo byte is color"
+        },
+        {
+            "trigger": "Sprite_GetDimensions",
+            "annotation": "layerNum:sprNum",
+            "contents": "Sprite_GetDimensions ${1:layerNum} : ${2:sprNum}",
+            "kind": "snippet",
+            "details": "Returns the current dimensionso of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a><br> Lo byte is width, Hi byte is height"
+        },
+        {
+            "trigger": "Sprite_GetPointer",
+            "annotation": "layerNum:sprNum",
+            "contents": "Sprite_GetPointer ${1:layerNum} : ${2:sprNum}",
+            "kind": "snippet",
+            "details": "Returns the current pointer of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+        },
+        {
+            "trigger": "Sprite_GetPositionX",
+            "annotation": "layerNum:sprNum",
+            "contents": "Sprite_GetPositionX ${1:layerNum} : ${2:sprNum}",
+            "kind": "snippet",
+            "details": "Returns the current X position of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+        },
+        {
+            "trigger": "Sprite_GetPositionY",
+            "annotation": "layerNum:sprNum",
+            "contents": "Sprite_GetPositionY ${1:layerNum} : ${2:sprNum}",
+            "kind": "snippet",
+            "details": "Returns the current Y position of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+        },
+        {
+            "trigger": "Sprite_SetColor",
+            "annotation": "layerNum:sprNum:color",
+            "contents": "Sprite_SetColor ${1:layerNum} : ${2:sprNum} : ${3:color}",
+            "kind": "snippet",
+            "details": "Sets a sprites color"
+        },
+        {
+            "trigger": "Sprite_SetDimensions",
+            "annotation": "layerNum:sprNum:pointer:layerNum:sprNum:width:height",
+            "contents": "Sprite_SetDimensions ${1:layerNum} : ${2:sprNum} : ${3:pointer} : ${4:layerNum} : ${5:sprNum} : ${6:width} : ${7:height}",
+            "kind": "snippet",
+            "details": "Sets a sprites width and height."
+        },
+        {
+            "trigger": "Sprite_SetPointer",
+            "annotation": "layerNum:sprNum:pointer",
+            "contents": "Sprite_SetPointer ${1:layerNum} : ${2:sprNum} : ${3:pointer}",
+            "kind": "snippet",
+            "details": "Sets a sprites pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
+        },
+        {
+            "trigger": "Sprite_SetPositionX",
+            "annotation": "layerNum:sprNum:xpos",
+            "contents": "Sprite_SetPositionX ${1:layerNum} : ${2:sprNum} : ${3:xpos}",
+            "kind": "snippet",
+            "details": "Sets a sprites X position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
+        },
+        {
+            "trigger": "Sprite_SetPositionY",
+            "annotation": "layerNum:sprNum:ypos",
+            "contents": "Sprite_SetPositionY ${1:layerNum} : ${2:sprNum} : ${3:ypos}",
+            "kind": "snippet",
+            "details": "Sets a sprites Y position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
+        },
+        {
             "trigger": "Sprite_Update",
             "annotation": "",
             "contents": "Sprite_Update ",
@@ -537,6 +626,20 @@
             "annotation": "The size in bytes of the IO registers for a single sprite",
             "kind": "snippet",
             "details": "The size in bytes of the IO registers for a single sprite"
+        },
+        {
+            "trigger": "System_GetRandom16",
+            "annotation": "",
+            "contents": "System_GetRandom16 ",
+            "kind": "snippet",
+            "details": "Returns a random 16 bit number in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+        },
+        {
+            "trigger": "System_GetRandom8",
+            "annotation": "",
+            "contents": "System_GetRandom8 ",
+            "kind": "snippet",
+            "details": "Returns a random 8 bit number in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator"
         },
         {
             "trigger": "System_BasicUpstart65",
