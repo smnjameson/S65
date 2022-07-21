@@ -1,20 +1,18 @@
 /**
-* .pseudocommand Map
+* .pseudocommand Set
 *
-* Maps a palette into IO memory
+* Sets the currently active palette in IO memory.
 * 
 * @namespace Palette
-*
-* @registers A
 * @flags nz
-* 
 * @param {byte} {REG|IMM} paletteNum The MEGA palette number to map
 */
-.pseudocommand Palette_Map paletteNum {
-	S65_AddToMemoryReport("Palette_Map")
-		_saveIfReg(paletteNum, SMpaletteNum)
+.pseudocommand Palette_Set paletteNum {
+	S65_AddToMemoryReport("Palette_Set")
+	_saveIfReg(paletteNum, SMpaletteNum)
+	pha
 
-		.if(!_isImmOrNone(paletteNum) && !_isReg(paletteNum)) .error "Palette_Map:"+ S65_TypeError
+		.if(!_isImmOrNone(paletteNum) && !_isReg(paletteNum)) .error "Palette_Set:"+ S65_TypeError
 
 		lda #%11000000
 		trb $d070
@@ -25,12 +23,13 @@
 		ror 
 
 		tsb $d070
-	S65_AddToMemoryReport("Palette_Map")
+	pla
+	S65_AddToMemoryReport("Palette_Set")
 }
 
 
 /**
-* .pseudocommand SetPalettes
+* .pseudocommand Assign
 *
 * Assigns palettes to the MEGA65 palette banks.
 * 
@@ -39,60 +38,49 @@
 * @param {byte?} {IMM} palleteChar The VIC IV Character/Bitmap color palette
 * @param {byte?} {IMM} paletteSprite The VIC IV Sprite color palette
 * @param {byte?} {IMM} paletteAltChar The VIC IV Alternate Character/Bitmap color palette
-*
-* @registers A
 * @flags nzc
 */
-.pseudocommand Palette_SetPalettes palleteChar : paletteSprite : paletteAltChar {
-	S65_AddToMemoryReport("Palette_SetPalettes")
-		.const SMpaletteSprite = S65_PseudoReg + 0
-		.const SMpaletteChar = S65_PseudoReg + 1
-		.const SMpaletteAltChar = S65_PseudoReg + 2
+.pseudocommand Palette_Assign palleteChar : paletteSprite : paletteAltChar {
+	S65_AddToMemoryReport("Palette_Assign")
+	.const SMpaletteSprite = S65_PseudoReg + 0
+	.const SMpaletteChar = S65_PseudoReg + 1
+	.const SMpaletteAltChar = S65_PseudoReg + 2
 
-		_saveIfRegOrNone(paletteSprite, SMpaletteSprite)
-		_saveIfRegOrNone(palleteChar, SMpaletteChar)
-		_saveIfRegOrNone(paletteAltChar, SMpaletteAltChar)
+	_saveIfRegOrNone(paletteSprite, SMpaletteSprite)
+	_saveIfRegOrNone(palleteChar, SMpaletteChar)
+	_saveIfRegOrNone(paletteAltChar, SMpaletteAltChar)
 
-		.if(!_isImmOrNone(paletteSprite) && !_isReg(paletteSprite)) .error "paletteSprite:"+ S65_TypeError
-		.if(!_isImmOrNone(palleteChar) && !_isReg(palleteChar)) .error "palleteChar:"+ S65_TypeError
-		.if(!_isImmOrNone(paletteAltChar) && !_isReg(paletteAltChar)) .error "paletteAltChar:"+ S65_TypeError
-
+	.if(!_isImmOrNone(paletteSprite) && !_isReg(paletteSprite)) .error "Palette_Assign:"+ S65_TypeError
+	.if(!_isImmOrNone(palleteChar) && !_isReg(palleteChar)) .error "Palette_Assign:"+ S65_TypeError
+	.if(!_isImmOrNone(paletteAltChar) && !_isReg(paletteAltChar)) .error "Palette_Assign:"+ S65_TypeError
+	pha
 		lda #%00111111
 		trb $d070
 
 		lda #$00
 		lda #[[palleteChar.getValue() & $03] << 4] + [[paletteSprite.getValue() & $03] << 2] + [[paletteAltChar.getValue() & $03]]
 		tsb $d070
-	S65_AddToMemoryReport("Palette_SetPalettes")
+	pla
+	S65_AddToMemoryReport("Palette_Assign")
 }
 
 
 /**
 * .pseudocommand LoadFromMem
 *
-* Copys data from agiven address into one of the MEGA65 palettes.
-* The palette will remain the active mapped palette at $d100
+* Copys palette data from a given address into the currently active palette.
 * 
 * @namespace Palette
 *
-* @param {byte} {IMM} paletteNum The MEGA65 Palette number to load to
 * @param {word} {ABS} addr The location of the source palette data in memory
 * @param {byte?} {IMM} size The number of colors in the palette data, defaults to 256
-*
-* @registers AX
 * @flags nzc
 */
-.pseudocommand Palette_LoadFromMem paletteNum : addr : size {
+.pseudocommand Palette_LoadFromMem addr : size {
 	S65_AddToMemoryReport("Palette_LoadFromMem")
-		.if(!_isImm(paletteNum) || !_isAbs(addr) || !_isImmOrNone(size)) .error "Palette_LoadFromMem:"+S65_TypeError
-		
-		lda #%11000000
-		trb $d070	
-
-		.var pn = [paletteNum.getValue() & $03]
-		lda #[pn << 6]
-		tsb $d070	
-
+	.if(!_isAbs(addr) || !_isImmOrNone(size)) .error "Palette_LoadFromMem:"+S65_TypeError
+	pha 
+	phx
 		.var off = _isNone(size) ? 0 : size.getValue()
 		ldx #$00
 	!:
@@ -105,6 +93,8 @@
 		inx
 		cpx #[_isNone(size) ? 0 : size.getValue()]
 		bne !-
+	plx 
+	pla
 	S65_AddToMemoryReport("Palette_LoadFromMem")
 }
 
@@ -112,27 +102,17 @@
 /**
 * .pseudocommand LoadFromSD
 *
-* Loads a full 256 color palette from SD card
+* Loads a full 256 color palette from SD card into the currently active palette
 * 
 * @namespace Palette
 *
-* @param {byte} {IMM} paletteNum The MEGA65 Palette number to load to
 * @param {word} {ABS} addr Pointer to the filename in CAPITALS and zero terminated
-*
-* @registers AX
 * @flags nzc
 */
 .pseudocommand Palette_LoadFromSD paletteNum : addr {
-	S65_AddToMemoryReport("Palette_LoadFromMem")
-		.if(!_isImm(paletteNum) || !_isAbs(addr) ) .error "Palette_LoadFromMem:"+S65_TypeError
-
-		lda #%11000000
-		trb $d070
-
-		.var pn = [paletteNum.getValue() & $03]
-		lda #[pn << 6]
-		tsb $d070	
-
+	S65_AddToMemoryReport("Palette_LoadFromSD")
+	.if(!_isImm(paletteNum) || !_isAbs(addr) ) .error "Palette_LoadFromSD:"+S65_TypeError
+	S65_SaveRegisters()
 		SDCard_LoadToChipRam $d100 : addr
 
 		ldx #$00
@@ -145,5 +125,6 @@
 		sta $d300, x
 		inx
 		bne !-
-	S65_AddToMemoryReport("Palette_LoadFromMem")
+	S65_RestoreRegisters()
+	S65_AddToMemoryReport("Palette_LoadFromSD")
 }

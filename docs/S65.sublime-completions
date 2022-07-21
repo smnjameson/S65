@@ -140,21 +140,21 @@
             "annotation": "source:destination:length:chain:Destination",
             "contents": "DMA_CopyJob ${1:source} : ${2:destination} : ${3:length} : ${4:chain} : ${5:Destination}",
             "kind": "snippet",
-            "details": "Copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s"
+            "details": "Data generator that copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s <br>This is NOT executable code, only data and should be used as such<br><br>"
         },
         {
             "trigger": "DMA_DisableTransparency",
             "annotation": "",
             "contents": "DMA_DisableTransparency ",
             "kind": "snippet",
-            "details": "Disables any transparent byte masking. This is the default state."
+            "details": "Data generator that disables the transparent byte masking. This is the default state. <br>This is NOT executable code, only data and should be used as such<br><br>"
         },
         {
             "trigger": "DMA_EnableTransparency",
             "annotation": "transparentByte",
             "contents": "DMA_EnableTransparency ${1:transparentByte}",
             "kind": "snippet",
-            "details": "Enables transparent byte masking. This will ignore any source bytes that match the given byte and leave the destination byte untouched."
+            "details": "Data generator that enables transparent byte masking. This will ignore any source bytes that match the given byte and leave the destination byte untouched. <br>This is NOT executable code, only data and should be used as such<br><br>"
         },
         {
             "trigger": "DMA_Execute",
@@ -168,21 +168,21 @@
             "annotation": "sourceByte:destination:length:chain",
             "contents": "DMA_FillJob ${1:sourceByte} : ${2:destination} : ${3:length} : ${4:chain}",
             "kind": "snippet",
-            "details": "Fills a defined number of bytes from one location in memory to another using the DMagic chip @ 40mb/s"
+            "details": "Data generator that fills a defined number of bytes from one location in memory to another using the DMagic chip @ 40mb/s <br>This is NOT executable code, only data and should be used as such<br><br>"
         },
         {
             "trigger": "DMA_Header",
             "annotation": "sourceBank:destBank",
             "contents": "DMA_Header ${1:sourceBank} : ${2:destBank}",
             "kind": "snippet",
-            "details": "Sets the DMagic header bytes defining the source and destination banks.<br><br> Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff"
+            "details": "Data generator that sets the DMagic header bytes defining the source and destination banks.<br>This is NOT executable code, only data and should be used as such<br><br> Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff"
         },
         {
             "trigger": "DMA_Step",
             "annotation": "sourceStep:destStep",
             "contents": "DMA_Step ${1:sourceStep} : ${2:destStep}",
             "kind": "snippet",
-            "details": "Sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)"
+            "details": "Data generator that sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal) <br>This is NOT executable code, only data and should be used as such<br><br>"
         },
         {
             "trigger": "DMA_F018_DMA_11_byte_format",
@@ -437,32 +437,32 @@
             "details": "Pointer to the table of MSB values for the address of the start of the layers sprite IO area"
         },
         {
-            "trigger": "Palette_LoadFromMem",
-            "annotation": "paletteNum:addr:size",
-            "contents": "Palette_LoadFromMem ${1:paletteNum} : ${2:addr} : ${3:size}",
+            "trigger": "Palette_Assign",
+            "annotation": "palleteChar:paletteSprite:paletteAltChar",
+            "contents": "Palette_Assign ${1:palleteChar} : ${2:paletteSprite} : ${3:paletteAltChar}",
             "kind": "snippet",
-            "details": "Copys data from agiven address into one of the MEGA65 palettes. The palette will remain the active mapped palette at $d100"
+            "details": "Assigns palettes to the MEGA65 palette banks."
+        },
+        {
+            "trigger": "Palette_LoadFromMem",
+            "annotation": "addr:size",
+            "contents": "Palette_LoadFromMem ${1:addr} : ${2:size}",
+            "kind": "snippet",
+            "details": "Copys palette data from a given address into the currently active palette."
         },
         {
             "trigger": "Palette_LoadFromSD",
-            "annotation": "paletteNum:addr",
-            "contents": "Palette_LoadFromSD ${1:paletteNum} : ${2:addr}",
+            "annotation": "addr",
+            "contents": "Palette_LoadFromSD ${1:addr}",
             "kind": "snippet",
-            "details": "Loads a full 256 color palette from SD card"
+            "details": "Loads a full 256 color palette from SD card into the currently active palette"
         },
         {
-            "trigger": "Palette_Map",
+            "trigger": "Palette_Set",
             "annotation": "paletteNum",
-            "contents": "Palette_Map ${1:paletteNum}",
+            "contents": "Palette_Set ${1:paletteNum}",
             "kind": "snippet",
-            "details": "Maps a palette into IO memory"
-        },
-        {
-            "trigger": "Palette_SetPalettes",
-            "annotation": "palleteChar:paletteSprite:paletteAltChar",
-            "contents": "Palette_SetPalettes ${1:palleteChar} : ${2:paletteSprite} : ${3:paletteAltChar}",
-            "kind": "snippet",
-            "details": "Assigns palettes to the MEGA65 palette banks."
+            "details": "Sets the currently active palette in IO memory."
         },
         {
             "trigger": "Palette_MEGA65_Palette",

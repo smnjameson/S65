@@ -475,7 +475,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s    </div>
+						<div class='macroItemDescription'> Data generator that copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s <br>This is NOT executable code, only data and should be used as such<br><br>    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_CopyJob <i>source</i> : <i>destination</i> : <i>length</i> : <i>chain</i> : <i>Destination</i></div>
 						
@@ -512,7 +512,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Disables any transparent byte masking. This is the default state.  </div>
+						<div class='macroItemDescription'> Data generator that disables the transparent byte masking. This is the default state. <br>This is NOT executable code, only data and should be used as such<br><br>  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_DisableTransparency </div>
 						
@@ -527,7 +527,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Enables transparent byte masking. This will ignore any source bytes that match the given byte and leave the destination byte untouched.   </div>
+						<div class='macroItemDescription'> Data generator that enables transparent byte masking. This will ignore any source bytes that match the given byte and leave the destination byte untouched. <br>This is NOT executable code, only data and should be used as such<br><br>  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_EnableTransparency <i>transparentByte</i></div>
 						
@@ -583,7 +583,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Fills a defined number of bytes from one location in memory to another using the DMagic chip @ 40mb/s   </div>
+						<div class='macroItemDescription'> Data generator that fills a defined number of bytes from one location in memory to another using the DMagic chip @ 40mb/s <br>This is NOT executable code, only data and should be used as such<br><br>   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_FillJob <i>sourceByte</i> : <i>destination</i> : <i>length</i> : <i>chain</i></div>
 						
@@ -616,7 +616,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the DMagic header bytes defining the source and destination banks.<br><br> Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff   </div>
+						<div class='macroItemDescription'> Data generator that sets the DMagic header bytes defining the source and destination banks.<br>This is NOT executable code, only data and should be used as such<br><br> Note: The bank number of a memory adress is its 5th and 6th nybble. e.g. $ff80000 is bank number $ff   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_Header <i>sourceBank</i> : <i>destBank</i></div>
 						
@@ -641,7 +641,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal)   </div>
+						<div class='macroItemDescription'> Data generator that sets the source and/or destination stepping values. The DMA will use a fixed point step for each increment on the source and destination by default they are both set to the fixed point 8:8 value $0100 (or 1.0 in decimal) <br>This is NOT executable code, only data and should be used as such<br><br>  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>DMA_Step <i>sourceStep</i> : <i>destStep</i></div>
 						
@@ -1566,27 +1566,19 @@ h4 {
 		
 				<div class='macroHeader' id='Palette_Pseudocommands'>Pseudocommands</div>
 			
+					<div class='macroIndex'><a href='#Palette_Assign'>Assign</a></div>
+				
 					<div class='macroIndex'><a href='#Palette_LoadFromMem'>LoadFromMem</a></div>
 				
 					<div class='macroIndex'><a href='#Palette_LoadFromSD'>LoadFromSD</a></div>
 				
-					<div class='macroIndex'><a href='#Palette_Map'>Map</a></div>
-				
-					<div class='macroIndex'><a href='#Palette_SetPalettes'>SetPalettes</a></div>
+					<div class='macroIndex'><a href='#Palette_Set'>Set</a></div>
 				
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Palette_LoadFromMem'>LoadFromMem
+						<div class='macroItemHeader' id='Palette_Assign'>Assign
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-			<td >X</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >c</td>
@@ -1600,16 +1592,51 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Copys data from agiven address into one of the MEGA65 palettes. The palette will remain the active mapped palette at $d100    </div>
+						<div class='macroItemDescription'> Assigns palettes to the MEGA65 palette banks.   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Palette_LoadFromMem <i>paletteNum</i> : <i>addr</i> : <i>size</i></div>
+						<div class='macroUsage'>Palette_Assign <i>palleteChar</i> : <i>paletteSprite</i> : <i>paletteAltChar</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} paletteNum - The MEGA65 Palette number to load to</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} palleteChar - The VIC IV Character/Bitmap color palette</div></span>
 						</div>
 					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteSprite - The VIC IV Sprite color palette</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteAltChar - The VIC IV Alternate Character/Bitmap color palette</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_LoadFromMem'>LoadFromMem
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Copys palette data from a given address into the currently active palette.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_LoadFromMem <i>addr</i> : <i>size</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{word} {ABS} addr - The location of the source palette data in memory</div></span>
 						</div>
@@ -1625,15 +1652,7 @@ h4 {
 						<div class='macroItemHeader' id='Palette_LoadFromSD'>LoadFromSD
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-			<td >X</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >c</td>
@@ -1647,16 +1666,12 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Loads a full 256 color palette from SD card    </div>
+						<div class='macroItemDescription'> Loads a full 256 color palette from SD card into the currently active palette   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Palette_LoadFromSD <i>paletteNum</i> : <i>addr</i></div>
+						<div class='macroUsage'>Palette_LoadFromSD <i>addr</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} paletteNum - The MEGA65 Palette number to load to</div></span>
-						</div>
-					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{word} {ABS} addr - Pointer to the filename in CAPITALS and zero terminated</div></span>
 						</div>
@@ -1665,16 +1680,10 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
-						<div class='macroItemHeader' id='Palette_Map'>Map
+						<div class='macroItemHeader' id='Palette_Set'>Set
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >n</td>
@@ -1686,59 +1695,14 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Maps a palette into IO memory    </div>
+						<div class='macroItemDescription'> Sets the currently active palette in IO memory.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Palette_Map <i>paletteNum</i></div>
+						<div class='macroUsage'>Palette_Set <i>paletteNum</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{byte} {REG|IMM} paletteNum - The MEGA palette number to map</div></span>
-						</div>
-					
-						
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Palette_SetPalettes'>SetPalettes
-							
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-		</tr></table>
-	 flags: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >c</td>
-		
-			<td >n</td>
-		
-			<td >z</td>
-		
-		</tr></table>
-	</span>
-							</div>
-							
-						</div>
-						<div class='macroItemDescription'> Assigns palettes to the MEGA65 palette banks.    </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Palette_SetPalettes <i>palleteChar</i> : <i>paletteSprite</i> : <i>paletteAltChar</i></div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} palleteChar - The VIC IV Character/Bitmap color palette</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteSprite - The VIC IV Sprite color palette</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteAltChar - The VIC IV Alternate Character/Bitmap color palette</div></span>
 						</div>
 					
 						
@@ -1819,19 +1783,7 @@ h4 {
 						<div class='macroItemHeader' id='SDCard_LoadToAtticRam'>LoadToAtticRam
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-			<td >X</td>
-		
-			<td >Y</td>
-		
-			<td >Z</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >c</td>
@@ -1845,7 +1797,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Loads a file from the SDCard into attic RAM    </div>
+						<div class='macroItemDescription'> Loads a file from the SDCard into attic RAM  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>SDCard_LoadToAtticRam <i>addr</i> : <i>filePtr</i></div>
 						
@@ -1866,19 +1818,7 @@ h4 {
 						<div class='macroItemHeader' id='SDCard_LoadToChipRam'>LoadToChipRam
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'>registers: 
-		<table><th></th><tr style="display:inline-block;">
-	
-			<td >A</td>
-		
-			<td >X</td>
-		
-			<td >Y</td>
-		
-			<td >Z</td>
-		
-		</tr></table>
-	 flags: 
+								<span  style='display:inline-flex;'>registers:  flags: 
 		<table><th></th><tr style="display:inline-block;">
 	
 			<td >c</td>
@@ -1892,7 +1832,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Loads a file from the SDCard into chip RAM    </div>
+						<div class='macroItemDescription'> Loads a file from the SDCard into chip RAM  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>SDCard_LoadToChipRam <i>addr</i> : <i>filePtr</i></div>
 						

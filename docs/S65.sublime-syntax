@@ -7,7 +7,7 @@ file_extensions:
 scope: source.assembly.kickassembler
 contexts:
   main:
-    - match: \b(DMA_CopyJob|DMA_DisableTransparency|DMA_EnableTransparency|DMA_Execute|DMA_FillJob|DMA_Header|DMA_Step|Layer_AddText|Layer_AdvanceScreenPointers|Layer_ClearAllLayers|Layer_ClearLayer|Layer_Get|Layer_GetGotoX|Layer_SetGotoX|Layer_SetScreenPointersXY|Layer_Update|Layer_WriteToScreen|Palette_LoadFromMem|Palette_LoadFromSD|Palette_Map|Palette_SetPalettes|SDCard_LoadToAtticRam|SDCard_LoadToChipRam|Sprite_Get|Sprite_GetColor|Sprite_GetDimensions|Sprite_GetEnabled|Sprite_GetPointer|Sprite_GetPositionX|Sprite_GetPositionY|Sprite_SetColor|Sprite_SetDimensions|Sprite_SetEnabled|Sprite_SetPointer|Sprite_SetPositionX|Sprite_SetPositionY|Sprite_Update|System_GetRandom16|System_GetRandom8)\b
+    - match: \b(DMA_CopyJob|DMA_DisableTransparency|DMA_EnableTransparency|DMA_Execute|DMA_FillJob|DMA_Header|DMA_Step|Layer_AddText|Layer_AdvanceScreenPointers|Layer_ClearAllLayers|Layer_ClearLayer|Layer_Get|Layer_GetGotoX|Layer_SetGotoX|Layer_SetScreenPointersXY|Layer_Update|Layer_WriteToScreen|Palette_Assign|Palette_LoadFromMem|Palette_LoadFromSD|Palette_Set|SDCard_LoadToAtticRam|SDCard_LoadToChipRam|Sprite_Get|Sprite_GetColor|Sprite_GetDimensions|Sprite_GetEnabled|Sprite_GetPointer|Sprite_GetPositionX|Sprite_GetPositionY|Sprite_SetColor|Sprite_SetDimensions|Sprite_SetEnabled|Sprite_SetPointer|Sprite_SetPositionX|Sprite_SetPositionY|Sprite_Update|System_GetRandom16|System_GetRandom8)\b
       scope: storage.type.macro
     - match: \b(Layer_GetColorAddress|Layer_GetIO|Layer_GetLayerCount|Layer_GetScreenAddress|Sprite_GetIO)\b
       scope: constant.language.pseudocommand

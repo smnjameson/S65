@@ -5,14 +5,13 @@
  * Loads a file from the SDCard into chip RAM
  * 
  * @namespace SDCard
- * 
  * @param {dword} {ABS} addr Pointer to the memory load location
  * @param {word} {ABS} filePtr Pointer to the filename (zero terminated) on the SDCard to load
- * 
- * @registers AXYZ
  * @flags izc
  */
 .pseudocommand SDCard_LoadToChipRam addr : filePtr {
+	S65_AddToMemoryReport("SDCard_LoadToChipRam")
+	S65_SaveRegisters()
 		lda #>filePtr.getValue()
 		ldx #<filePtr.getValue()
 		jsr SDIO.CopyFileName
@@ -24,6 +23,8 @@
 		lda #HVC_SD_TO_CHIPRAM
 		sta $d640 
 		nop
+	S65_RestoreRegisters()
+	S65_AddToMemoryReport("SDCard_LoadToChipRam")
 }
 
 
@@ -33,14 +34,13 @@
  * Loads a file from the SDCard into attic RAM
  * 
  * @namespace SDCard
- * 
  * @param {word} {ABS} addr Pointer to the memory load location
  * @param {string} {ABS} filePtr Pointer to the filename (zero terminated) on the SDCard to load
- * 
- * @registers AXYZ
  * @flags izc
  */
 .pseudocommand SDCard_LoadToAtticRam addr : filePtr {
+	S65_AddToMemoryReport("SDCard_LoadToChipRam")
+	S65_SaveRegisters()	
 		lda #>filePtr.getValue()
 		ldx #<filePtr.getValue()
 		jsr SDIO.CopyFileName
@@ -52,6 +52,8 @@
 		lda #HVC_SD_TO_ATTICRAM
 		sta $d640 
 		nop
+	S65_RestoreRegisters()
+	S65_AddToMemoryReport("SDCard_LoadToChipRam")		
 }
 
 SDIO: {

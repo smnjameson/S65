@@ -520,15 +520,10 @@
 
 
 
-
-
-
 .macro _configureDynamicData(pc) {
 	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 
 	S65_Trace("Configuring dynamic layer memory...")
-	S65_Trace("")
-
 	S65_Trace("")	
 
 		//Add layer IO Data
@@ -554,10 +549,6 @@
 	//Layer IO address lookup table
 
 	.eval Layer_DynamicDataTable = *	
-		.print("Layer_DynamicDataTable $"+toHexString(Layer_DynamicDataTable))	
-		.for(var i=0 ; i< layerAddr.size(); i++) {
-			.print("layerAddr"+i+"   $"+ toHexString(layerAddr.get(i)))
-		}
 		.fill layerAddr.size(), [<layerAddr.get(floor(i)), >layerAddr.get(i)]
 	
 	//Screen row address table

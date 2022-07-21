@@ -21,9 +21,6 @@ cd ..\..
 for %%i in (%cd%\includes\s65\tests\*.s) do (
     echo %%~ni
     
-
-    rem MAKE SURE NODE IS INSTALLED
-
     echo ASSEMBLING SOURCES...
     %KICK% includes\s65\tests\%%~ni.s -odir bin
 

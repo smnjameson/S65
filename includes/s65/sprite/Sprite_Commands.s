@@ -555,7 +555,6 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 		cpx #ListSize.getValue()
 		lbne !layerloop-
 }
-.print ("MaskRowValue: $" + toHexString(MaskRowValue))
 MaskRowValue:
 		.fill 8, 255 - pow(2, 8-i) 
 
