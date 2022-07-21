@@ -1,5 +1,6 @@
 @echo off
 rem MAKE SURE NODE IS INSTALLED
+set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages\User"
 WHERE node.exe >nul
 IF %ERRORLEVEL% NEQ 0 (
 	echo NodeJS is not installed please install from https://nodejs.org/en/
