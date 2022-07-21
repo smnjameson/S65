@@ -9,7 +9,17 @@ sprites.
 
 ## Installation
 
-Once you have met the prerequisites below you can install the toolkit by running install.bat from the root of the S65 folder
+Once you have met the prerequisites below you can install the toolkit by running install.bat from the root of the S65 folder.
+
+## Running the HelloWorld
+
+By default the framework is setup such that with main.s open if you press F8 it will assemble and start to deploy. If you get an error about connection refused, its because you dont have M65Debugger open. If you want to change the deploy method you can change the last line in make.bat
+
+```
+node build\m65debugger\client.js ./bin/main.prg
+```
+
+You can replace with whatever you need to including deploying to XEMU mega65 emulator
 
 ## Prerequisites
 
