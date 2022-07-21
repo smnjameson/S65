@@ -697,13 +697,18 @@ MaskRowValue:
 
 				//Where do we start? get offset from rowcount table into z
 				//and double it to give the byte offset
+				ldy #Sprite_IOwidth
+				lda (SprIO), y 
 				ldz S65_SpriteRowTablePtr //RowCountTable y position offset
-				lda (LayerIO), z
+				clc 
+				adc (LayerIO), z
+
 					//Skip if no room left in line buffer
 					ldy #Layer_IOmaxCharsRRB
 					cmp (LayerIO), y
 					// jmp *
 					lbcs !nextsprite+ 
+				lda (LayerIO), z
 				asl
 				taz 
 
@@ -786,21 +791,6 @@ MaskRowValue:
 							lda.z S65_SpritePointerOld + 1		
 							sta.z S65_SpritePointerTemp + 1
 
-// 							ldy #Sprite_IOheight
-// 							clc //Using CLC isntead of SEC so we subtract an extra 1 
-
-// 							lda.z S65_SpritePointerTemp + 0
-// 							sbc (SprIO), y			
-// 							sta.z S65_SpritePointerTemp + 0
-// 							bcs !+
-// 							dec.z S65_SpritePointerTemp + 1
-// 						!:		
-// #if ROWMASK_FIXED
-// #else
-// //TODO on HW				//Disabled row mask until its working
-// 							dew.z S65_SpritePointerTemp + 0 //DISABLE THIS WHEN ROWMASK WORKS
-// 							dew.z S65_SpritePointerTemp + 0 //DISABLE THIS WHEN ROWMASK WORKS
-// #endif
 
 						plx
 
