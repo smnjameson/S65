@@ -20,37 +20,29 @@
 		.var width = 64 								//512x288 (uses 80 column mode)
 		.var height = 36
 		Layer_DefineResolution(width, height, false)	
-
 		.const LYR_BG = Layer_GetLayerCount()
 		Layer_DefineScreenLayer(64, 0, false)  			//layer 0
-
 		.const LYR_UI = Layer_GetLayerCount()
 		Layer_DefineScreenLayer(40, 80, false)			//layer 1
-
 		Layer_InitScreen($8000)							//Initialize
 
 		Palette_SetPalettes #$03 : #$00 : #$00
 		Palette_LoadFromMem #3 : palette : #256
 
-		lda #$df
-		sta $d021
-
-		.const BLANK = $100				
-		Layer_ClearLayer #LYR_UI : #BLANK			
-
-		Layer_AddText #1 : #0 : #8 : message : #$0f
-
-		Layer_Update 
+		.const BLANK = $100	
+		Layer_Get #LYR_UI			
+		Layer_ClearLayer #BLANK			
+		Layer_AddText #0 : #8 : message : #$0f
 
 !loop:
 	System_WaitForRaster($0ff)
 	System_BorderDebug($01)
 
+		// Layer_Get #LYR_UI (not needed we already have this layer active from above)
 		//Increment the GOTOX for the UI Layer
-		inc Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
-		bne !+
-		inc Layer_GetIO(LYR_UI, Layer_IOgotoX) + 1
-	!:
+		Layer_GetGotoX 
+		inw.z S65_ReturnValue
+		Layer_SetGotoX S65_ReturnValue
 
 		//Update all gotox markers
 		Layer_Update 

@@ -70,10 +70,16 @@
             "details": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
         },
         {
-            "trigger": "S65_LastSpriteIOPointer",
-            "annotation": "S65 BasePage pointer into to the IO data for the last sprite that was accessed using the Sprite commands<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> to correctly set up the base page before using indirect indexed adressing modes on this pointer.",
+            "trigger": "S65_LastLayerIOPointer",
+            "annotation": "S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into to the IO data for the last sprite that was accessed using the Sprite commands<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> to correctly set up the base page before using indirect indexed adressing modes on this pointer."
+            "details": "S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>"
+        },
+        {
+            "trigger": "S65_LastSpriteIOPointer",
+            "annotation": "S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>",
+            "kind": "snippet",
+            "details": "S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>"
         },
         {
             "trigger": "S65_ReturnValue",
@@ -186,36 +192,57 @@
         },
         {
             "trigger": "Layer_AddText",
-            "annotation": "layer:xpos:ypos:textPtr:color",
-            "contents": "Layer_AddText ${1:layer} : ${2:xpos} : ${3:ypos} : ${4:textPtr} : ${5:color}",
+            "annotation": "xpos:ypos:textPtr:color",
+            "contents": "Layer_AddText ${1:xpos} : ${2:ypos} : ${3:textPtr} : ${4:color}",
             "kind": "snippet",
-            "details": "Writes a string of bytes to the given layer and co-ordinate. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br><br>  Note: As layer screen rows are interlaced in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
+            "details": "Writes a string of bytes to the currently active layer at the provide co-ordinates. Optionally allows the use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), this will only work on non NCM layers with char indices less than $100 <br> This is a conveinience function it is better to use Layer_WriteToScreen as it is more efficient<br><br> Note: As layer screen rows are interlaced in memory, its important to not let the string extend off the right edge of the layer as it can break the RRB on other layers. There is an upper limit string length of 128"
         },
         {
             "trigger": "Layer_AdvanceScreenPointers",
             "annotation": "Optional",
             "contents": "Layer_AdvanceScreenPointers ${1:Optional}",
             "kind": "snippet",
-            "details": "Advances the S65 Basepage dword values for <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> and <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> by the given byte offset.<br><br>  Note: This method assumes you are already in the S65 base page, this is true after a <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations"
+            "details": "Advances the S65 Basepage dword values for <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> and <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> by the given byte offset.<br><br>  Note: This method assumes you are already in the S65 base page, this is true after a <a href=\"#Layer_Get\">Layer_Get</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations"
         },
         {
             "trigger": "Layer_ClearAllLayers",
             "annotation": "clearChar",
             "contents": "Layer_ClearAllLayers ${1:clearChar}",
             "kind": "snippet",
-            "details": "Fills the screen RAM area with a given 16bit value. Note this will overwrite any RRB GotoX markers also"
+            "details": "Fills the screen RAM area for ALL layers with a given 16bit value. Note this will overwrite any RRB GotoX markers also"
         },
         {
             "trigger": "Layer_ClearLayer",
-            "annotation": "layer:clearChar:clearColor",
-            "contents": "Layer_ClearLayer ${1:layer} : ${2:clearChar} : ${3:clearColor}",
+            "annotation": "clearChar:clearColor",
+            "contents": "Layer_ClearLayer ${1:clearChar} : ${2:clearColor}",
             "kind": "snippet",
-            "details": "Fills the screen RAM area for the layer with a given 16bit value."
+            "details": "Fills the screen RAM area for the currently selected layer with a given 16bit value."
+        },
+        {
+            "trigger": "Layer_Get",
+            "annotation": "layerNum",
+            "contents": "Layer_Get ${1:layerNum}",
+            "kind": "snippet",
+            "details": "This method sets the currently active layer for all Layer commands.<br><br> Note: This method will also call <a href=\"#S65_SetBasePage\">S65_SetBasePage</a> which is required for the Layer functions"
+        },
+        {
+            "trigger": "Layer_GetGotoX",
+            "annotation": "",
+            "contents": "Layer_GetGotoX ",
+            "kind": "snippet",
+            "details": "Returns the gotox value for the current selected layer into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+        },
+        {
+            "trigger": "Layer_SetGotoX",
+            "annotation": "gotox",
+            "contents": "Layer_SetGotoX ${1:gotox}",
+            "kind": "snippet",
+            "details": "Sets the gotox value for the current selected layer so that it is rendered in a <a href=\"#Layer_Update\">Layer_Update</a> with a new shifted X position<br>"
         },
         {
             "trigger": "Layer_SetScreenPointersXY",
-            "annotation": "layer:xpos:ypos",
-            "contents": "Layer_SetScreenPointersXY ${1:layer} : ${2:xpos} : ${3:ypos}",
+            "annotation": "xpos:ypos",
+            "contents": "Layer_SetScreenPointersXY ${1:xpos} : ${2:ypos}",
             "kind": "snippet",
             "details": "Sets the basepage to point to the S65 base page area and then sets screen and color ram pointers <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> to point to the given layers x and y co-ordinate"
         },
@@ -224,14 +251,14 @@
             "annotation": "",
             "contents": "Layer_Update ",
             "kind": "snippet",
-            "details": "Updates the all the layers Note: this is an expensive operation in both memory and cpu, try to call it once only per frame and put it in a subroutine if you need to call it from more than one place"
+            "details": "Updates ALL the layers. This is basically the render method, it sets all the GOTOX markers for the various layers and calls the Sprite_Update method<br><br> Note: this is an expensive operation in both memory and cpu, it should be called once only per frame and put it in a subroutine if you need to call it from more than one place"
         },
         {
             "trigger": "Layer_WriteToScreen",
             "annotation": "screenSource:colorSource:size",
             "contents": "Layer_WriteToScreen ${1:screenSource} : ${2:colorSource} : ${3:size}",
             "kind": "snippet",
-            "details": "Copys up to 256 bytes from the source addresses to the locations pointed at by <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and optionally <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a>. Does NOT change the contents of the screen and color ram pointers.<br> If immediate values are used for source then this byte is written directly<br><br> Note: This method assumes you are already in the S65 base page, this is true after a <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations<br> If ABSY mode is used for either source then the y register is added to the address before writing. Additionally upon completion the Y register will be incremented by the amount of bytes written<br><br> Note: Writing past the end of your layers right edge can cause RRB and memory issues please use <a href=\"#Layer_AdvanceScreenPointers\">Layer_AdvanceScreenPointers<a> to move the pointers safely to the next row"
+            "details": "Copys up to 256 bytes from the source addresses to the locations pointed at by <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and optionally <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a>. Does NOT change the contents of the screen and color ram pointers.<br> If immediate values are used for source then this byte is written directly<br><br> Note: This method assumes you are already in the S65 base page, this is true after a <a href=\"#Layer_Get\">Layer_Get</a> command, be careful not to use this command if base page is not set, otherwise it will likely write to unintended locations<br> If ABSY mode is used for either source then the y register is added to the address before writing. Additionally upon completion the Y register will be incremented by the amount of bytes written<br><br> Note: Writing past the end of your layers right edge can cause RRB and memory issues please use <a href=\"#Layer_AdvanceScreenPointers\">Layer_AdvanceScreenPointers<a> to move the pointers safely to the next row"
         },
         {
             "trigger": "Layer_DefineRRBSpriteLayer",
@@ -482,88 +509,102 @@
             "details": "Loads a file from the SDCard into chip RAM"
         },
         {
-            "trigger": "Sprite_Enable",
+            "trigger": "Sprite_Get",
             "annotation": "layerNum:sprNum",
-            "contents": "Sprite_Enable ${1:layerNum} : ${2:sprNum}",
+            "contents": "Sprite_Get ${1:layerNum} : ${2:sprNum}",
             "kind": "snippet",
-            "details": "Enables a sprite so that it is rendered in a <a href=\"#Layer_Update\">Layer_Update</a><br> Sets <a href=\"#Global_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br>"
+            "details": "This method is a prerequisite for getting or setting any sprites IO registers it sets the \"current active\" sprite used by the Sprite Get and Set methods by storing the pointer to that sprites IO area in <a href=\"#S65_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br> Note: This method will also call <a href=\"#S65_SetBasePage\">S65_SetBasePage</a> which is required for the Sprite functions"
         },
         {
             "trigger": "Sprite_GetColor",
-            "annotation": "layerNum:sprNum",
-            "contents": "Sprite_GetColor ${1:layerNum} : ${2:sprNum}",
+            "annotation": "",
+            "contents": "Sprite_GetColor ",
             "kind": "snippet",
-            "details": "Returns the current color of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator Lo byte is color"
+            "details": "Returns the color of the currently selected sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator Lo byte is color"
         },
         {
             "trigger": "Sprite_GetDimensions",
-            "annotation": "layerNum:sprNum",
-            "contents": "Sprite_GetDimensions ${1:layerNum} : ${2:sprNum}",
+            "annotation": "",
+            "contents": "Sprite_GetDimensions ",
             "kind": "snippet",
-            "details": "Returns the current dimensionso of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a><br> Lo byte is width, Hi byte is height"
+            "details": "Returns the dimensions of the currently selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a><br> Lo byte is width, Hi byte is height"
+        },
+        {
+            "trigger": "Sprite_GetEnabled",
+            "annotation": "",
+            "contents": "Sprite_GetEnabled ",
+            "kind": "snippet",
+            "details": "Returns the enabled state of the current selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
         },
         {
             "trigger": "Sprite_GetPointer",
-            "annotation": "layerNum:sprNum",
-            "contents": "Sprite_GetPointer ${1:layerNum} : ${2:sprNum}",
+            "annotation": "",
+            "contents": "Sprite_GetPointer ",
             "kind": "snippet",
-            "details": "Returns the current pointer of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+            "details": "Returns the current pointer of the currently selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
         },
         {
             "trigger": "Sprite_GetPositionX",
-            "annotation": "layerNum:sprNum",
-            "contents": "Sprite_GetPositionX ${1:layerNum} : ${2:sprNum}",
+            "annotation": "",
+            "contents": "Sprite_GetPositionX ",
             "kind": "snippet",
-            "details": "Returns the current X position of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+            "details": "Returns the X position of the current selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
         },
         {
             "trigger": "Sprite_GetPositionY",
-            "annotation": "layerNum:sprNum",
-            "contents": "Sprite_GetPositionY ${1:layerNum} : ${2:sprNum}",
+            "annotation": "",
+            "contents": "Sprite_GetPositionY ",
             "kind": "snippet",
-            "details": "Returns the current Y position of the sprite in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+            "details": "Returns the Y position of the current selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
         },
         {
             "trigger": "Sprite_SetColor",
-            "annotation": "layerNum:sprNum:color",
-            "contents": "Sprite_SetColor ${1:layerNum} : ${2:sprNum} : ${3:color}",
+            "annotation": "color",
+            "contents": "Sprite_SetColor ${1:color}",
             "kind": "snippet",
-            "details": "Sets a sprites color"
+            "details": "Sets the currently selected sprites color"
         },
         {
             "trigger": "Sprite_SetDimensions",
-            "annotation": "layerNum:sprNum:pointer:layerNum:sprNum:width:height",
-            "contents": "Sprite_SetDimensions ${1:layerNum} : ${2:sprNum} : ${3:pointer} : ${4:layerNum} : ${5:sprNum} : ${6:width} : ${7:height}",
+            "annotation": "width:height",
+            "contents": "Sprite_SetDimensions ${1:width} : ${2:height}",
             "kind": "snippet",
-            "details": "Sets a sprites width and height."
+            "details": "Sets the currently selected sprites width and height."
+        },
+        {
+            "trigger": "Sprite_SetEnabled",
+            "annotation": "enabled",
+            "contents": "Sprite_SetEnabled ${1:enabled}",
+            "kind": "snippet",
+            "details": "Enables or disables the current selected sprite so that it is rendered in a <a href=\"#Layer_Update\">Layer_Update</a><br> Sets <a href=\"#Global_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br>"
         },
         {
             "trigger": "Sprite_SetPointer",
-            "annotation": "layerNum:sprNum:pointer",
-            "contents": "Sprite_SetPointer ${1:layerNum} : ${2:sprNum} : ${3:pointer}",
+            "annotation": "pointer",
+            "contents": "Sprite_SetPointer ${1:pointer}",
             "kind": "snippet",
-            "details": "Sets a sprites pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
+            "details": "Sets the current selected sprite pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
         },
         {
             "trigger": "Sprite_SetPositionX",
-            "annotation": "layerNum:sprNum:xpos",
-            "contents": "Sprite_SetPositionX ${1:layerNum} : ${2:sprNum} : ${3:xpos}",
+            "annotation": "xpos",
+            "contents": "Sprite_SetPositionX ${1:xpos}",
             "kind": "snippet",
-            "details": "Sets a sprites X position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
+            "details": "Sets the current selected sprite X position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
         },
         {
             "trigger": "Sprite_SetPositionY",
-            "annotation": "layerNum:sprNum:ypos",
-            "contents": "Sprite_SetPositionY ${1:layerNum} : ${2:sprNum} : ${3:ypos}",
+            "annotation": "ypos",
+            "contents": "Sprite_SetPositionY ${1:ypos}",
             "kind": "snippet",
-            "details": "Sets a sprites Y position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
+            "details": "Sets the current selected sprite Y position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
         },
         {
             "trigger": "Sprite_Update",
             "annotation": "",
             "contents": "Sprite_Update ",
             "kind": "snippet",
-            "details": ""
+            "details": "Called internally by <a href=\"#Layer_Update\">Layer_Update</a><br>"
         },
         {
             "trigger": "Sprite_GenerateLayerData",

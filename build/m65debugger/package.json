@@ -1,0 +1,27 @@
+{
+  "name": "M65Debugger Webscoket Client",
+  "version": "0.5.17",
+  "description": "",
+  "author": "Simon Jameson",
+  "license": "",
+  "private": false,
+  "homepage": "",
+  "engines": {
+    "node": ">=9.0.0",
+    "npm": ">=5.0.0",
+    "yarn": ">=1.0.0"
+  },
+  "browserslist": [
+    "last 4 versions"
+  ],
+  "main": "client.js",
+  "scripts": {
+  },
+  "build": {
+  },
+  "dependencies": {
+    "ws": "^7.5.0"
+  },
+  "devDependencies": {
+  }
+}

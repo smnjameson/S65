@@ -76,9 +76,9 @@
 		.eval Layer_LayerList.get(index).put("offsetX", offsetX )
 		.eval Layer_LayerList.get(index).put("ncm", ncm)
 
-		lda #<charWidth 
+		lda #<[charWidth + 1]
 		sta [Layer_LayerWidth + index * 2]
-		lda #>charWidth 
+		lda #>[charWidth + 1]
 		sta [Layer_LayerWidth + index * 2 + 1]
 			
 		lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
@@ -482,6 +482,8 @@
 
 	S65_AddToMemoryReport("Layer_InitScreen")
 
+	* = * "S65 Dynamic Layer/Sprite IO and Data"
+	.eval DataLayerInitScreen = * 
 		//This area can be used for dynamic memory based on the size of layers and sprites
 		//////////////////////////
 		//Sprites data
@@ -507,6 +509,8 @@
 		lda #>Layer_SpriteIOAddrMSB
 		sta S65_SpriteIOAddrMSB + 1	
 
+		* = * "Post Layer_InitScreen User Code and Data"
+		.eval PostLayerInitScreen = *
 
 	.if(S65_SCREEN_LOGICAL_ROW_WIDTH > $1f4) {
 		.error "Pixel clock limits S65_SCREEN_LOGICAL_ROW_WIDTH to values <= $1f4, you are using $"+toHexString(S65_SCREEN_LOGICAL_ROW_WIDTH)+" bytes per row.  Please reduce your layer widths..."
@@ -717,11 +721,11 @@
 
 				clc 
 				lda Layer_AddrOffsets, y 	
-				adc #<[S65_SCREEN_RAM + 2]				
+				adc #<[S65_SCREEN_RAM + 0]				
 				sta destJobA + 0
 				sta destJobB + 0
 				lda Layer_AddrOffsets + 1, y 
-				adc #>[S65_SCREEN_RAM + 2]				
+				adc #>[S65_SCREEN_RAM + 0]				
 				sta destJobA + 1	
 				sta destJobB + 1	
 

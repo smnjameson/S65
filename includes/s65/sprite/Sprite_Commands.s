@@ -1,721 +1,65 @@
-
 // #define ROWMASK_FIXED
 
+
 /**
-* .pseudocommand Enable
+* .pseudocommand Get
 *
-* Enables a sprite so that it is rendered in a 
-* <a href="#Layer_Update">Layer_Update</a><br>
-* Sets <a href="#Global_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br>
+* This method is a prerequisite for getting or setting any sprites IO registers
+* it sets the "current active" sprite used by the Sprite Get and Set methods by storing the 
+* pointer to that sprites IO area in 
+* <a href="#S65_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br>
+* Note: This method will also call <a href="#S65_SetBasePage">S65_SetBasePage</a> which 
+* is required for the Sprite functions
 * 
 * @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
+* @param {byte} {IMM} layerNum The layer to get sprite from, note if this is NOT an RRB layer writing to addresses pointed to by S65_LastSpriteIOPointer can cause crashes and corruption
 * @param {byte} {IMM|REG|ABSXY} sprNum The sprite number to enable
-*
+* @registers B
+* @flags nzc
 */
-.pseudocommand Sprite_Enable layerNum : sprNum {
-	S65_AddToMemoryReport("Sprite_Enable")
-		.if(!_isImm(layerNum)) .error "Sprite_Enable:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum) && !_isAbsXY(sprNum)) .error "Sprite_Enable:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-
-		phx
-		phy
-		pha	
-
+.pseudocommand Sprite_Get layerNum : sprNum {
+	S65_AddToMemoryReport("Sprite_Get")
+	.if(!_isImm(layerNum)) .error "Sprite_Get:"+ S65_TypeError
+	.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum) && !_isAbsXY(sprNum)) .error "Sprite_Get:"+ S65_TypeError
+	_saveIfReg(sprNum, S65_PseudoReg + 0)
+	phx 
+	phy
+	pha
 		S65_SetBasePage()
-			.if(_isReg(sprNum)) {
+		.if(_isReg(sprNum)) {
+			ldy layerNum
+			ldx.z S65_PseudoReg + 0
+			jsr _getSprIOoffsetForLayer
+		} else {
+			.if(_isImm(sprNum)) {
 				ldy layerNum
-				ldx.z S65_PseudoReg + 0
+				ldx #sprNum.getValue()
 				jsr _getSprIOoffsetForLayer
-			} else {
-				.if(_isImm(sprNum)) {
-					ldy layerNum
-					ldx #sprNum.getValue()
-					jsr _getSprIOoffsetForLayer
-				} else {
-					ldy layerNum
-					ldx sprNum
-					jsr _getSprIOoffsetForLayer					
-				}
+			} else {	
+				lda sprNum
+				tax
+				ldy layerNum
+				jsr _getSprIOoffsetForLayer					
 			}
-
-			ldy #Sprite_IOflags 
-			lda (S65_LastSpriteIOPointer), y	
-			ora #$80
-			sta (S65_LastSpriteIOPointer), y
-
-		S65_RestoreBasePage()
-		pla
-		ply
-		plx
-	S65_AddToMemoryReport("Sprite_Enable")	
+		}
+	pla
+	ply
+	plx
+	S65_AddToMemoryReport("Sprite_Get")
 }
-
-
-
-/**
-* .pseudocommand GetPositionY
-*
-* Returns the current Y position of the sprite in
-* <a href="#Global_ReturnValue">S65_ReturnValue</a>
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer number
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number
-*/
-.pseudocommand Sprite_GetPositionY layerNum : sprNum  {
-	S65_AddToMemoryReport("Sprite_GetPositionY")
-		.if(!_isImm(layerNum)) .error "Sprite_GetPositionY:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_GetPositionY:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			ldy #[Sprite_IOy + 1]
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 1
-			dey
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 0
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_GetPositionY")	
-}
-
-/**
-* .pseudocommand GetPositionX
-*
-* Returns the current X position of the sprite in
-* <a href="#Global_ReturnValue">S65_ReturnValue</a>
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer number
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number
-*/
-.pseudocommand Sprite_GetPositionX layerNum : sprNum  {
-	S65_AddToMemoryReport("Sprite_GetPositionX")
-		.if(!_isImm(layerNum)) .error "Sprite_GetPositionX:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_GetPositionX:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-
-	
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			ldy #[Sprite_IOx + 1]
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 1
-			dey
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 0
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_GetPositionX")	
-}
-
-
-/**
-* .pseudocommand SetPositionX
-*
-* Sets a sprites X position. If position is passed as a register it
-* sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address
-* and used to set the value
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number to enable
-* @param {byte} {IMM|REG|ABS} xpos The x position
-* 
-*/
-.pseudocommand Sprite_SetPositionX layerNum : sprNum : xpos {
-	S65_AddToMemoryReport("Sprite_SetPositionX")
-		.if(!_isImm(layerNum)) .error "Sprite_SetPositionX:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_SetPositionX:"+ S65_TypeError
-		.if(!_isReg(xpos) && !_isImm(xpos) && !_isAbs(xpos)) .error "Sprite_SetPositionX:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-		_saveIfReg(xpos,	S65_PseudoReg + 1)
-
-
-		
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			.if(_isReg(xpos)) {
-				lda.z S65_PseudoReg + 1
-			} else {
-				.if(_isImm(xpos)) {
-					lda #<xpos.getValue()
-				} else {
-					lda xpos.getValue()	+ 0	
-				}
-			}
-			ldy #[Sprite_IOx + 0]
-			sta (S65_LastSpriteIOPointer), y
-
-			.if(_isReg(xpos)) {
-				lda #$00
-			} else {
-				.if(_isImm(xpos)) {
-					lda #>xpos.getValue()
-				} else {
-					lda xpos.getValue() + 1			
-				}
-			}
-			iny
-			sta (S65_LastSpriteIOPointer), y
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_SetPositionX")	
-}
-
-/**
-* .pseudocommand SetPositionY
-*
-* Sets a sprites Y position. If position is passed as a register it
-* sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address
-* and used to set the value
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number to enable
-* @param {byte} {IMM|REG|ABS} ypos The y position
-* 
-*/
-.pseudocommand Sprite_SetPositionY layerNum : sprNum : ypos {
-	S65_AddToMemoryReport("Sprite_SetPositionY")
-		.if(!_isImm(layerNum)) .error "Sprite_SetPositionY:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_SetPositionY:"+ S65_TypeError
-		.if(!_isReg(ypos) && !_isImm(ypos) && !_isAbs(ypos)) .error "Sprite_SetPositionY:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-		_saveIfReg(ypos,	S65_PseudoReg + 1)
-		
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			.if(_isReg(ypos)) {
-				lda.z S65_PseudoReg + 1
-			} else {
-				.if(_isImm(ypos)) {
-					lda #<ypos.getValue()
-				} else {
-					lda ypos.getValue()	+ 0	
-				}
-			}
-			ldy #[Sprite_IOy + 0]
-			sta (S65_LastSpriteIOPointer), y
-
-			.if(_isReg(ypos)) {
-				lda #$00
-			} else {
-				.if(_isImm(ypos)) {
-					lda #>ypos.getValue()
-				} else {
-					lda ypos.getValue() + 1			
-				}
-			}
-			iny
-			sta (S65_LastSpriteIOPointer), y
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_SetPositionY")	
-}
-
-
-
-
-
-
-
-/**
-* .pseudocommand SetPointer
-*
-* Sets a sprites pointer. If pointer is passed as a register it
-* sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address
-* and used to set the value
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number to enable
-* @param {byte} {IMM|REG|ABS} pointer The y pointer to set
-*/
-.pseudocommand Sprite_SetPointer layerNum : sprNum : pointer {
-	S65_AddToMemoryReport("Sprite_SetPointer")
-		.if(!_isImm(layerNum)) .error "Sprite_SetPointer:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_SetPointer:"+ S65_TypeError
-		.if(!_isReg(pointer) && !_isImm(pointer) && !_isAbs(pointer)) .error "Sprite_SetPointer:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-		_saveIfReg(pointer,	S65_PseudoReg + 1)
-		
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			.if(_isReg(pointer)) {
-				lda.z S65_PseudoReg + 1
-			} else {
-				.if(_isImm(pointer)) {
-					lda #<pointer.getValue()
-				} else {
-					lda pointer.getValue()	+ 0	
-				}
-			}
-			ldy #[Sprite_IOptr + 0]
-			sta (S65_LastSpriteIOPointer), y
-
-			.if(_isReg(pointer)) {
-				lda #$00
-			} else {
-				.if(_isImm(pointer)) {
-					lda #>pointer.getValue()
-				} else {
-					lda pointer.getValue() + 1			
-				}
-			}
-			iny
-			sta (S65_LastSpriteIOPointer), y
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_SetPointer")		
-}
-
-/**
-* .pseudocommand GetPointer
-*
-* Returns the current pointer of the sprite in
-* <a href="#Global_ReturnValue">S65_ReturnValue</a>
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer number
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number
-*/
-.pseudocommand Sprite_GetPointer layerNum : sprNum  {
-	S65_AddToMemoryReport("Sprite_GetPointer")
-		.if(!_isImm(layerNum)) .error "Sprite_GetPointer:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_GetPointer:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			ldy #[Sprite_IOptr + 1]
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 1
-			dey
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 0
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_GetPointer")	
-}
-
-
-/**
-* .pseudocommand SetDimensions
-*
-* Sets a sprites width and height. 
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number to enable
-* @param {byte} {IMM|REG|ABS} pointer The y pointer to set
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number to enable
-* @param {byte} {IMM|REG} width Sprite width in chars
-* @param {byte} {IMM|REG} height Sprite height in chars
-*/
-.pseudocommand Sprite_SetDimensions layerNum : sprNum : width : height {
-	S65_AddToMemoryReport("Sprite_SetDimensions")
-		.if(!_isImm(layerNum)) .error "Sprite_SetDimensions:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_SetDimensions:"+ S65_TypeError
-		.if(!_isReg(width) && !_isImm(width)) .error "Sprite_SetDimensions:"+ S65_TypeError
-		.if(!_isReg(height) && !_isImm(height)) .error "Sprite_SetDimensions:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-		_saveIfReg(width,	S65_PseudoReg + 1)
-		_saveIfReg(height,	S65_PseudoReg + 2)
-		
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			.if(_isReg(width)) {
-				lda.z S65_PseudoReg + 1
-			} else {
-				lda #width.getValue()
-			}
-			ldy #[Sprite_IOwidth + 0]
-			sta (S65_LastSpriteIOPointer), y
-
-			.if(_isReg(height)) {
-				lda.z S65_PseudoReg + 2
-			} else {
-				lda #height.getValue()
-			}
-			ldy #[Sprite_IOheight + 0]
-			sta (S65_LastSpriteIOPointer), y
-
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_SetDimensions")	
-}
-
-/**
-* .pseudocommand GetDimensions
-*
-* Returns the current dimensionso of the sprite in 
-* <a href="#Global_ReturnValue">S65_ReturnValue</a><br>
-* Lo byte is width, Hi byte is height
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer number
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number
-*/
-.pseudocommand Sprite_GetDimensions layerNum : sprNum  {
-	S65_AddToMemoryReport("Sprite_GetPointer")
-		.if(!_isImm(layerNum)) .error "Sprite_GetPointer:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_GetPointer:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			ldy #[Sprite_IOheight]
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 1
-			ldy #[Sprite_IOwidth]
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 0
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_GetPointer")	
-}
-
-
-/**
-* .pseudocommand SetColor
-*
-* Sets a sprites color
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer to enable a sprite on, note if this is NOT an RRB layer this can cause crashes and corruption
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number to enable
-* @param {byte} {IMM|REG} color Sprites color
-*/
-.pseudocommand Sprite_SetColor layerNum : sprNum : color {
-	S65_AddToMemoryReport("Sprite_SetColor")
-		.if(!_isImm(layerNum)) .error "Sprite_SetColor:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_SetColor:"+ S65_TypeError
-		.if(!_isReg(color) && !_isImm(color)) .error "Sprite_SetColor:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-		_saveIfReg(color,	S65_PseudoReg + 1)
-		
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			.if(_isReg(color)) {
-				lda.z S65_PseudoReg + 1
-			} else {
-				lda #color.getValue()
-			}
-			ldy #[Sprite_IOcolor]
-			sta (S65_LastSpriteIOPointer), y
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_SetColor")	
-}
-
-
-/**
-* .pseudocommand GetColor
-*
-* Returns the current color of the sprite in 
-* <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator
-* Lo byte is color
-* 
-* @namespace Sprite
-*
-* @param {byte} {IMM} layerNum The layer number
-* @param {byte} {IMM|REG|ABS} sprNum The sprite number
-*/
-.pseudocommand Sprite_GetColor layerNum : sprNum  {
-	S65_AddToMemoryReport("Sprite_GetColor")
-		.if(!_isImm(layerNum)) .error "Sprite_GetColor:"+ S65_TypeError
-		.if(!_isReg(sprNum) && !_isImm(sprNum) && !_isAbs(sprNum)) .error "Sprite_GetColor:"+ S65_TypeError
-
-		_saveIfReg(sprNum,	S65_PseudoReg + 0)
-
-		phy
-		pha	
-
-		S65_SetBasePage()
-			phx
-				.if(_isReg(sprNum)) {
-					ldy layerNum
-					ldx.z S65_PseudoReg + 0
-					jsr _getSprIOoffsetForLayer
-				} else {
-					.if(_isImm(sprNum)) {
-						ldy layerNum
-						ldx #sprNum.getValue()
-						jsr _getSprIOoffsetForLayer
-					} else {
-						ldy layerNum
-						ldx sprNum
-						jsr _getSprIOoffsetForLayer					
-					}
-				}
-			plx
-
-			ldy #[Sprite_IOcolor]
-			lda (S65_LastSpriteIOPointer), y
-			sta.z S65_ReturnValue + 0
-
-
-		S65_RestoreBasePage()
-		pla
-		ply
-	S65_AddToMemoryReport("Sprite_GetColor")	
-}
-
-
-
-
-_lastFetchedLayer: .byte $ff
-_lastFetchedSprite: .byte $ff 
 _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
-	
-		//Only fetch if we dont already have it
-		cpx _lastFetchedLayer
-		bne !+
-		cpy  _lastFetchedSprite
-		bne !+
-		bra !exit+
-
-	!:	
-	
 		lda #$00
 		sta.z S65_LastSpriteIOPointer + 1
 	
 		txa 
 		asl 
-		rol S65_LastSpriteIOPointer + 1		
+		rol.z S65_LastSpriteIOPointer + 1		
 		asl 
-		rol S65_LastSpriteIOPointer + 1
+		rol.z S65_LastSpriteIOPointer + 1
 		asl 
-		rol S65_LastSpriteIOPointer + 1		
+		rol.z S65_LastSpriteIOPointer + 1		
 		asl 
-		rol S65_LastSpriteIOPointer + 1
+		rol.z S65_LastSpriteIOPointer + 1
 		sta.z S65_LastSpriteIOPointer + 0
 
 		clc
@@ -724,21 +68,419 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 		lda S65_LastSpriteIOPointer + 1
 		adc (S65_SpriteIOAddrMSB), y
 		sta.z S65_LastSpriteIOPointer + 1
-
 	!exit:
-
 		rts
+}
 
+/**
+* .pseudocommand SetEnabled
+*
+* Enables or disables the current selected sprite so that it is rendered in a 
+* <a href="#Layer_Update">Layer_Update</a><br>
+* Sets <a href="#Global_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br>
+* 
+* @namespace Sprite
+* @param {bool} {IMM|REG} enabled Sprite enabled flag in the sprites IO
+* @flags nz
+*/
+.pseudocommand Sprite_SetEnabled enabled {
+	S65_AddToMemoryReport("Sprite_SetEnabled")
+	.if(!_isReg(enabled) && !_isImm(enabled)) .error "Sprite_SetEnabled:"+ S65_TypeError
+	phy
+	pha
+		.if(_isReg(enabled)) {
+			_saveIfReg(enabled,	Reg)
+			ldy #Sprite_IOflags 
+			lda Reg:#$BEEF
+
+			sta (S65_LastSpriteIOPointer), y
+		} else {
+			.if(enabled.getValue() == 0) {
+				ldy #Sprite_IOflags 
+				lda (S65_LastSpriteIOPointer), y	
+				and #$7f
+				sta (S65_LastSpriteIOPointer), y
+			} else {
+				ldy #Sprite_IOflags 
+				lda (S65_LastSpriteIOPointer), y	
+				ora #$80
+				sta (S65_LastSpriteIOPointer), y				
+			}
+		}
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetEnabled")	
+}
+
+/**
+* .pseudocommand GetEnabled
+*
+* Returns the enabled state of the current selected sprite into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* 
+* @namespace Sprite
+* @flags nz
+* @returns {bool} S65_ReturnValue $80 if enabled $00 if not
+*/
+.pseudocommand Sprite_GetEnabled {
+	S65_AddToMemoryReport("Sprite_GetEnabled")
+	phy
+	pha
+			ldy #[Sprite_IOflags]
+			lda (S65_LastSpriteIOPointer), y
+			and #$80
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetEnabled")	
+}
+
+/**
+* .pseudocommand GetPositionY
+*
+* Returns the Y position of the current selected sprite into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* 
+* @namespace Sprite
+* @flags nz
+* @returns {word} S65_ReturnValue
+*/
+.pseudocommand Sprite_GetPositionY {
+	S65_AddToMemoryReport("Sprite_GetPositionY")
+	phy
+	pha
+			ldy #[Sprite_IOy + 1]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 1
+			dey
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetPositionY")	
+}
+
+/**
+* .pseudocommand GetPositionX
+*
+* Returns the X position of the current selected sprite into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* 
+* @namespace Sprite
+* @flags nz
+* @returns {word} S65_ReturnValue
+*/
+.pseudocommand Sprite_GetPositionX {
+	S65_AddToMemoryReport("Sprite_GetPositionX")
+	phy
+	pha	
+			ldy #[Sprite_IOx + 1]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 1
+			dey
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetPositionX")	
 }
 
 
+/**
+* .pseudocommand SetPositionX
+*
+* Sets the current selected sprite X position. If position is passed as a register it
+* sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address
+* and used to set the value
+* 
+* @namespace Sprite
+* @param {word} {IMM|REG|ABS} xpos The x position
+* @flags nz
+*/
+.pseudocommand Sprite_SetPositionX xpos {
+	S65_AddToMemoryReport("Sprite_SetPositionX")
+	.if(!_isReg(xpos) && !_isImm(xpos) && !_isAbs(xpos)) .error "Sprite_SetPositionX:"+ S65_TypeError
+	_saveIfReg(xpos,	S65_PseudoReg + 1)	
+	phy
+	pha	
+		.if(_isReg(xpos)) {
+			lda.z S65_PseudoReg + 1
+		} else {
+			.if(_isImm(xpos)) {
+				lda #<xpos.getValue()
+			} else {
+				lda xpos.getValue()	+ 0	
+			}
+		}
+		ldy #[Sprite_IOx + 0]
+		sta (S65_LastSpriteIOPointer), y
+
+		.if(_isReg(xpos)) {
+			lda #$00
+		} else {
+			.if(_isImm(xpos)) {
+				lda #>xpos.getValue()
+			} else {
+				lda xpos.getValue() + 1			
+			}
+		}
+		iny
+		sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetPositionX")	
+}
+
+/**
+* .pseudocommand SetPositionY
+*
+* Sets the current selected sprite Y position. If position is passed as a register it
+* sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address
+* and used to set the value
+* 
+* @namespace Sprite
+* @param {word} {IMM|REG|ABS} ypos The y position
+* @flags nz
+*/
+.pseudocommand Sprite_SetPositionY ypos {
+	S65_AddToMemoryReport("Sprite_SetPositionY")
+	.if(!_isReg(ypos) && !_isImm(ypos) && !_isAbs(ypos)) .error "Sprite_SetPositionY:"+ S65_TypeError
+	_saveIfReg(ypos,	S65_PseudoReg + 1)	
+	phy
+	pha	
+		.if(_isReg(ypos)) {
+			lda.z S65_PseudoReg + 1
+		} else {
+			.if(_isImm(ypos)) {
+				lda #<ypos.getValue()
+			} else {
+				lda ypos.getValue()	+ 0	
+			}
+		}
+		ldy #[Sprite_IOy + 0]
+		sta (S65_LastSpriteIOPointer), y
+
+		.if(_isReg(ypos)) {
+			lda #$00
+		} else {
+			.if(_isImm(ypos)) {
+				lda #>ypos.getValue()
+			} else {
+				lda ypos.getValue() + 1			
+			}
+		}
+		iny
+		sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetPositionY")	
+}
+
+
+/**
+* .pseudocommand SetPointer
+*
+* Sets the current selected sprite pointer. If pointer is passed as a register it
+* sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address
+* and used to set the value
+* 
+* @namespace Sprite
+* @param {word} {IMM|REG|ABS} pointer The sprite pointer to set
+* @flags nz
+*/
+.pseudocommand Sprite_SetPointer pointer {
+	S65_AddToMemoryReport("Sprite_SetPointer")
+	.if(!_isReg(pointer) && !_isImm(pointer) && !_isAbs(pointer)) .error "Sprite_SetPointer:"+ S65_TypeError
+	_saveIfReg(pointer,	S65_PseudoReg + 1)	
+	phy
+	pha	
+		.if(_isReg(pointer)) {
+			lda.z S65_PseudoReg + 1
+		} else {
+			.if(_isImm(pointer)) {
+				lda #<pointer.getValue()
+			} else {
+				lda pointer.getValue()	+ 0	
+			}
+		}
+		ldy #[Sprite_IOptr + 0]
+		sta (S65_LastSpriteIOPointer), y
+
+		.if(_isReg(pointer)) {
+			lda #$00
+		} else {
+			.if(_isImm(pointer)) {
+				lda #>pointer.getValue()
+			} else {
+				lda pointer.getValue() + 1			
+			}
+		}
+		iny
+		sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetPointer")		
+}
+
+/**
+* .pseudocommand GetPointer
+*
+* Returns the current pointer of the currently selected sprite into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* 
+* @namespace Sprite
+* @flags nz
+* @returns {word} S65_ReturnValue
+*/
+.pseudocommand Sprite_GetPointer {
+	S65_AddToMemoryReport("Sprite_GetPointer")
+	phy
+	pha	
+			ldy #[Sprite_IOptr + 1]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 1
+			dey
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetPointer")	
+}
+
+
+/**
+* .pseudocommand SetDimensions
+*
+* Sets the currently selected sprites width and height. 
+*
+* @namespace Sprite
+* @param {byte} {IMM|REG|ABS} width Sprite width in chars
+* @param {byte} {IMM|REG|ABS} height Sprite height in chars
+* @flags nz 
+*/
+.pseudocommand Sprite_SetDimensions width : height {
+	S65_AddToMemoryReport("Sprite_SetDimensions")
+	.if(!_isReg(width) && !_isImm(width) && !_isAbs(width)) .error "Sprite_SetDimensions:"+ S65_TypeError
+	.if(!_isReg(height) && !_isImm(height) && !_isAbs(width)) .error "Sprite_SetDimensions:"+ S65_TypeError
+	_saveIfReg(width,	S65_PseudoReg + 1)
+	_saveIfReg(height,	S65_PseudoReg + 2)	
+	phy
+	pha	
+			.if(_isReg(width)) {
+				lda.z S65_PseudoReg + 1
+			} else {
+				.if(_isImm(width)) {
+					lda #width.getValue()	
+				} else {
+					lda width
+				}
+				
+			}
+			ldy #[Sprite_IOwidth + 0]
+			sta (S65_LastSpriteIOPointer), y
+
+			.if(_isReg(height)) {
+				lda.z S65_PseudoReg + 2
+			} else {
+				.if(_isImm(height)) {
+					lda #height.getValue()	
+				} else {
+					lda height
+				}
+			}
+			ldy #[Sprite_IOheight + 0]
+			sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetDimensions")	
+}
+
+/**
+* .pseudocommand GetDimensions
+*
+* Returns the dimensions of the currently selected sprite into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a><br>
+* Lo byte is width, Hi byte is height
+* 
+* @namespace Sprite
+* @flags nz 
+* @returns {word} S65_ReturnValue
+*/
+.pseudocommand Sprite_GetDimensions {
+	S65_AddToMemoryReport("Sprite_GetDimensions")
+	phy
+	pha	
+			ldy #[Sprite_IOheight]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 1
+			ldy #[Sprite_IOwidth]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetDimensions")	
+}
+
+
+/**
+* .pseudocommand SetColor
+*
+* Sets the currently selected sprites color
+* 
+* @namespace Sprite
+* @param {byte} {IMM|REG|ABS} color Sprites color
+* @flags nz 
+*/
+.pseudocommand Sprite_SetColor color {
+	S65_AddToMemoryReport("Sprite_SetColor")
+	.if(!_isReg(color) && !_isImm(color)) .error "Sprite_SetColor:"+ S65_TypeError
+	_saveIfReg(color,	S65_PseudoReg + 1)	
+	phy
+	pha	
+			.if(_isReg(color)) {
+				lda.z S65_PseudoReg + 1
+			} else {
+				lda #color.getValue()
+			}
+			ldy #[Sprite_IOcolor]
+			sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetColor")	
+}
+
+
+/**
+* .pseudocommand GetColor
+*
+* Returns the color of the currently selected sprite in 
+* <a href="#Global_ReturnValue">S65_ReturnValue</a> and the accumulator
+* Lo byte is color
+* 
+* @namespace Sprite
+* @flags nz
+* @returns {word} S65_ReturnValue
+*/
+.pseudocommand Sprite_GetColor {
+	S65_AddToMemoryReport("Sprite_GetColor")
+	phy
+	pha	
+			ldy #[Sprite_IOcolor]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetColor")	
+}
 
 
 
 
 /**
 * .pseudocommand Update
-*
+* 
+* Called internally by <a href="#Layer_Update">Layer_Update</a><br>
+* 
 * @namespace Sprite
 */
 .pseudocommand Sprite_Update ListSize {
@@ -1153,8 +895,5 @@ MaskRowValue:
 		adc #>[S65_COLOR_RAM - S65_SCREEN_RAM]						
 		sta.z S65_ColorRamPointer+ 1
 		rts
-
 	End:
-		//Now clear the remaining space
-	
 }

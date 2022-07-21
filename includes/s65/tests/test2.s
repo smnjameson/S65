@@ -8,18 +8,16 @@
 #import "includes/s65/start.s"
 	jmp Start 
 
-
-
-			//Safest to define all the data before your code to avoid assembler pass errors
-			.encoding "screencode_upper"
-			palette:
-				.import binary "assets/bin/test2_palette.bin"
-			testScreenChars:
-				.fill 16 * 8, [<[$100 + i], >[$100 + i]]
-			testScreenColors:
-				.import binary "assets/bin/test2_ncm.bin"
-			message:
-				S65_Text16("LAYER 2 - THIS IS AN FCM LAYER")
+		//Safest to define all the data before your code to avoid assembler pass errors
+		.encoding "screencode_upper"
+		palette:
+			.import binary "assets/bin/test2_palette.bin"
+		testScreenChars:
+			.fill 16 * 8, [<[$100 + i], >[$100 + i]]
+		testScreenColors:
+			.import binary "assets/bin/test2_ncm.bin"
+		message:
+			S65_Text16("LAYER 2 - THIS IS AN FCM LAYER")
 
 	Start:
 		Layer_DefineResolution(42, 30, true)		//Resolution
@@ -35,26 +33,28 @@
 		Palette_SetPalettes #$03 : #$00 : #$00
 		Palette_LoadFromMem #$03 : palette : #256
 
-		lda #$15
-		sta $d021
+
 
 		//clear screen
 		.const BLANK = $100
 		.const BRICK = $106
 		//Clear all layers to blank
 		Layer_ClearAllLayers #BLANK 
+
 		//Then fill the background with briick in color #$01
-		Layer_ClearLayer #LYR_BG : #BRICK : #$01
-		// Layer_ClearLayer #LYR_BG : #$002e
+		Layer_Get #LYR_BG
+		Layer_ClearLayer #BRICK : #$01
 
 		//Add some text to UI layer
-		Layer_AddText #LYR_UI : #0 : #12 : message : #1
+		Layer_Get #LYR_UI
+		Layer_AddText #0 : #12 : message : #1
 
 
 		//Copy 8 rows of data from testScreenChars and testScreenColors to the
 		//screen and color ram 
 		//Set the pointers for LayerBG at 0,9
-		Layer_SetScreenPointersXY #LYR_LV : #0: #0
+		Layer_Get #LYR_LV
+		Layer_SetScreenPointersXY #0: #0
 
 		//Now draw the char set 4 times slightly offset each time
 		ldz #$04
@@ -81,16 +81,16 @@
 	System_BorderDebug($01)
 
 		//Move the BG Layer
-		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 0
-		bne !+
-		inc Layer_GetIO(LYR_LV, Layer_IOgotoX) + 1
-	!:
+		Layer_Get #LYR_LV
+		Layer_GetGotoX 
+		inw.z S65_ReturnValue
+		Layer_SetGotoX S65_ReturnValue
+
 		//Move the UI layer
-		lda Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
-		bne !+
-		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 1
-	!:
-		dec Layer_GetIO(LYR_UI, Layer_IOgotoX) + 0
+		Layer_Get #LYR_UI
+		Layer_GetGotoX 
+		dew.z S65_ReturnValue
+		Layer_SetGotoX S65_ReturnValue
 
 		//Update - Call once per frame, its expensive!!
 		Layer_Update

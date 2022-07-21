@@ -51,7 +51,7 @@
 .macro S65_Trace(str) {
     #if NODEBUG
     #else
-	   .print "-=[S65]=- "+str
+	   .print "[S65] "+str
     #endif
 }
 
@@ -148,9 +148,9 @@ _S65_SetBasePage: {
 * @namespace S65
 */
 .macro S65_MemoryReport() {
-
-    S65_Trace("Memory Report")
-    S65_Trace("============================")
+    S65_Trace("===========================================")  
+    S65_Trace("S65 Memory Report")
+    S65_Trace("===========================================")  
     S65_Trace("Total   Count:Avg     Method")
     S65_Trace("-----   ---------     ------")
     .var keys = _MemoryReport.keys()
@@ -161,18 +161,17 @@ _S65_SetBasePage: {
             S65_Trace("$"+toHexString(ht.get("bytes"),4)+"  ($"+toHexString(ht.get("count"),2)+":$"+toHexString(floor(ht.get("bytes") / ht.get("count")),4) + ")    "+keys.get(i))
             .eval libCallsTotal += ht.get("bytes")
         }
-    }
+    }   
     S65_Trace("")   
+    S65_Trace("===========================================")       
     S65_Trace("Summary:")
-    S65_Trace("    S65 Base Library $2001-$"+ toHexString( S65_InitComplete) + " ($" + toHexString( S65_InitComplete - $2001) + " bytes)")
-    S65_Trace("    Total program memory used $"+ toHexString( * - S65_InitComplete))
-    S65_Trace("        of which:")
-    .var _dynamicDataIO = _MemoryReport.get("Layer_DynamicDataAndIO")
-    .var _dynamicDataIO2 = _MemoryReport.get("Layer_DynamicDataAndIO")
-    S65_Trace("        Library calls       $"+toHexString(libCallsTotal))
-    S65_Trace("        Layer IO and data   $"+toHexString(_dynamicDataIO.get("bytes")+ _dynamicDataIO2.get("bytes")))
-    // S65_Trace("        Other program code  $"+toHexString( (* - S65_InitComplete) - (_dynamicDataIO.get("bytes") + libCallsTotal) ))
-    S65_Trace("============================")    
+    S65_Trace("    Base Library              $"+toHexString(S65_InitComplete - $2001) + " bytes")
+    S65_Trace("    Total Library calls       $"+toHexString(libCallsTotal)+" bytes") 
+    S65_Trace("    Layer IO and data         $"+toHexString(PostLayerInitScreen - DataLayerInitScreen) +" bytes")
+    S65_Trace("    Other                     $"+toHexString((PostLayerInitScreen - $2001) - (libCallsTotal) - (S65_InitComplete - $2001) - (PostLayerInitScreen - DataLayerInitScreen)) +" bytes")
+    S65_Trace("    ---------------------------------------")
+    S65_Trace("    Total                     $"+toHexString(PostLayerInitScreen - $2001) +" bytes")
+    S65_Trace("===========================================")    
 }
 .const _MemoryReport = Hashtable()
 

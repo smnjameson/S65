@@ -1,57 +1,130 @@
 /**
+* .pseudocommand Get
+*
+* This method sets the currently active layer for all Layer commands.<br><br>
+* Note: This method will also call <a href="#S65_SetBasePage">S65_SetBasePage</a> which 
+* is required for the Layer functions
+* 
+* @namespace Layer
+* @param {byte} {IMM} layerNum The layer to fetch
+* @registers B
+* @flags nzc
+*/
+.pseudocommand Layer_Get layer {
+	pha
+	S65_SetBasePage()
+			.eval LastLayerValue = layer.getValue()
+	pla
+}
+.var LastLayerValue = 0
+
+
+
+/**
+* .pseudocommand SetGotoX
+*
+* Sets the gotox value for the current selected layer so that it is rendered in a 
+* <a href="#Layer_Update">Layer_Update</a> with a new shifted X position<br>
+* 
+* @namespace Layer
+* @param {bool} {IMM|REG|ABS} gotox The gotox value to set
+* @flags nz
+* @returns {word} S65_ReturnValue
+*/
+.pseudocommand Layer_SetGotoX gotox {
+	S65_AddToMemoryReport("Layer_SetGotoX")
+	.if(!_isReg(gotox) && !_isImm(gotox) && !_isAbs(gotox) && !_isAbsXY(gotox)) .error "Layer_SetGotoX:"+ S65_TypeError
+	_saveIfReg(gotox, S65_PseudoReg + 0)
+	pha	
+
+		.if(_isReg(gotox)) {
+			lda S65_PseudoReg + 0
+			sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+			lda #$00
+			sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
+		} else {
+			.if(_isImm(gotox)) {
+				lda #<gotox.getValue()
+				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+				lda #>gotox.getValue()
+				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
+			} else {	
+				lda gotox.getValue() + 0
+				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+				lda gotox.getValue() + 1
+				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1			
+			}
+		}
+	pla
+	S65_AddToMemoryReport("Layer_SetGotoX")
+}
+/**
+* .pseudocommand GetGotoX
+*
+* Returns the gotox value for the current selected layer into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* 
+* @namespace Layer
+* @flags nz
+* @returns {bool} S65_ReturnValue
+*/
+.pseudocommand Layer_GetGotoX gotox {
+	S65_AddToMemoryReport("Layer_GetGotoX")
+	pha
+			lda Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+			sta.z S65_ReturnValue + 0
+			lda Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
+			sta.z S65_ReturnValue + 1
+	pla
+	S65_AddToMemoryReport("Layer_GetGotoX")	
+}
+
+/**
 * .pseudocommand AddText
 *
-* Writes a string of bytes to the given layer and co-ordinate. Optionally allows the
+* Writes a string of bytes to the currently active layer at the provide co-ordinates. Optionally allows the
 * use of color, setting Color RAM Byte 1 all bits (so includes bit4-blink, bit5-reverse, bit6-bold and bit7-underline), 
-* this will only work on non NCM layers with char indices less than $100 <br><br>
-* 
+* this will only work on non NCM layers with char indices less than $100 <br>
+* This is a conveinience function it is better to use Layer_WriteToScreen as it is more efficient<br><br>
 * Note: As layer screen rows are interlaced in memory, its important to not let
 * the string extend off the right edge of the layer as it can break the RRB on other layers. 
 * There is an upper limit string length of 128
 *
 * @namespace Layer
 *
-* @param {word} {IMM} layer The layer number to write to
 * @param {word} {REG|IMM} xpos Layer char X position
 * @param {word} {REG|IMM} ypos Layer char Y position
 * @param {word} {ABS} textPtr The address to fetch char data from
 * @param {byte} {REG|IMM|ABS|ABX|ABY} color Color to write to color ram
-*
 * @flags znc
 */
-.pseudocommand Layer_AddText layer: xpos: ypos: textPtr : color {
-		S65_AddToMemoryReport("Layer_AddText")
-		S65_SaveRegisters()
-
-		.if(!_isImm(layer)) .error "Layer_AddText:"+ S65_TypeError
-		.if(!_isReg(xpos) && !_isImm(xpos)) .error "Layer_AddText:"+ S65_TypeError
-		.if(!_isReg(ypos) && !_isImm(ypos)) .error "Layer_AddText:"+ S65_TypeError
-		.if(!_isAbs(textPtr)) .error "Layer_AddText:"+ S65_TypeError
-
-		.if(!_isAbsXY(color) && !_isImm(color) && !_isReg(color)) .error "Layer_AddText:"+ S65_TypeError
-			
-		_saveIfReg(color,	SMcolor)
-		_saveIfReg(xpos, 	S65_PseudoReg + 1)
-		_saveIfReg(ypos, 	S65_PseudoReg + 2)
+.pseudocommand Layer_AddText xpos: ypos: textPtr : color {
+	S65_AddToMemoryReport("Layer_AddText")
+	S65_SaveRegisters()
+	.if(!_isReg(xpos) && !_isImm(xpos)) .error "Layer_AddText:"+ S65_TypeError
+	.if(!_isReg(ypos) && !_isImm(ypos)) .error "Layer_AddText:"+ S65_TypeError
+	.if(!_isAbs(textPtr)) .error "Layer_AddText:"+ S65_TypeError
+	.if(!_isAbsXY(color) && !_isImm(color) && !_isReg(color)) .error "Layer_AddText:"+ S65_TypeError	
+	_saveIfReg(color,	SMcolor)
+	_saveIfReg(xpos, 	S65_PseudoReg + 1)
+	_saveIfReg(ypos, 	S65_PseudoReg + 2)
 
 		.const SCREEN_PTR = S65_ScreenRamPointer
 		.const COLOR_PTR = S65_ColorRamPointer
 		.const TEXT_PTR = S65_TempWord1
 
-		S65_SetBasePage()
-			.var ADDRESS = Layer_GetScreenAddress(layer.getValue(), xpos.getValue(), ypos.getValue())
+
+			.var ADDRESS = Layer_GetScreenAddress(LastLayerValue, xpos.getValue(), ypos.getValue())
 
 			.if(_isImm(xpos) && _isImm(ypos)) {
-				.eval ADDRESS = Layer_GetScreenAddress(layer.getValue(), xpos.getValue(), ypos.getValue())
+				.eval ADDRESS = Layer_GetScreenAddress(LastLayerValue, xpos.getValue(), ypos.getValue())
 				lda #<ADDRESS
 				sta.z S65_ScreenRamPointer + 0
 				lda #>ADDRESS
 				sta.z S65_ScreenRamPointer + 1
-
-
 			}
 			.if(_isReg(xpos) && _isImm(ypos)) {
-					.eval ADDRESS = Layer_GetScreenAddress(layer.getValue(), 0, ypos.getValue())
+					.eval ADDRESS = Layer_GetScreenAddress(LastLayerValue, 0, ypos.getValue())
 					asl.z S65_PseudoReg + 1
 					clc
 					lda #<ADDRESS
@@ -61,7 +134,6 @@
 					adc #$00
 					sta.z S65_ScreenRamPointer + 1
 			}
-
 			.if(_isReg(xpos) && _isReg(ypos)) {
 				phx
 					asl.z S65_PseudoReg + 1 //xpos
@@ -74,7 +146,7 @@
 					adc #$00
 					sta.z S65_ScreenRamPointer + 1
 
-					lda #layer.getValue()
+					lda #LastLayerValue
 					asl 
 					tax
 					clc 	
@@ -85,7 +157,7 @@
 					adc.z Layer_AddrOffsets + 1, x
 					sta.z S65_ScreenRamPointer + 1
 				plx
-				} 
+			} 
 
 			.if(_isImm(xpos) && _isReg(ypos)) {
 				phx
@@ -100,7 +172,7 @@
 					sta.z S65_ScreenRamPointer + 1
 
 
-					lda #layer.getValue()
+					lda #LastLayerValue
 					asl 
 					tax
 					clc 	
@@ -128,17 +200,12 @@
 
 			lda SMcolor: color 		
 			sta _Layer_AddText.VALUE 
-
 			jsr _Layer_AddText
-		S65_RestoreRegisters()
-		S65_AddToMemoryReport("Layer_AddText")
+	S65_RestoreRegisters()
+	S65_AddToMemoryReport("Layer_AddText")
 }
-
 _Layer_AddText: {
 			.const TEXT_PTR = S65_TempWord1
-
-			phy
-			phz
 			ldz #$00
 			ldy #$00
 		!loop:
@@ -163,10 +230,6 @@ _Layer_AddText: {
 				iny
 			bra !loop-
 		!exit:
-		plz
-		ply
-		S65_RestoreBasePage()
-
 		rts
 }	
 
@@ -175,65 +238,52 @@ _Layer_AddText: {
 /**
 * .pseudocommand ClearAllLayers
 *
-* Fills the screen RAM area with a given 16bit value. Note this will overwrite any 
+* Fills the screen RAM area for ALL layers with a given 16bit value. Note this will overwrite any 
 * RRB GotoX markers also
 * 
 * @namespace Layer 
-*
 * @param {word?} {IMM} clearChar The 16bit char value to clear with, defaults to $0000
-* 
 * @flags zn
 */
 .pseudocommand Layer_ClearAllLayers clearChar {
 	S65_AddToMemoryReport("Layer_ClearAllLayers")
+	.if(!_isAbsImmOrNone(clearChar) && !_isReg(clearChar)) .error "Layer_ClearAllLayers:"+ S65_TypeError
+	_saveIfReg(clearChar, S65_PseudoReg + 0)
 	phy
 	phx
-	pha
-			.if(_isReg(clearChar)) {
-				 _saveIfReg(clearChar, S65_PseudoReg + 0)
-			} else {
-				.if(!_isAbsImmOrNone(clearChar)) .error "Layer_ClearAllLayers:"+ S65_TypeError
-			}
-	        
-			.const SCREEN_BYTE_SIZE = S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT
-			//REGISTER
-			.if(_isReg(clearChar)) {
-				lda S65_PseudoReg + 0
-				sta jobIf.Job1_Source
-				lda #$00
-				sta jobIf.Job2_Source	
-			} 
+	pha        
+		.const SCREEN_BYTE_SIZE = S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		//REGISTER
+		.if(_isReg(clearChar)) {
+			lda S65_PseudoReg + 0
+			sta jobIf.Job1_Source
+			lda #$00
+			sta jobIf.Job2_Source	
+		} 
 
-			//ABSOLUTE
-			.if(_isAbs(clearChar) && !_isReg(clearChar)) {
-				lda clearChar.getValue()
-				sta jobIf.Job1_Source
-				lda clearChar.getValue() + 1
-				sta jobIf.Job2_Source
-			}
+		//ABSOLUTE
+		.if(_isAbs(clearChar) && !_isReg(clearChar)) {
+			lda clearChar.getValue()
+			sta jobIf.Job1_Source
+			lda clearChar.getValue() + 1
+			sta jobIf.Job2_Source
+		}
 
-			DMA_Execute job
-			jmp end
+		DMA_Execute job
+		jmp end
 
-			
 		job:
 			DMA_Header #$00 : #$00
 			jobIf:
 			.if(clearChar.getType() != AT_NONE) {
 				DMA_Step #$0100 : #$0200 
-
 				.label Job1_Source = * + $04
 				DMA_FillJob #<clearChar.getValue() : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE/2 : #TRUE
-
 				.label Job2_Source = * + $04		
 				DMA_FillJob #>clearChar.getValue() : S65_SCREEN_RAM + 1 : #SCREEN_BYTE_SIZE/2 : #FALSE
 
-				// DMA_FillJob #$00 : S65_COLOR_RAM + 0 : #SCREEN_BYTE_SIZE/2 : #TRUE
-				// DMA_FillJob #$00 : S65_COLOR_RAM + 1 : #SCREEN_BYTE_SIZE/2 : #FALSE
-
 			} else {
-				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
-				// DMA_FillJob #$00 : S65_COLOR_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE						
+				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE												
 			}
 		end:
 	pla
@@ -246,30 +296,23 @@ _Layer_AddText: {
 /**
 * .pseudocommand ClearLayer
 *
-* Fills the screen RAM area for the layer with a given 16bit value. 
+* Fills the screen RAM area for the currently selected layer with a given 16bit value. 
 * 
 * @namespace Layer
 *
-* @param {byte} {REG|IMM} layer The layer number to clear
 * @param {word?} {REG|IMM} clearChar The 16bit char value to clear with, defaults to $0000
 * @param {word?} {REG|IMM} clearColor The 8bit char value to clear with, defaults to $00
-*
-* @registers AXY
 * @flags nzc
-* 
-* @return {byte} A <add description here> 
 */
-.pseudocommand Layer_ClearLayer layer : clearChar : clearColor {
+.pseudocommand Layer_ClearLayer clearChar : clearColor {
 	S65_AddToMemoryReport("Layer_ClearLayer")
-		.if(!_isImmOrNone(layer) && !_isReg(layer)) .error "Layer_ClearLayer:"+ S65_TypeError
-		.if(!_isImmOrNone(clearChar) && !_isReg(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
-		.if(!_isImmOrNone(clearColor) && !_isReg(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
-		
-
-		_saveIfReg(layer, SMlayer)
-		_saveIfReg(clearChar, S65_PseudoReg + 0)
-		_saveIfReg(clearChar, S65_PseudoReg + 1)
-		
+	.if(!_isImmOrNone(clearChar) && !_isReg(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
+	.if(!_isImmOrNone(clearColor) && !_isReg(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
+	_saveIfReg(clearChar, S65_PseudoReg + 0)
+	_saveIfReg(clearChar, S65_PseudoReg + 1)
+	phx 
+	pha 
+	phy	
 
 		//X=charLo, Y=charHi, A = layer
 		//REGISTER
@@ -286,14 +329,13 @@ _Layer_AddText: {
 				ldy #>clearChar.getValue()
 			}
 		}
-		lda SMlayer:#[layer.getValue()]
+		lda #LastLayerValue
 		.if(!_isNone(clearColor)) {
 			pha
 		}
 		jsr Layer_DMAClear
 		
 		.if(!_isNone(clearColor)) {
-
 			.if(_isReg(clearColor)) {
 				lda S65_PseudoReg + 1
 				tax 
@@ -304,9 +346,9 @@ _Layer_AddText: {
 			pla
 			jsr Layer_DMAClearColor
 		}		
-
-		
-
+	ply
+	pla 
+	plx	
 	S65_AddToMemoryReport("Layer_ClearLayer")
 }
 
@@ -315,59 +357,51 @@ _Layer_AddText: {
 /**
 * .pseudocommand Update
 *
-* Updates the all the layers 
-* Note: this is an expensive operation in both memory and cpu, try to call it once only per frame
+* Updates ALL the layers. This is basically the render method, it sets all the GOTOX markers for 
+* the various layers and calls the Sprite_Update method<br><br>
+* Note: this is an expensive operation in both memory and cpu, it should be called once only per frame
 * and put it in a subroutine if you need to call it from more than one place
 * 
 * @namespace Layer
-*
-* @registers A
-* @flags znc
 */
 
 .pseudocommand Layer_Update {
 
 		S65_AddToMemoryReport("Layer_Update")
+		pha
 		phx 
 		phy
 		phz
 
-		S65_SetBasePage()
 		System_BorderDebug($01)
 			jsr _Layer_Update
 		System_BorderDebug($03)
 			Sprite_Update Layer_LayerList.size()
-		System_BorderDebug($0f)
-		S65_RestoreBasePage()		
+		System_BorderDebug($0f)	
 
 		plz
 		ply
 		plx
+		pla
 		S65_AddToMemoryReport("Layer_Update")
 }
 _Layer_Update: {
-
-
 		.const DYN_TABLE = S65_TempWord1
-		S65_SetBasePage()
 			//Transfer the GOTOX values from the dynamic IO
 			ldx #$00
 			ldy #$00 
 			ldz #$00 
 		!loop:
+
 			lda (S65_DynamicLayerData), y
 			iny
 			sta.z DYN_TABLE + 0
-
 			lda (S65_DynamicLayerData), y
 			dey
 			sta.z DYN_TABLE + 1
 
-
 			lda (DYN_TABLE), z
-.print ("Layer_GotoXPositions: $" + toHexString(Layer_GotoXPositions))
 			sta Layer_GotoXPositions, y
-
 			iny
 			inz 
 			lda (DYN_TABLE), z 
@@ -380,9 +414,6 @@ _Layer_Update: {
 			cpx ListSize0:#$BEEF
 			bne !loop-
 
-
-
-			//add the rrb GOTOX markers
 			.var offset = 0
 			ldx #$00
 		!outerLoop:
@@ -405,63 +436,58 @@ _Layer_Update: {
 			sta.z S65_ScreenRamPointer + 1
 			dex
 
-			// 	cpx #$06
-			// 	bne !+
-			// 	jmp *
-			// !:
 
-.print ("S65_VISIBLE_SCREEN_CHAR_HEIGHT: $" + toHexString(S65_VISIBLE_SCREEN_CHAR_HEIGHT))
-				ldy ScreenHeight:#S65_VISIBLE_SCREEN_CHAR_HEIGHT
-			!loop:
-				//COLOR RAM
-				ldz #$00
-				lda #$10 //If this is the first BG layer its NOT transparent
-				cpx #$00
-				beq !+
-				lda #$90 //All other layers transparent
-			!:
+			ldy ScreenHeight:#S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		!loop:
+			//COLOR RAM
+			ldz #$00
+			lda #$10 //If this is the first BG layer its NOT transparent
+			cpx #$00
+			beq !+
+			lda #$90 //All other layers transparent
+		!:
 
-				sta ((S65_ColorRamPointer)), z 
-				inz
-				lda #$00
-				sta ((S65_ColorRamPointer)), z 
-				dez	
+			sta ((S65_ColorRamPointer)), z 
+			inz
+			lda #$00
+			sta ((S65_ColorRamPointer)), z 
+			dez	
 
-				//SCREEN RAM
-				lda Layer_GotoXPositions, x//0
-				inx
-				sta ((S65_ScreenRamPointer)), z 
-				inz
-				lda ((S65_ScreenRamPointer)), z
-				and #%11111100
-				ora Layer_GotoXPositions, x//1
-				dex
-				sta ((S65_ScreenRamPointer)), z 
+			//SCREEN RAM
+			lda Layer_GotoXPositions, x//0
+			inx
+			sta ((S65_ScreenRamPointer)), z 
+			inz
+			lda ((S65_ScreenRamPointer)), z
+			and #%11111100
+			ora Layer_GotoXPositions, x//1
+			dex
+			sta ((S65_ScreenRamPointer)), z 
 
 
-				//next row
-				clc
-				lda.z S65_ColorRamPointer + 0
-				adc Layer_LogicalWidth + 0
-				sta.z S65_ColorRamPointer + 0
-				lda.z S65_ColorRamPointer + 1
-				adc Layer_LogicalWidth + 1
-				sta.z S65_ColorRamPointer + 1
+			//next row
+			clc
+			lda.z S65_ColorRamPointer + 0
+			adc Layer_LogicalWidth + 0
+			sta.z S65_ColorRamPointer + 0
+			lda.z S65_ColorRamPointer + 1
+			adc Layer_LogicalWidth + 1
+			sta.z S65_ColorRamPointer + 1
 
-				clc
-				lda.z S65_ScreenRamPointer + 0
-				adc Layer_LogicalWidth + 0
-				sta.z S65_ScreenRamPointer + 0
-				lda.z S65_ScreenRamPointer + 1
-				adc Layer_LogicalWidth + 1
-				sta.z S65_ScreenRamPointer + 1
+			clc
+			lda.z S65_ScreenRamPointer + 0
+			adc Layer_LogicalWidth + 0
+			sta.z S65_ScreenRamPointer + 0
+			lda.z S65_ScreenRamPointer + 1
+			adc Layer_LogicalWidth + 1
+			sta.z S65_ScreenRamPointer + 1
 
 
-				dey 
-				bne !loop-
+			dey 
+			bne !loop-
 
-				inx
-				inx
+			inx
+			inx
 			cpx ListSize1:#$BEEF
 			bcc !outerLoop-
 		!end:
@@ -479,7 +505,7 @@ _Layer_Update: {
 * by the given byte offset.<br><br>
 * 
 * Note: This method assumes you are already in the S65 base page, this is true after a 
-* <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> command, 
+* <a href="#Layer_Get">Layer_Get</a> command, 
 * be careful not to use this command if base page is not set, otherwise it will likely write to 
 * unintended locations
 * 
@@ -494,15 +520,15 @@ _Layer_Update: {
 	S65_AddToMemoryReport("Layer_AdvanceScreenPointers")
 	.if(!_isImmOrNone(offset) && !_isReg(offset)) .error "Layer_AdvanceScreenPointers:" +S65_TypeError
 	_saveIfReg(offset, S65_PseudoReg)
-
+	pha
 
 		.if(_isReg(offset)) {
 			lda S65_PseudoReg + 0
-			sta BRANCH_REGORB8BIT + 4 //Byte offset as lables wont work through the if
+			sta BRANCH_REGORB8BIT + 4 //Byte offset as labels wont work through the if
 		}
+
 		BRANCH_REGORB8BIT:
 		.if(!_isNone(offset) && (offset.getValue() < $100 || _isReg(offset))){
-
 				clc
 				lda.z S65_ScreenRamPointer + 0
 				adc #offset.getValue()
@@ -512,11 +538,8 @@ _Layer_Update: {
 				inc.z S65_ScreenRamPointer + 1
 				inc.z S65_ColorRamPointer + 1
 			!:
-
 		} else {
-
 			.if(_isNone(offset)) {
-
 				.if(S65_SCREEN_LOGICAL_ROW_WIDTH < $100) {
 					clc
 					lda.z S65_ScreenRamPointer + 0
@@ -526,11 +549,8 @@ _Layer_Update: {
 					bcc !+
 					inc.z S65_ScreenRamPointer + 1
 					inc.z S65_ColorRamPointer + 1
-
 				!:	
 				} else {
-
-
 					clc
 					lda.z S65_ScreenRamPointer + 0
 					adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
@@ -546,14 +566,9 @@ _Layer_Update: {
 					lda.z S65_ColorRamPointer + 1
 					adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
 					sta.z S65_ColorRamPointer + 1
-
-
 				!:
 				}
-
-
 			} else {
-
 				clc
 				lda.z S65_ScreenRamPointer + 0
 				adc #<offset.getValue()
@@ -572,8 +587,8 @@ _Layer_Update: {
 				sta.z S65_ColorRamPointer + 1	
 			!:
 			}
-
 		}
+	pla
 	S65_AddToMemoryReport("Layer_AdvanceScreenPointers")
 }
 
@@ -587,7 +602,7 @@ _Layer_Update: {
 * the screen and color ram pointers.<br>
 * If immediate values are used for source then this byte is written directly<br><br>
 * Note: This method assumes you are already in the S65 base page, this is true after a 
-* <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> command, 
+* <a href="#Layer_Get">Layer_Get</a> command, 
 * be careful not to use this command if base page is not set, otherwise it will likely write to 
 * unintended locations<br>
 * If ABSY mode is used for either source then the y register is added to the address before
@@ -603,8 +618,7 @@ _Layer_Update: {
 * @param {byte?} {ABSY|IMM|REG} colorSource The color source data address to use or a value to use if IMM defaults to #$00
 * @param {byte} {REG|IMM} size The lengh of the data in CHARS (so bytes/2)
 *
-* @registers
-* @flags
+* @flags nzc
 */
 .pseudocommand Layer_WriteToScreen screenSource : colorSource : size {
 	S65_AddToMemoryReport("Layer_WriteToScreen")
@@ -613,7 +627,9 @@ _Layer_Update: {
 	.if(!_isImmOrReg(size)) .error "Layer_WriteToScreen:"+ S65_TypeError
 	phz
 	phx
-	phy	
+	pha	
+	phy
+	
 
 	_saveIfReg(size, S65_PseudoReg + 0)
 	_saveIfReg(screenSource, S65_PseudoReg + 1)
@@ -732,7 +748,6 @@ _Layer_Update: {
 			bne !layerloop-
 
 	ply
-
 		.if(_isAbsY(screenSource)||_isAbsY(colorSource)) {
 			sty ADDSM
 			tza 
@@ -740,7 +755,7 @@ _Layer_Update: {
 			adc ADDSM:#$BEEF 
 			tay 
 		}
-
+	pla
 	plx
 	plz
 	S65_AddToMemoryReport("Layer_WriteToScreen")			
@@ -758,30 +773,23 @@ _Layer_Update: {
 * to point to the given layers x and y co-ordinate
 * @namespace Layer
 *
-* @param {byte} {IMM} layer Layer to get pointer to
 * @param {byte} {REG|IMM} xpos x position on layer
 * @param {byte} {REG|IMM} ypos y position on layer
-*
-* @registers AB
 * @flags nzc
 */
-	// .var Layer_RowAddressLSB = $0000
-	// .var Layer_RowAddressMSB = $0000
-
-.pseudocommand Layer_SetScreenPointersXY layer : xpos : ypos {
+.pseudocommand Layer_SetScreenPointersXY xpos : ypos {
 	S65_AddToMemoryReport("Layer_SetScreenPointersXY")
-	S65_SetBasePage()
-	.if(!_isImm(layer)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
 	.if(!_isImmOrReg(xpos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
 	.if(!_isImmOrReg(ypos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
 	_saveIfReg(xpos, S65_PseudoReg + 0)
 	_saveIfReg(ypos, S65_PseudoReg + 1)
-	phx 
+	phx
+	pha 
 
-		.var address = S65_SCREEN_RAM
-		.if(!_isReg(ypos)) .eval address += ypos.getValue() * S65_SCREEN_LOGICAL_ROW_WIDTH
-		.if(!_isReg(xpos)) .eval address += xpos.getValue() * 2
-		.eval address += Layer_LayerList.get(layer.getValue()).get("startAddr")
+	.var address = S65_SCREEN_RAM
+	.if(!_isReg(ypos)) .eval address += ypos.getValue() * S65_SCREEN_LOGICAL_ROW_WIDTH
+	.if(!_isReg(xpos)) .eval address += xpos.getValue() * 2
+	.eval address += Layer_LayerList.get(LastLayerValue).get("startAddr")
 
 		.if(!_isReg(xpos) && !_isReg(ypos)) {
 				lda #<address 
@@ -845,8 +853,7 @@ _Layer_Update: {
 				}
 
 		}
-
+	pla
 	plx
-	S65_AddToMemoryReport("Layer_SetScreenPointersXY")
-	//DO NOT RESTORE BASE PAGE 	
+	S65_AddToMemoryReport("Layer_SetScreenPointersXY")	
 }

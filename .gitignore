@@ -1,3 +1,5 @@
 bin/
 build/aseparse65/node_modules/.package-lock.json
 build/aseparse65/node_modules/
+build/m65debugger/package-lock.json
+build/m65debugger/node_modules/

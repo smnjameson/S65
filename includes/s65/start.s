@@ -1,5 +1,4 @@
 
-
 /**
  * .global S65
  * 
@@ -20,8 +19,13 @@
 .cpu _45gs02
 .const S65_MAX_LAYERS = $10
 
+* = $2001 "S65 BasicUpstart"
 System_BasicUpstart65(S65_InitComplete)
 * = $2016 "S65 Base page area"
+
+.var PreLayerInitScreen = *
+.var DataLayerInitScreen = * 
+.var PostLayerInitScreen = *
 
 //Constants and functions for use with the pseudocommandsystem
 .const AT_IMMEDIATE16 = -6
@@ -164,18 +168,22 @@ System_BasicUpstart65(S65_InitComplete)
  */	
 			S65_ReturnValue:	.word $0000
 
-.print ("S65_LastSpriteIOPointer: $" + toHexString(S65_LastSpriteIOPointer))
-
 /** 
  * .var LastSpriteIOPointer
  * 
  * S65 BasePage pointer into to the IO data for the last sprite that was
- * accessed using the Sprite commands<br><br>
- * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a>
- * to correctly set up the base page
- * before using indirect indexed adressing modes on this pointer.
+ * fetched using <a href="#Sprite_Get">Sprite_Get</a>
  */	
 			S65_LastSpriteIOPointer: .word $0000
+
+/** 
+ * .var LastLayerIOPointer
+ * 
+ * S65 BasePage pointer into to the IO data for the last layer that was
+ * fetched using <a href="#Layer_Get">Layer_Get</a>
+ */	
+			S65_LastLayerIOPointer: .word $0000		
+
 			S65_SpriteIOAddrLSB: .word $0000
 			S65_SpriteIOAddrMSB: .word $0000
 
@@ -191,6 +199,7 @@ System_BasicUpstart65(S65_InitComplete)
  			S65_SpareBasePage: .fill 16, 0
 
 ///////////////////////////////////////////// 51 of 64 bytes reserved
+* = * "S65 Base Library methods"
 
 #import "includes/s65/sdcard.s"		
 #import "includes/s65/s65.s"
@@ -255,7 +264,8 @@ S65: {
 
 }
 
-
+* = * "Pre Layer_InitScreen User Code and Data"
+.eval PreLayerInitScreen = *
 //This label S65_InitComplete MUST always be at the end of the library 
 //as it is where the program continues execution when initialised
 S65_InitComplete:
