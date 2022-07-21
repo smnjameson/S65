@@ -1,6 +1,8 @@
 # S65
 S65 kick assembler macro toolkit for MEGA65
 
+Full documentation : [https://smnjameson.github.io/S65/docs.html](https://smnjameson.github.io/S65/docs.html)
+
 ## Overview
 
 S65 is a Kick Assembler development library for the MEGA65 that provides a simple API into the Raster Rewrite system 
