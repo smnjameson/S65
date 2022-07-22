@@ -1594,20 +1594,20 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Assigns palettes to the MEGA65 palette banks.   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Palette_Assign <i>palleteChar</i> : <i>paletteSprite</i> : <i>paletteAltChar</i></div>
+						<div class='macroUsage'>Palette_Assign <i>palleteChar</i> : <i>paletteHWSprite</i> : <i>paletteRRBSprite</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} palleteChar - The VIC IV Character/Bitmap color palette</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} palleteChar - The Palette for Character/Bitmap</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteSprite - The VIC IV Sprite color palette</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteHWSprite - The Palette for HW Sprites</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteAltChar - The VIC IV Alternate Character/Bitmap color palette</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteRRBSprite - The Palette for RRB Sprites</div></span>
 						</div>
 					
 						
@@ -2413,7 +2413,7 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOflagNCM'>IOflagNCM</div>
-						<div class='macroItemDescription'>This registers is set internally on creation of a sprite and should NOT be manually changed it should ALWAYS be set </div>
+						<div class='macroItemDescription'>Turns on NCM for this sprite<br><br> NOTE: It is best to use NCM where possible as it takes half the processing time per visible sprite on a Layer_Update, less chars on a line, and less memory for the image data at the cost of dropping to 16 colors </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_IOflagNCM</div>						
 					</div>

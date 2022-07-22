@@ -35,30 +35,30 @@
 * 
 * @namespace Palette
 *
-* @param {byte?} {IMM} palleteChar The VIC IV Character/Bitmap color palette
-* @param {byte?} {IMM} paletteSprite The VIC IV Sprite color palette
-* @param {byte?} {IMM} paletteAltChar The VIC IV Alternate Character/Bitmap color palette
+* @param {byte?} {IMM} palleteChar The Palette for Character/Bitmap
+* @param {byte?} {IMM} paletteHWSprite The Palette for HW Sprites
+* @param {byte?} {IMM} paletteRRBSprite The Palette for RRB Sprites
 * @flags nzc
 */
-.pseudocommand Palette_Assign palleteChar : paletteSprite : paletteAltChar {
+.pseudocommand Palette_Assign palleteChar : paletteHWSprite : paletteRRBSprite {
 	S65_AddToMemoryReport("Palette_Assign")
-	.const SMpaletteSprite = S65_PseudoReg + 0
+	.const SMpaletteHWSprite = S65_PseudoReg + 0
 	.const SMpaletteChar = S65_PseudoReg + 1
-	.const SMpaletteAltChar = S65_PseudoReg + 2
+	.const SMpaletteRRBSprite = S65_PseudoReg + 2
 
-	_saveIfRegOrNone(paletteSprite, SMpaletteSprite)
+	_saveIfRegOrNone(paletteHWSprite, SMpaletteHWSprite)
 	_saveIfRegOrNone(palleteChar, SMpaletteChar)
-	_saveIfRegOrNone(paletteAltChar, SMpaletteAltChar)
+	_saveIfRegOrNone(paletteRRBSprite, SMpaletteRRBSprite)
 
-	.if(!_isImmOrNone(paletteSprite) && !_isReg(paletteSprite)) .error "Palette_Assign:"+ S65_TypeError
+	.if(!_isImmOrNone(paletteHWSprite) && !_isReg(paletteHWSprite)) .error "Palette_Assign:"+ S65_TypeError
 	.if(!_isImmOrNone(palleteChar) && !_isReg(palleteChar)) .error "Palette_Assign:"+ S65_TypeError
-	.if(!_isImmOrNone(paletteAltChar) && !_isReg(paletteAltChar)) .error "Palette_Assign:"+ S65_TypeError
+	.if(!_isImmOrNone(paletteRRBSprite) && !_isReg(paletteRRBSprite)) .error "Palette_Assign:"+ S65_TypeError
 	pha
 		lda #%00111111
 		trb $d070
 
 		lda #$00
-		lda #[[palleteChar.getValue() & $03] << 4] + [[paletteSprite.getValue() & $03] << 2] + [[paletteAltChar.getValue() & $03]]
+		lda #[[palleteChar.getValue() & $03] << 4] + [[paletteHWSprite.getValue() & $03] << 2] + [[paletteRRBSprite.getValue() & $03]]
 		tsb $d070
 	pla
 	S65_AddToMemoryReport("Palette_Assign")

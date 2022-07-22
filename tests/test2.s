@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////
 
 // #define NODEBUG
-#import "includes/s65/start.s"
+#import "../includes/s65/start.s"
 	jmp Start 
 
 		//Safest to define all the data before your code to avoid assembler pass errors

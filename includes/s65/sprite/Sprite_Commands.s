@@ -92,7 +92,6 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 				lda #flags.getValue()
 			}
 			ldy #[Sprite_IOflags]
-			ora #Sprite_IOflagNCM //Always enable NCM mode
 			sta (S65_LastSpriteIOPointer), y
 	pla
 	ply

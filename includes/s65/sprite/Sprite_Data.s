@@ -47,7 +47,9 @@
 .const Sprite_IOflagEnabled = $20
 /**
 * .var IOflagNCM
-* This registers is set internally on creation of a sprite and should NOT be manually changed it should ALWAYS be set
+* Turns on NCM for this sprite<br><br>
+* NOTE: It is best to use NCM where possible as it takes half the processing time per visible sprite on
+* a Layer_Update, less chars on a line, and less memory for the image data at the cost of dropping to 16 colors
 * @namespace Sprite
 */
 .const Sprite_IOflagNCM = $08
