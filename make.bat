@@ -15,9 +15,8 @@ call npm install >nul
 cd ..\..
 
 rem echo GENERATING DOCS
-rem set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages\User"
 rem node build/gendocs ./includes/S65/start.s ./docs
-
+set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages\User"
 copy .\docs\S65*.* %SUBLIME_PACKAGES%
 set KICK=java -cp build\kickass.jar kickass.KickAssembler65CE02 -vicesymbols -showmem
 set PNG65=node build\aseparse65\png65.js
