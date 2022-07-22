@@ -3,7 +3,7 @@
 // NCM Asset pipeline, Hi res and Layering test
 //////////////////////////////////////////////////
 
-// #define NODEBUG
+#define NODEBUG
 #import "../includes/s65/start.s"
 	jmp Start 
 
@@ -42,9 +42,12 @@
 
 		Layer_InitScreen($10000)							//Initialize
 
-		Palette_Assign #$03 : #$00 : #$00
+		Palette_Assign #$03 : #$00 : #$03
 		Palette_Set #$03
-		Palette_LoadFromMem palette : #$100
+		Palette_LoadFromMem palette : #$100 
+
+		lda #$ff
+		sta $d020
 
 		//Clear layers
 		Layer_ClearAllLayers #BLANK

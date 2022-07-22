@@ -361,7 +361,7 @@
 	}
 
 
-	.var adjustH = S65_VISIBLE_SCREEN_CHAR_WIDTH * 8  * ncmMult
+	.var adjustH = S65_VISIBLE_SCREEN_CHAR_WIDTH * 8  * ncmMult -1
 
 	.if(S65_VISIBLE_SCREEN_CHAR_WIDTH <= (Layer_SCREEN_HORIZ_BREAK / ncmMult)) {
 		// Set VIC to use 40 column mode display
@@ -381,7 +381,7 @@
 		lda #$80		
 		tsb $d031 
 
-		.eval adjustH = S65_VISIBLE_SCREEN_CHAR_WIDTH * 4  * ncmMult
+		.eval adjustH = S65_VISIBLE_SCREEN_CHAR_WIDTH * 4  * ncmMult - 1
 		lda #S65_VISIBLE_SCREEN_CHAR_HEIGHT
 		sta $d07b
 	}

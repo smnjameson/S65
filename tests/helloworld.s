@@ -1,5 +1,5 @@
 //Comment this next line out to get memory report and border debug colors
-// #define NODEBUG				
+#define NODEBUG				
 //Start the S65 library by importing includes/s65/start.s
 #import "includes/s65/start.s"
 	jmp Start 

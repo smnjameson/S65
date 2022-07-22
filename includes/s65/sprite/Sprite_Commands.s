@@ -797,6 +797,8 @@ MaskRowValue:
 				and #$03
 				ora YscrollOffset:#$BEEF	
 				sta ((S65_ScreenRamPointer)), z //scr byte 1
+				lda #$f0 //transparent gotox and alt palette
+				sta ((S65_ColorRamPointer)), z //col byte 0						
 				inz 
 
 

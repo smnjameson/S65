@@ -4,7 +4,7 @@
 // and Layering test
 //////////////////////////////////////////////////
 
-// #define NODEBUG
+#define NODEBUG
 #import "../includes/s65/start.s"
 	jmp Start 
 
@@ -34,7 +34,8 @@
 		Palette_Set #$03
 		Palette_LoadFromMem palette : #$100
 
-
+		lda #$ff 
+		sta $d020
 
 		//clear screen
 		.const BLANK = $100
