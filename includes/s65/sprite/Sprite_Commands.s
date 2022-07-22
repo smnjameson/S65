@@ -1,6 +1,3 @@
-// #define ROWMASK_FIXED
-
-
 /**
 * .pseudocommand Get
 *
@@ -71,6 +68,59 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	!exit:
 		rts
 }
+
+
+/**
+* .pseudocommand SetFlags
+*
+* Sets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65
+* to abstract the values
+* 
+* @namespace Sprite
+* @param {byte} {IMM|REG|ABS} flags Sprite flags
+* @flags nz 
+*/
+.pseudocommand Sprite_SetFlags flags {
+	S65_AddToMemoryReport("Sprite_SetFlags")
+	.if(!_isReg(flags) && !_isImm(flags)) .error "Sprite_SetFlags:"+ S65_TypeError
+	_saveIfReg(flags,	S65_PseudoReg + 1)	
+	phy
+	pha	
+			.if(_isReg(flags)) {
+				lda.z S65_PseudoReg + 1
+			} else {
+				lda #flags.getValue()
+			}
+			ldy #[Sprite_IOflags]
+			ora #Sprite_IOflagNCM //Always enable NCM mode
+			sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetFlags")	
+}
+
+/**
+* .pseudocommand GetFlags
+*
+* Returns the flags of the current selected sprite into
+* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* 
+* @namespace Sprite
+* @flags nz
+* @returns {bool} S65_ReturnValue value of the flags
+*/
+.pseudocommand Sprite_GetFlags {
+	S65_AddToMemoryReport("Sprite_GetFlags")
+	phy
+	pha
+			ldy #[Sprite_IOflags]
+			lda (S65_LastSpriteIOPointer), y
+			sta.z S65_ReturnValue + 0
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_GetFlags")	
+}
+
 
 /**
 * .pseudocommand SetEnabled
@@ -351,7 +401,8 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 /**
 * .pseudocommand SetDimensions
 *
-* Sets the currently selected sprites width and height. 
+* Sets the currently selected sprites width and height. There is a hard limit of 255 chars
+* to make up any one sprite therefore width * height MUST be less than 256
 *
 * @namespace Sprite
 * @param {byte} {IMM|REG|ABS} width Sprite width in chars
@@ -379,6 +430,12 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 			ldy #[Sprite_IOwidth + 0]
 			sta (S65_LastSpriteIOPointer), y
 
+			//Store width -1 for the flipH ptr offset start value
+			//offset = (width - 1) * (height + 1)
+			sec 
+			sbc #$01 
+			sta $d770	//Multiply A0
+
 			.if(_isReg(height)) {
 				lda.z S65_PseudoReg + 2
 			} else {
@@ -388,8 +445,19 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					lda height
 				}
 			}
+
 			ldy #[Sprite_IOheight + 0]
 			sta (S65_LastSpriteIOPointer), y
+
+			//Store height + 1 for the flipH ptr offset start value
+			//offset = (width - 1) * (height + 1)
+			//Carry will already be set here so jst adc #0 instead of clc + adc #1
+			adc #$00 
+			sta $d774	//Multiply B0
+			lda $d778   //Math Result0
+			ldy #[Sprite_IOflipHoffset]
+			sta (S65_LastSpriteIOPointer), y
+
 	pla
 	ply
 	S65_AddToMemoryReport("Sprite_SetDimensions")	
@@ -582,6 +650,11 @@ MaskRowValue:
 			//Skip if not enabled
 			lbeq !nextsprite+
 
+			//store flags to apply later
+			lda (SprIO), y
+			and #%11011111
+			sta S65_SpriteFlags
+
 				//Sprite is active so add an entry to the RRB
 
 				//Figure out its screen row (ypos /8) and set screen/col pointers
@@ -629,27 +702,28 @@ MaskRowValue:
 			lda (SprIO), y
 			sta.z S65_SpriteRowCounter
 
-			lda #$00
-			sta MaskEnable
-			sta RowMask
+			!checkHFlip:
+				//If we have H flipped we need to also set the pointer to a new right side offset
+				bbr6 S65_SpriteFlags, !noHFlip+
+
+					ldy #Sprite_IOflipHoffset
+					clc 
+					lda.z S65_SpritePointerTemp + 0
+					adc (SprIO), y 
+					sta.z S65_SpritePointerTemp + 0
+					sta.z S65_SpritePointerOld + 0
+					bcc !+
+					inc.z S65_SpritePointerTemp + 1 //byte 0
+					inc.z S65_SpritePointerOld + 1 //byte 0				
+				!:
+			!noHFlip:
+
 
 				//retrieve the ypos lsb and use it to get the inverse 0-7 fine y
 		pla 
 				and #$07
 				sta YscrollOffset
 				sta S65_SpriteFineY
-
-#if ROWMASK_FIXED
-//TODO on HW	//Disabled row mask until its working
-//ENABLE THIS BLOCK WHEN ROWMASK WORKS
-				pha 
-					tay 
-					lda MaskRowValue, y 
-					sta RowMask
-				pla 
-#endif
-
-
 
 				beq !nextrow+
 				eor #$07
@@ -670,14 +744,11 @@ MaskRowValue:
 				dew.z S65_SpritePointerTemp + 0 //byte 0
 				dew.z S65_SpritePointerOld + 0 //byte 0
 
-				
-#if ROWMASK_FIXED
-//TODO on HW	//Disabled row mask until its working
-				// //And set the first row mask on //ENABLE THIS BLOCK WHEN ROWMASK WORKS
-				lda #$08 //bit 3 (for color ram byte 0 ROWMASK)
-				sta MaskEnable
-#endif
-			!:
+
+
+
+
+
 			!nextrow:
 				//If this row is off screen then skip this row
 				ldy S65_SpriteRowTablePtr
@@ -720,7 +791,6 @@ MaskRowValue:
 				sta ((S65_ScreenRamPointer)), z //scr byte 0
 				//and color ram
 				lda #$90 //transparent and gotox
-				ora MaskEnable:#$BEEF	
 				sta ((S65_ColorRamPointer)), z //col byte 0				
 				iny //$02
 				inz
@@ -728,8 +798,6 @@ MaskRowValue:
 				and #$03
 				ora YscrollOffset:#$BEEF	
 				sta ((S65_ScreenRamPointer)), z //scr byte 1
-				lda RowMask
-				sta ((S65_ColorRamPointer)), z //col byte 1
 				inz 
 
 
@@ -748,7 +816,7 @@ MaskRowValue:
 							//CHAR RAM 
 							lda.z S65_SpritePointerTemp + 0
 							sta ((S65_ScreenRamPointer)), z //scr byte 0
-							lda #$08
+							lda S65_SpriteFlags
 							sta ((S65_ColorRamPointer)), z //col byte 0
 
 							inz
@@ -767,26 +835,41 @@ MaskRowValue:
 							ldy #Sprite_IOwidth
 							lda (SprIO), y
 							cmp #$01
-							beq !+
+							beq !columnadvDone+
 
-							ldy #Sprite_IOheight
-							lda (SprIO), y
-#if ROWMASK_FIXED
-//TODO on HW				//Disabled row mask until its working
-							clc //SWITCH SEC for CLC THIS WHEN ROWMASK WORKS	
-#else 
-							//sec
-							//already set from above cmp
-#endif
-							//Add height (+1 if !ROWMASK_FIXED) to Sprite pointer counter
-							adc.z S65_SpritePointerTemp + 0	
-							sta.z S65_SpritePointerTemp + 0
-							bcc !+
-							inc.z S65_SpritePointerTemp + 1
-						!:
 
+								//deal with hflip flag
+								bbr6 S65_SpriteFlags, !noHflip+
+
+							!yesHFlip:
+								//Subtract height + 1 (+1 comes from the CLC being clear) 
+								//from Sprite pointer counter							
+								ldy #Sprite_IOheight						
+								clc
+								lda.z S65_SpritePointerTemp + 0	
+								sbc (SprIO), y
+								sta.z S65_SpritePointerTemp + 0
+								bcs !+
+								dec.z S65_SpritePointerTemp + 1
+							!:
+								bra !columnadvDone+
+
+							!noHflip:
+								//Add height + 1 (+1 comes from the SEC being set) 
+								//to Sprite pointer counter
+								ldy #Sprite_IOheight
+								lda (SprIO), y							
+								sec
+								adc.z S65_SpritePointerTemp + 0	
+								sta.z S65_SpritePointerTemp + 0
+								bcc !+
+								inc.z S65_SpritePointerTemp + 1
+							!:
+
+						!columnadvDone:
 							dex 
 							bne !charwidthLoop-		
+
 
 
 							//set pointer to next row
@@ -795,7 +878,7 @@ MaskRowValue:
 							sta.z S65_SpritePointerTemp + 0
 							lda.z S65_SpritePointerOld + 1		
 							sta.z S65_SpritePointerTemp + 1
-
+						!rowadvDone:
 
 						plx
 
@@ -846,20 +929,8 @@ MaskRowValue:
 		!noreset:	
 			jmp !nextrow-
 
-
-
 					
 	!nextsprite:
-		lda.z S65_SpriteFineY
-		beq !+
-		lda.z S65_SpriteRowCounter
-		cmp #$01 //Last row??
-		bne !+
-		lda RowMask:#$ff
-		eor #$ff 
-		sta RowMask
-	!:
-
 		//increment sprite IO pointer
 		clc 
 		lda.z SprIO + 0
