@@ -16,7 +16,7 @@
 		testScreenColors:
 			.import binary "assets/bin/test3_ncm.bin"
 		message:
-			S65_Text16("LAYER 2 - THIS IS AN FCM LAYER")
+			S65_Text16("LAYER 3 - THIS IS AN FCM LAYER")
 
 	Start:
 		

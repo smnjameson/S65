@@ -180,10 +180,11 @@ function findBestFitForCharColors(inp, out) {
             let matches = inp.filter(a => out[i].includes(a));
             let uniques = inp.filter(a => !out[i].includes(a));
             if( matches.length > best && //most matches in this palette slice
-                uniques.length + out[i].length <= 15) {
+                uniques.length + out[i].length <= 16) {
                 best = i 
                 max = matches.length
                 unq = uniques
+                break;
             }
         }
         if(best === -1) {
@@ -263,7 +264,7 @@ function sortNCMPalette(charData, paletteData) {
 
         console.log(charData.originalPalIndex.length)
 
-        //with the palette found and the color table and slcie array done,
+        //with the palette found and the color table and slice array done,
         //now need to change every pixels data to 
         //reflect the new color indices changing each nybble
         for(var i=0; i<charData.originalPalIndex.length; i+=2) {

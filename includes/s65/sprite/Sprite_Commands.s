@@ -767,14 +767,18 @@ MaskRowValue:
 							lda (SprIO), y
 							cmp #$01
 							beq !+
+
+							ldy #Sprite_IOheight
+							lda (SprIO), y
 #if ROWMASK_FIXED
 //TODO on HW				//Disabled row mask until its working
 							clc //SWITCH SEC for CLC THIS WHEN ROWMASK WORKS	
 #else 
-							sec //Using SEC isntead of CLC so we add an extra 1 
+							//sec
+							//already set from above cmp
 #endif
-							lda.z S65_SpritePointerTemp + 0
-							adc (SprIO), y			
+							//Add height (+1 if !ROWMASK_FIXED) to Sprite pointer counter
+							adc.z S65_SpritePointerTemp + 0	
 							sta.z S65_SpritePointerTemp + 0
 							bcc !+
 							inc.z S65_SpritePointerTemp + 1
