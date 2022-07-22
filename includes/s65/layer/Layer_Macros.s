@@ -411,8 +411,8 @@
 		ora #>borderSide 
 		sta $d05d
 	} else {
-		.var textXpos = $18f - adjustH
-		.var borderSide = textXpos + 1
+		.var textXpos = $18e - adjustH
+		.var borderSide = textXpos + 2
 
 		lda #<textXpos 
 		sta $d04c 

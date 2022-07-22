@@ -158,7 +158,8 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpritePointerTemp:	.word $0000
 			S65_SpritePointerOld:	.word $0000
 			S65_SpriteRowCounter:	.byte $00
-			S65_SpriteRowTablePtr:	.byte $0000
+			S65_SpriteRowTablePtr:	.word $0000
+			S65_SpriteFlags:	.byte $00
 
 /** 
  * .var ReturnValue

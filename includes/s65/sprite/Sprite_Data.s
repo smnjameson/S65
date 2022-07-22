@@ -14,9 +14,9 @@
  * 
  * Flags for the state of this sprite
  * 
- * bit 7 = Enabled
- * bit 6 = Flip H (Not yet implemented)
- * bit 5 = Flip V (Not yet implemented)
+ * bit 7 = Flip H (Not yet implemented)
+ * bit 6 = Flip V (Not yet implemented)
+ * bit 5 = Enabled
  * 
  * @namespace Sprite
  */

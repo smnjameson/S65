@@ -98,12 +98,12 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 			.if(enabled.getValue() == 0) {
 				ldy #Sprite_IOflags 
 				lda (S65_LastSpriteIOPointer), y	
-				and #$7f
+				and #%11011111
 				sta (S65_LastSpriteIOPointer), y
 			} else {
 				ldy #Sprite_IOflags 
 				lda (S65_LastSpriteIOPointer), y	
-				ora #$80
+				ora #%00100000
 				sta (S65_LastSpriteIOPointer), y				
 			}
 		}
@@ -120,7 +120,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 * 
 * @namespace Sprite
 * @flags nz
-* @returns {bool} S65_ReturnValue $80 if enabled $00 if not
+* @returns {bool} S65_ReturnValue $20 if enabled $00 if not
 */
 .pseudocommand Sprite_GetEnabled {
 	S65_AddToMemoryReport("Sprite_GetEnabled")
@@ -128,7 +128,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	pha
 			ldy #[Sprite_IOflags]
 			lda (S65_LastSpriteIOPointer), y
-			and #$80
+			and #%00100000
 			sta.z S65_ReturnValue + 0
 	pla
 	ply
@@ -577,9 +577,10 @@ MaskRowValue:
 			phz
 			ldy #Sprite_IOflags 
 			lda (SprIO), y
+			and #%00100000
 
 			//Skip if not enabled
-			lbpl !nextsprite+
+			lbeq !nextsprite+
 
 				//Sprite is active so add an entry to the RRB
 
