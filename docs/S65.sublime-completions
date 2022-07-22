@@ -537,6 +537,13 @@
             "details": "Returns the enabled state of the current selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
         },
         {
+            "trigger": "Sprite_GetFlags",
+            "annotation": "",
+            "contents": "Sprite_GetFlags ",
+            "kind": "snippet",
+            "details": "Returns the flags of the current selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+        },
+        {
             "trigger": "Sprite_GetPointer",
             "annotation": "",
             "contents": "Sprite_GetPointer ",
@@ -569,7 +576,7 @@
             "annotation": "width:height",
             "contents": "Sprite_SetDimensions ${1:width} : ${2:height}",
             "kind": "snippet",
-            "details": "Sets the currently selected sprites width and height."
+            "details": "Sets the currently selected sprites width and height. There is a hard limit of 255 chars to make up any one sprite therefore width * height MUST be less than 256"
         },
         {
             "trigger": "Sprite_SetEnabled",
@@ -577,6 +584,13 @@
             "contents": "Sprite_SetEnabled ${1:enabled}",
             "kind": "snippet",
             "details": "Enables or disables the current selected sprite so that it is rendered in a <a href=\"#Layer_Update\">Layer_Update</a><br> Sets <a href=\"#Global_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br>"
+        },
+        {
+            "trigger": "Sprite_SetFlags",
+            "annotation": "flags",
+            "contents": "Sprite_SetFlags ${1:flags}",
+            "kind": "snippet",
+            "details": "Sets one or more of the currently selected sprites flags. You can use the <a href=\"#Sprite_IOflagEnabled\">flag constants</a> provided by S65 to abstract the values"
         },
         {
             "trigger": "Sprite_SetPointer",
@@ -627,10 +641,46 @@
             "details": "The color to apply to all the cahrs in this sprite"
         },
         {
-            "trigger": "Sprite_IOflags",
-            "annotation": "Flags for the state of this sprite  bit 7 = Enabled bit 6 = Flip H (Not yet implemented) bit 5 = Flip V (Not yet implemented)",
+            "trigger": "Sprite_IOflagEnabled",
+            "annotation": "The value to set the enabled bit in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a>",
             "kind": "snippet",
-            "details": "Flags for the state of this sprite  bit 7 = Enabled bit 6 = Flip H (Not yet implemented) bit 5 = Flip V (Not yet implemented)"
+            "details": "The value to set the enabled bit in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a>"
+        },
+        {
+            "trigger": "Sprite_IOflagFlipH",
+            "annotation": "The value to set the flip H bit in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a>",
+            "kind": "snippet",
+            "details": "The value to set the flip H bit in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a>"
+        },
+        {
+            "trigger": "Sprite_IOflagFlipV",
+            "annotation": "The value to set the flip V bit in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a><br><br> NOTE: Currently due to HW limitations (missing ROWMASK functionality) this flag will cause rendering issues and should NOT be used",
+            "kind": "snippet",
+            "details": "The value to set the flip V bit in <a href=\"#Sprite_IOflags\">Sprite_IOflags</a><br><br> NOTE: Currently due to HW limitations (missing ROWMASK functionality) this flag will cause rendering issues and should NOT be used"
+        },
+        {
+            "trigger": "Sprite_IOflagNCM",
+            "annotation": "This registers is set internally on creation of a sprite and should NOT be manually changed it should ALWAYS be set",
+            "kind": "snippet",
+            "details": "This registers is set internally on creation of a sprite and should NOT be manually changed it should ALWAYS be set"
+        },
+        {
+            "trigger": "Sprite_IOflags",
+            "annotation": "Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled",
+            "kind": "snippet",
+            "details": "Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled"
+        },
+        {
+            "trigger": "Sprite_IOflipHoffset",
+            "annotation": "This registers is set internally on creation of a sprite and should NOT be manually changed",
+            "kind": "snippet",
+            "details": "This registers is set internally on creation of a sprite and should NOT be manually changed"
+        },
+        {
+            "trigger": "Sprite_IOflipVoffset",
+            "annotation": "This registers is set internally on creation of a sprite and should NOT be manually changed",
+            "kind": "snippet",
+            "details": "This registers is set internally on creation of a sprite and should NOT be manually changed"
         },
         {
             "trigger": "Sprite_IOheight",

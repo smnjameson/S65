@@ -33,7 +33,9 @@
 .const Sprite_IOflagFlipH = $40
 /**
 * .var IOflagFlipV
-* The value to set the flip V bit in <a href="#Sprite_IOflags">Sprite_IOflags</a>
+* The value to set the flip V bit in <a href="#Sprite_IOflags">Sprite_IOflags</a><br><br>
+* NOTE: Currently due to HW limitations (missing ROWMASK functionality) this flag will cause
+* rendering issues and should NOT be used
 * @namespace Sprite
 */
 .const Sprite_IOflagFlipV = $80

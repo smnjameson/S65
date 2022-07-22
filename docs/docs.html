@@ -1864,6 +1864,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Sprite_GetEnabled'>GetEnabled</a></div>
 				
+					<div class='macroIndex'><a href='#Sprite_GetFlags'>GetFlags</a></div>
+				
 					<div class='macroIndex'><a href='#Sprite_GetPointer'>GetPointer</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_GetPositionX'>GetPositionX</a></div>
@@ -1875,6 +1877,8 @@ h4 {
 					<div class='macroIndex'><a href='#Sprite_SetDimensions'>SetDimensions</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_SetEnabled'>SetEnabled</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetFlags'>SetFlags</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_SetPointer'>SetPointer</a></div>
 				
@@ -1995,6 +1999,29 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetFlags'>GetFlags
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Returns the flags of the current selected sprite into <a href="#Global_ReturnValue">S65_ReturnValue</a>  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetFlags </div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_GetPointer'>GetPointer
 							
 							<div class='macroItemSubHeader'>
@@ -2108,7 +2135,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the currently selected sprites width and height.  </div>
+						<div class='macroItemDescription'> Sets the currently selected sprites width and height. There is a hard limit of 255 chars to make up any one sprite therefore width * height MUST be less than 256  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_SetDimensions <i>width</i> : <i>height</i></div>
 						
@@ -2149,6 +2176,35 @@ h4 {
 						
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{bool} {IMM|REG} enabled - Sprite enabled flag in the sprites IO</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetFlags'>SetFlags
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65 to abstract the values  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetFlags <i>flags</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} flags - Sprite flags</div></span>
 						</div>
 					
 						
@@ -2305,7 +2361,19 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Sprite_IOcolor'>IOcolor</a></div>
 				
+					<div class='macroIndex'><a href='#Sprite_IOflagEnabled'>IOflagEnabled</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOflagFlipH'>IOflagFlipH</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOflagFlipV'>IOflagFlipV</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOflagNCM'>IOflagNCM</a></div>
+				
 					<div class='macroIndex'><a href='#Sprite_IOflags'>IOflags</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOflipHoffset'>IOflipHoffset</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOflipVoffset'>IOflipVoffset</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_IOheight'>IOheight</a></div>
 				
@@ -2326,10 +2394,46 @@ h4 {
 						<div class='macroUsage'>Sprite_IOcolor</div>						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOflagEnabled'>IOflagEnabled</div>
+						<div class='macroItemDescription'>The value to set the enabled bit in <a href="#Sprite_IOflags">Sprite_IOflags</a> </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOflagEnabled</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOflagFlipH'>IOflagFlipH</div>
+						<div class='macroItemDescription'>The value to set the flip H bit in <a href="#Sprite_IOflags">Sprite_IOflags</a> </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOflagFlipH</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOflagFlipV'>IOflagFlipV</div>
+						<div class='macroItemDescription'>The value to set the flip V bit in <a href="#Sprite_IOflags">Sprite_IOflags</a><br><br> NOTE: Currently due to HW limitations (missing ROWMASK functionality) this flag will cause rendering issues and should NOT be used </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOflagFlipV</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOflagNCM'>IOflagNCM</div>
+						<div class='macroItemDescription'>This registers is set internally on creation of a sprite and should NOT be manually changed it should ALWAYS be set </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOflagNCM</div>						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOflags'>IOflags</div>
-						<div class='macroItemDescription'> Flags for the state of this sprite  bit 7 = Enabled bit 6 = Flip H (Not yet implemented) bit 5 = Flip V (Not yet implemented)  </div>
+						<div class='macroItemDescription'> Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_IOflags</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOflipHoffset'>IOflipHoffset</div>
+						<div class='macroItemDescription'>This registers is set internally on creation of a sprite and should NOT be manually changed </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOflipHoffset</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOflipVoffset'>IOflipVoffset</div>
+						<div class='macroItemDescription'>This registers is set internally on creation of a sprite and should NOT be manually changed  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOflipVoffset</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOheight'>IOheight</div>
