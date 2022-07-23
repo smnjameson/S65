@@ -9,6 +9,13 @@
             "details": "Measures the byte size of a block of assembly and records it in the memory report output by <a href=\"#Global_MemoryReport\">S65_MemoryReport</a><br><br> Called at the start and the end of the code block you wish to measure by passing the same name in both"
         },
         {
+            "trigger": "S65_ImportSprites",
+            "annotation": "name,path,address",
+            "contents": "S65_ImportSprites(${1:name}, ${2:path}, ${3:address})",
+            "kind": "snippet",
+            "details": "Helper function to load the sprites _chars file into a given address and load the _meta file to create the sprite to char index values for use in ...<br> When loading using these imports you only need the first part of the path and file name. eg<br><br> S65_ImportSprites(\"player\",\"assets/bin/sprites1\", $8000)<br><br> Will load both the \"assets/bin/sprites1_ncm.bin\" (or _fcm) and the \"assets/bin/sprites1_meta.s\" files. NCM or FCM is determined from the metafile"
+        },
+        {
             "trigger": "S65_MemoryReport",
             "annotation": "",
             "contents": "S65_MemoryReport()",
@@ -65,27 +72,33 @@
         },
         {
             "trigger": "S65_ColorRamPointer",
-            "annotation": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
+            "annotation": "{dword} S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+            "details": "{dword} S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+        },
+        {
+            "trigger": "S65_LastImportPtr",
+            "annotation": "{dword} S65 Basepage pointer that contains the address at which the last S65_Import macro finished importing",
+            "kind": "snippet",
+            "details": "{dword} S65 Basepage pointer that contains the address at which the last S65_Import macro finished importing"
         },
         {
             "trigger": "S65_LastLayerIOPointer",
-            "annotation": "S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>",
+            "annotation": "{word} S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>"
+            "details": "{word} S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>"
         },
         {
             "trigger": "S65_LastSpriteIOPointer",
-            "annotation": "S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>",
+            "annotation": "{word} S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>"
+            "details": "{word} S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>"
         },
         {
             "trigger": "S65_ReturnValue",
-            "annotation": "S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte.",
+            "annotation": "{word} S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte.",
             "kind": "snippet",
-            "details": "S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte."
+            "details": "{word} S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte."
         },
         {
             "trigger": "S65_SCREEN_LOGICAL_ROW_WIDTH",
@@ -113,15 +126,15 @@
         },
         {
             "trigger": "S65_ScreenRamPointer",
-            "annotation": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
+            "annotation": "{dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+            "details": "{dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
         },
         {
             "trigger": "S65_SpareBasePage",
-            "annotation": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page",
+            "annotation": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in S65 base page",
             "kind": "snippet",
-            "details": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page"
+            "details": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in S65 base page"
         },
         {
             "trigger": "S65_VISIBLE_SCREEN_CHAR_HEIGHT",
@@ -636,9 +649,9 @@
         },
         {
             "trigger": "Sprite_IOcolor",
-            "annotation": "The color to apply to all the cahrs in this sprite",
+            "annotation": "The color to apply to all the chars in this sprite.",
             "kind": "snippet",
-            "details": "The color to apply to all the cahrs in this sprite"
+            "details": "The color to apply to all the chars in this sprite."
         },
         {
             "trigger": "Sprite_IOflagEnabled",

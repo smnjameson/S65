@@ -172,6 +172,8 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Global_AddToMemoryReport'>AddToMemoryReport</a></div>
 				
+					<div class='macroIndex'><a href='#Global_ImportSprites'>ImportSprites</a></div>
+				
 					<div class='macroIndex'><a href='#Global_MemoryReport'>MemoryReport</a></div>
 				
 					<div class='macroIndex'><a href='#Global_RestoreBasePage'>RestoreBasePage</a></div>
@@ -203,6 +205,39 @@ h4 {
 						</div>
 					
 						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_ImportSprites'>ImportSprites
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Helper function to load the sprites _chars file into a given address and load the _meta file to create the sprite to char index values for use in ...<br> When loading using these imports you only need the first part of the path and file name. eg<br><br> S65_ImportSprites("player","assets/bin/sprites1", $8000)<br><br> Will load both the "assets/bin/sprites1_ncm.bin" (or _fcm) and the "assets/bin/sprites1_meta.s" files. NCM or FCM is determined from the metafile     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_ImportSprites(<i>name</i>, <i>path</i>, <i>address</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The name to refer to this group of sprites when using the Sprite_GetPointer function</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} path - The path to the files excluding the _ncm.bin etc (see above)</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} address - <add a description here></div></span>
+						</div>
+					
+						
+							<div class='macroUsageText'><i>Sets Registers:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>A {byte} - <add description here></div></span>
+						</div>
+					
 						
 					</div>
 					<div class='macroItem'>
@@ -346,6 +381,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Global_ColorRamPointer'>ColorRamPointer</a></div>
 				
+					<div class='macroIndex'><a href='#Global_LastImportPtr'>LastImportPtr</a></div>
+				
 					<div class='macroIndex'><a href='#Global_LastLayerIOPointer'>LastLayerIOPointer</a></div>
 				
 					<div class='macroIndex'><a href='#Global_LastSpriteIOPointer'>LastSpriteIOPointer</a></div>
@@ -376,25 +413,31 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_ColorRamPointer'>ColorRamPointer</div>
-						<div class='macroItemDescription'> S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
+						<div class='macroItemDescription'> {dword} S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_ColorRamPointer</div>						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Global_LastImportPtr'>LastImportPtr</div>
+						<div class='macroItemDescription'> {dword} S65 Basepage pointer that contains the address at which the last S65_Import macro finished importing </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>S65_LastImportPtr</div>						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_LastLayerIOPointer'>LastLayerIOPointer</div>
-						<div class='macroItemDescription'> S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href="#Layer_Get">Layer_Get</a> </div>
+						<div class='macroItemDescription'> {word} S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href="#Layer_Get">Layer_Get</a> </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_LastLayerIOPointer</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_LastSpriteIOPointer'>LastSpriteIOPointer</div>
-						<div class='macroItemDescription'> S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href="#Sprite_Get">Sprite_Get</a> </div>
+						<div class='macroItemDescription'> {word} S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href="#Sprite_Get">Sprite_Get</a> </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_LastSpriteIOPointer</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_ReturnValue'>ReturnValue</div>
-						<div class='macroItemDescription'> S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte. </div>
+						<div class='macroItemDescription'> {word} S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte. </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_ReturnValue</div>						
 					</div>
@@ -424,13 +467,13 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_ScreenRamPointer'>ScreenRamPointer</div>
-						<div class='macroItemDescription'> S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
+						<div class='macroItemDescription'> {dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or <a href="#Layer_SetScreenPointersXY">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes. </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_ScreenRamPointer</div>						
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_SpareBasePage'>SpareBasePage</div>
-						<div class='macroItemDescription'> 16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page </div>
+						<div class='macroItemDescription'> 16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in S65 base page </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_SpareBasePage</div>						
 					</div>
@@ -2389,7 +2432,7 @@ h4 {
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOcolor'>IOcolor</div>
-						<div class='macroItemDescription'> The color to apply to all the cahrs in this sprite  </div>
+						<div class='macroItemDescription'> The color to apply to all the chars in this sprite.  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_IOcolor</div>						
 					</div>

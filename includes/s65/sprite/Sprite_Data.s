@@ -1,3 +1,6 @@
+.var Sprite_SpriteList = Hashtable()
+
+
 /**
 * .var SpriteIOLength
 *
@@ -119,7 +122,7 @@
 /**
  * .var IOcolor
  *  
- * The color to apply to all the cahrs in this sprite
+ * The color to apply to all the chars in this sprite.
  * 
  * @namespace Sprite
  */
@@ -146,4 +149,7 @@
 
 //Pad out the array so it aligns to allow faster access
 .eval Sprite_SpriteIOLength = $10
+
+
+
 
