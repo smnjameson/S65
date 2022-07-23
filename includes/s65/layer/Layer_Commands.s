@@ -688,7 +688,7 @@ _Layer_Update: {
 					lda screenSource.getValue(), x //char msb
 					sta ((S65_ScreenRamPointer)), z 	
 				} else {
-					//scewen REG
+					//screen REG
 					.if(_isReg(screenSource)) {
 						lda S65_PseudoReg + 1 //char lsb
 						sta ((S65_ScreenRamPointer)), z 

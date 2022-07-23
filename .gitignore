@@ -1,5 +1,10 @@
-bin/
+tests/bin
+includes/s65/bin
+includes/**/bin
+./bin
 build/aseparse65/node_modules/.package-lock.json
 build/aseparse65/node_modules/
 build/m65debugger/package-lock.json
 build/m65debugger/node_modules/
+bin/main.prg
+bin/main.vs
