@@ -293,7 +293,7 @@
 	//Set border and text positions for this resolution
 	.var ncmMult = 1//Layer_LayerList.get(0).get("ncm") ? 2 : 1
 	.var adjust = S65_VISIBLE_SCREEN_CHAR_HEIGHT * 8
-	.var borderTop = $130 - adjust
+	.var borderTop = $12e - adjust
 	.var borderBottom = borderTop + S65_VISIBLE_SCREEN_CHAR_HEIGHT * 8 * 2
 	.var textYpos = borderTop - 1
 
@@ -313,11 +313,11 @@
 		ora #>borderTop 
 		sta $d049
 
-		lda #<[borderBottom - 1]
+		lda #<[borderBottom-1]
 		sta $d04a
 		lda $d04b 
 		and #%11110000
-		ora #>[borderBottom -1]
+		ora #>[borderBottom-1]
 		sta $d04b
 
 		lda #<[textYpos -3]
