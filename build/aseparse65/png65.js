@@ -96,55 +96,36 @@ function getFCMData(png, palette) {
 function sortNCMDataForSprites(png, sw, sh, palette, charData) {
         let spriteData = []
 
-        let numSprites = (png.width / (sw*16)  * (png.height / (sh*8)))
-        let spritesPerRow = (png.width / (sw*16))
-        let spritesPerCol = (png.height / (sh*8))
         
-        let charNewData = []
-
-        console.log(numSprites,spritesPerRow,spritesPerCol)
-        // for(var s = 0; s<numSprites; s++) {
+        let charNewColors = []
 
 
-        //     for(var x=0; x<sw; x++) {
-        //         for(var j=0; j<64;j++) charNewData.push(0)
-        //         for(var y = 0; y< sh; y++) {
-
-        //             var index = (Math.floor(s / spritesPerRow) + y) * sw
-        //             index += (s % spritesPerRow)  * sw + x
-        //             index *= 64
-
-        //             for(var f = 0; f< 64; f++) {
-        //                 let i = (0 + f)
-        //                 charNewData.push(charData.data[i])
-        //             }
-        //         }
-        //     }
-
-        // }
-        for(var i=0; i<4; i++){
-            for(var j=0; j<64;j++) charNewData.push(0)
-            for(var f = 0; f< 64 * 4; f++) {
-                let i = (0 + f)
-                charNewData.push(charData.data[i])
+console.log(charData.originalPalIndex.length, sw, sh, png.width, png.height)
+        for(var y = 0; y< png.height/8; y+=sh) {
+            for(var x=0; x<(png.width / 16); x+=sw) {
+                let cols=[]
+                for(var ty=0; ty<sh; ty++) {
+                    for(var tx=0; tx<sh; tx++) {
+                        let i = (y + ty) * (png.width / 16) + x + tx
+                        i *= 64;
+                        console.log(i)
+                        // cols.push(charData.originalPalIndex[])
+                    }
+                }
             }
         }
-        for(var j=0; j<64;j++) charNewData.push()
 
-        console.log(charNewData.length)
 
-        return {    data:charNewData, 
-                    charColors:charData.charColors, 
-                    originalPalIndex: charData.originalPalIndex,
-                    spriteData}
+
+        return { charColors:charNewColors }
 }
 
-function sortFCMDataForSprites(png, sw, sh, palette, charData, ncm) {
-        ncm = ncm || 1
+function sortFCMDataForSprites(png, sw, sh, palette, charData, isSprite) {
+        let mult = isSprite ? 2 : 1
         let spriteData = []
 
-        let numSprites = (png.width / (sw*8))  * (png.height / (sh*8))
-        let spritesPerRow = (png.width / (sw*8))
+        let numSprites = (png.width / (sw*8*mult))  * (png.height / (sh*8))
+        let spritesPerRow = (png.width / (sw*8*mult))
         let spritesPerCol = (png.height / (sh*8))
         
         let charNewData = []
@@ -158,13 +139,23 @@ function sortFCMDataForSprites(png, sw, sh, palette, charData, ncm) {
                 for(var j=0; j<64;j++) charNewData.push(0)
                 for(var sy=0; sy<sh; sy++){
 
-                    var index = (png.width/8) * (Math.floor(s / spritesPerRow) + sy/ncm) //8 = char width
+
+
+                    var index = (png.width/8) * (Math.floor(s / spritesPerRow) + sy) //8 = char width
                     index += (s % spritesPerRow) + sx
                     index *= 64
 
+                    // let index = sy * (png.width / 16) + sx + s*sw
+                    // index *=64
+                    // console.log(index)
+
                     for(var y=0; y<8; y++) {
                         for(var x=0; x<8; x++) { //8 = char width
-                            let i = (index + ((y * 8) + x ))
+                            let i = (index + ((y * 8) + x ))//
+                            // let i = index + y * (png.width / 16) + x 
+                            // i *=64
+                             // let i = ((y + sy) * (png.width / 16) + x + sx 
+
                             charNewData.push(charData.data[i])
                         }
                     }      
@@ -180,20 +171,66 @@ function sortFCMDataForSprites(png, sw, sh, palette, charData, ncm) {
 }
 
 
+
+
+function sortNCMDataForSprites(png, sw, sh, palette, charData) {
+        let spriteData = []
+
+        let numSprites = (png.width / (sw*16))  * (png.height / (sh*8))
+        let spritesPerRow = (png.width / (sw*16))
+        let spritesPerCol = (png.height / (sh*8))
+        
+        let charNewData = []
+
+
+        for(var s = 0; s<numSprites; s++) {
+            for(var sx=0; sx<sw; sx++){
+                for(var j=0; j<64;j++) charNewData.push(0)
+                for(var sy=0; sy<sh; sy++){
+
+                    var id = s * (sw * sh) + (sx + sy * sw) 
+
+                    var index = (png.width/8) * (Math.floor(s / spritesPerRow) + sy) //8 = char width
+                    index += (s % spritesPerRow) + sx
+
+                    index = id
+                    index *= 64
+
+                    for(var y=0; y<8; y++) {
+                        for(var x=0; x<8; x++) { //8 = char width
+                            let i = (index + ((y * 8) + x ))//
+                            charNewData.push(charData.data[i])
+                        }
+                    }      
+                }
+            }
+        }
+        for(var j=0; j<64;j++) charNewData.push()
+
+        return {    data:charNewData, 
+                    charColors:charData.charColors, 
+                    originalPalIndex: charData.originalPalIndex,
+                    spriteData}
+}
+
+
+
 function getNCMData(png, palette, wid, hei) {
     let data = []
     let charColors = []
     let originalPalIndex = []
 
-    for(var y=0; y<png.height; y+=(8)) {
-        for(var x=0; x<png.width; x+=(16)) {
+    for(var y=0; y<png.height; y+=(8 * hei)) {
+        for(var x=0; x<png.width; x+=(16 * wid)) {
 
             let charCols = []
 
-            for(var r=0; r<8; r++) {
+
+            for(var tx=0; tx<wid ; tx++) {
+            for(var r=0; r<8 * hei; r++) {
                 for(var c=0; c<16; c+=2) {
 
-                    let i = ((y + r) * (png.width * 4) + ((x + c) * 4))
+                    let i = ((y + r) * (png.width * 4) + ((x + c + tx*16) * 4))
                     let j = i + 4
 
                     //find the color
@@ -234,8 +271,87 @@ function getNCMData(png, palette, wid, hei) {
                     data.push(( nyb2 << 4 ) + nyb1)
                 }
             }
+            }
             charCols = charCols.sort((a,b) => a-b)
             for(var k=0; k<wid*hei;k++) charColors.push(charCols)
+        }
+    }
+
+    // console.log(charColors)
+    // console.log("===================")
+    // console.log(originalPalIndex)
+
+    return { data, charColors, originalPalIndex }
+}
+
+
+
+function getNCMDataForSprites(png, palette, wid, hei) {
+    let data = []
+    let charColors = []
+    let originalPalIndex = []
+    let row = (png.width)
+
+    for(var y=0; y<png.height; y+=(8 * hei)) {
+        for(var x=0; x<png.width; x+=(16 * wid)) {
+
+            let charCols = [0]
+
+            for(var ty=0; ty<hei; ty++) {
+            for(var tx=0; tx<wid; tx++) {
+
+            for(var r=0; r<8; r++) {
+
+
+                for(var c=0; c<16; c+=2) {
+
+
+                    let i = ( row * (y + ty * 8 ) + (x + tx * 16) + r*row + c)//row * (y + ty * 8 + r) + (x + tx * 16 + c)
+
+                    i *=4
+                    let j = i + 4
+
+                    //find the color
+                    let col1 = palette.findIndex(a => {
+                        return (
+                            png.data[i+0] === a.red &&
+                            png.data[i+1] === a.green &&
+                            png.data[i+2] === a.blue
+                        );
+                    })
+
+
+                    originalPalIndex.push(col1)
+                    if(charCols.indexOf(col1) === -1)  charCols.push(col1)  
+                    let nyb1 = charCols.indexOf(col1)
+                    
+
+                    let col2 = palette.findIndex(a => {
+                        return (
+                            png.data[j+0] === a.red &&
+                            png.data[j+1] === a.green &&
+                            png.data[j+2] === a.blue 
+                        );
+                    })   
+                    originalPalIndex.push(col2)
+                    if(charCols.indexOf(col2) === -1)  charCols.push(col2) 
+                    let nyb2 = charCols.indexOf(col2)
+
+                    //push colors in this order so they can be turned into bytes easily alter
+               
+                   
+                    
+
+                    // if(nyb1 > 0xf || nyb2 > 0xf) {
+                    //     throw(new Error(`Too many colors in this char: $${(y * hei + x * wid).toString(16)}   ${x},${y},${charCols}`))
+                    // }
+                    data.push(( nyb2 << 4 ) + nyb1)
+                }
+            }
+            }
+            }
+            charCols = charCols.sort((a,b) => a-b)
+            charColors.push(charCols)
         }
     }
 
@@ -306,7 +422,9 @@ function findBestFitForCharColors(inp, out) {
         return out
 }
 
-function sortNCMPalette(charData, paletteData) {
+function sortNCMPalette(charData, paletteData, wid, hei) {
+        wid = wid || 1
+        hei = hei || 1
         let sortedArray = new Array(16).fill([0])
 
         // console.log(charData.charColors)
@@ -373,6 +491,7 @@ function sortNCMPalette(charData, paletteData) {
 
         }
 
+        console.log(charData.slices)
         //with the palette found and the color table and slice array done,
         //now need to change every pixels data to 
         //reflect the new color indices changing each nybble
@@ -381,8 +500,8 @@ function sortNCMPalette(charData, paletteData) {
             //get old value
             let orig = charData.originalPalIndex[i]
             //find its new index
-            var s= charData.slices[Math.floor(i/128)]
-            // console.log("CCC",i,Math.floor(i/128),charData.slices.length,s,sortedArray[ s ])
+            var s= charData.slices[Math.floor(i/(128*wid*hei))]
+            // console.log("CCC",i,Math.floor(i/128),charData.slices.length,s,charData.originalPalIndex.length)
             var palSlice = sortedArray[ s ]
             var index = palSlice.indexOf(orig)
 
@@ -391,7 +510,7 @@ function sortNCMPalette(charData, paletteData) {
             //get next value
             orig = charData.originalPalIndex[i+1]
             //find its new index
-            s= charData.slices[Math.floor(i/128)]
+            s= charData.slices[Math.floor(i/(128*wid*hei))]
             palSlice = sortedArray[ s ]
             index = palSlice.indexOf(orig)
 
@@ -510,18 +629,32 @@ async function runSpriteMapper(argv) {
     if(argv.fcm) {
         convertedPal = paletteData.pal
         charData = getFCMData(png, paletteData.palette)
+
         charData = sortFCMDataForSprites(png, spriteWidth/8, spriteHeight/8,  paletteData.palette, charData)
         console.log("Building sprites in FCM mode")
     }
 
     if(argv.ncm) {
-        charData = getNCMData(png, paletteData.palette, spriteWidth/16, spriteHeight/8)
-        sortedPalette = sortNCMPalette(charData, paletteData)
-        paletteData = sortedPalette.paletteData
-        convertedPal = paletteData.pal
-        // charData = sortNCMDataForSprites(png, spriteWidth / 16, spriteHeight / 8,  paletteData.palette, charData)
-        charData = sortFCMDataForSprites(png, spriteWidth/8, spriteHeight/8,  paletteData.palette, charData, 2)
+        // charData = getNCMDataForSprites(png, paletteData.palette, spriteWidth/16, spriteHeight/8)
+        // sortedPalette = sortNCMPalette(charData, paletteData)
+        // paletteData = sortedPalette.paletteData
+        // convertedPal = paletteData.pal
+        // // charData = sortNCMDataForSprites(png, spriteWidth / 16, spriteHeight / 8,  paletteData.palette, charData)
+        // charData = sortFCMDataForSprites(png, spriteWidth/8, spriteHeight/8,  paletteData.palette, charData, 2)
+
+
+        charData = getNCMDataForSprites(png, paletteData.palette, spriteWidth/16, spriteHeight/8)
+        // charData.charColors = sortNCMDataForSprites(png, spriteWidth / 16, spriteHeight / 8,  paletteData.palette, charData).charColors
+        sortedPalette = sortNCMPalette(charData, paletteData, spriteWidth/16, spriteHeight/8)
+
+        // charData = getNCMData(png, paletteData.palette, spriteWidth/16, spriteHeight/8)
+        // paletteData = sortedPalette.paletteData
+        charData = sortNCMDataForSprites(png, spriteWidth/16, spriteHeight/8,  paletteData.palette, charData, false)
+
         
+        convertedPal = paletteData.pal
+
+
         //save NCM color table
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
         console.log("Building sprites in NCM mode")

@@ -110,7 +110,7 @@ System_BasicUpstart65(S65_InitComplete)
 /** 
  * .var ScreenRamPointer
  * 
- * S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set
+ * {dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set
  * at all times so can be used to access the screen ram using 32bit indirect z addressing.
  * DO NOT change bytes 2 and 3!<br><br>
  * 
@@ -126,7 +126,7 @@ System_BasicUpstart65(S65_InitComplete)
 /** 
  * .var ColorRamPointer
  * 
- * S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set
+ * {dword} S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set
  * at all times so can be used to access the color ram using 32bit indirect z addressing.
  * DO NOT change bytes 2 and 3!<br><br>
  * Note: Requires <a href="#Global_SetBasePage">S65_SetBasePage</a> or 
@@ -161,10 +161,18 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpriteRowTablePtr:	.word $0000
 			S65_SpriteFlags:	.byte $00
 
+/**
+* .var LastImportPtr
+*
+* {dword} S65 Basepage pointer that contains the address at which the last S65_Import
+* macro finished importing
+*/
+			S65_LastImportPtr:		.dword $00000000
+
 /** 
  * .var ReturnValue
  * 
- * S65 BasePage value that is used as a return for many commands
+ * {word} S65 BasePage value that is used as a return for many commands
  * when the result is a word rather than a byte. 
  */	
 			S65_ReturnValue:	.word $0000
@@ -172,7 +180,7 @@ System_BasicUpstart65(S65_InitComplete)
 /** 
  * .var LastSpriteIOPointer
  * 
- * S65 BasePage pointer into to the IO data for the last sprite that was
+ * {word} S65 BasePage pointer into to the IO data for the last sprite that was
  * fetched using <a href="#Sprite_Get">Sprite_Get</a>
  */	
 			S65_LastSpriteIOPointer: .word $0000
@@ -180,7 +188,7 @@ System_BasicUpstart65(S65_InitComplete)
 /** 
  * .var LastLayerIOPointer
  * 
- * S65 BasePage pointer into to the IO data for the last layer that was
+ * {word} S65 BasePage pointer into to the IO data for the last layer that was
  * fetched using <a href="#Layer_Get">Layer_Get</a>
  */	
 			S65_LastLayerIOPointer: .word $0000		
@@ -195,7 +203,7 @@ System_BasicUpstart65(S65_InitComplete)
  * .var SpareBasePage
  * 
  * 16 bytes of spare storage free for use when the S65 base page is active
- * to assist with using commands that expect to be in base page
+ * to assist with using commands that expect to be in S65 base page
  */	 			
  			S65_SpareBasePage: .fill 16, 0
 
