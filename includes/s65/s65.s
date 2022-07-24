@@ -40,6 +40,13 @@
 */
 .var 		S65_SCREEN_TERMINATOR_OFFSET = 0
 
+/**
+* .var LastImportPtr
+*
+* Contains the address at which the last Asset_Import
+* macro finished importing. Useful for chaining imports together
+*/
+.var  S65_LastImportPtr = 0
 
 
 /**
@@ -200,38 +207,3 @@ _S65_SetBasePage: {
 }
 
 
-
-/**
-* .macro ImportSprites 
-*
-* Helper function to load the sprites _chars file into a given address
-* and load the _meta file to create the sprite to char index values for
-* use in ...<br> 
-* When loading using these imports you only need the first part of the path and file name. eg<br><br>
-* S65_ImportSprites("player","assets/bin/sprites1", $8000)<br><br>
-* Will load both the "assets/bin/sprites1_ncm.bin" (or _fcm) and the "assets/bin/sprites1_meta.s" files.
-* NCM or FCM is determined from the metafile
-* 
-* @namespace S65
-*
-* @param {string} name The name to refer to this group of sprites when using the Sprite_GetPointer function
-* @param {byte} path The path to the files excluding the _ncm.bin etc (see above)
-* @param {byte} address <add a description here>
-*
-* @registers
-* @flags
-* 
-* @setreg {byte} A <add description here>
-*/
-.macro S65_ImportSprites (name, path, address) {
-        .eval Sprite_SpriteList.put("name", Hashtable().put(
-            "id", Sprite_SpriteList.keys().size(),
-            "address", address
-        ))
-
-        .var PC = *
-        * = address
-    .import binary "assets/bin/sprites1_chars.bin"
-
-        * = PC
-}

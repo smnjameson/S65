@@ -585,7 +585,16 @@
 			.eval layerOffset = layer.get("startAddr")
 		}		
 
-		
+
+	//Possibly store sprite meta data lookup table here???
+	.eval Sprite_SpritesetMetaTable = *
+	.for(var i=0; i<S65_SPRITESET_LIMIT; i++) {
+		.if( i < Sprite_SpriteList.size()) {
+			.word Sprite_SpriteList.get(i).get("metaAddress")
+		} else {
+			.word $0000
+		}
+	}
 
 	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 }

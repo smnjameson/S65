@@ -149,6 +149,8 @@ h4 {
 	
 			<div class='macroIndex'><a href='#Global'>Global (S65)</a></div>
 		
+			<div class='macroIndex'><a href='#Asset'>Asset</a></div>
+		
 			<div class='macroIndex'><a href='#DMA'>DMA</a></div>
 		
 			<div class='macroIndex'><a href='#Layer'>Layer</a></div>
@@ -171,8 +173,6 @@ h4 {
 				<div class='macroHeader' id='Global_Macros'>Macros</div>
 			
 					<div class='macroIndex'><a href='#Global_AddToMemoryReport'>AddToMemoryReport</a></div>
-				
-					<div class='macroIndex'><a href='#Global_ImportSprites'>ImportSprites</a></div>
 				
 					<div class='macroIndex'><a href='#Global_MemoryReport'>MemoryReport</a></div>
 				
@@ -205,39 +205,6 @@ h4 {
 						</div>
 					
 						
-						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Global_ImportSprites'>ImportSprites
-							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'></span>
-							</div>
-						</div>
-						<div class='macroItemDescription'> Helper function to load the sprites _chars file into a given address and load the _meta file to create the sprite to char index values for use in ...<br> When loading using these imports you only need the first part of the path and file name. eg<br><br> S65_ImportSprites("player","assets/bin/sprites1", $8000)<br><br> Will load both the "assets/bin/sprites1_ncm.bin" (or _fcm) and the "assets/bin/sprites1_meta.s" files. NCM or FCM is determined from the metafile     </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>S65_ImportSprites(<i>name</i>, <i>path</i>, <i>address</i>)</div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{string} name - The name to refer to this group of sprites when using the Sprite_GetPointer function</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} path - The path to the files excluding the _ncm.bin etc (see above)</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} address - <add a description here></div></span>
-						</div>
-					
-						
-							<div class='macroUsageText'><i>Sets Registers:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>A {byte} - <add description here></div></span>
-						</div>
-					
 						
 					</div>
 					<div class='macroItem'>
@@ -419,7 +386,7 @@ h4 {
 					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Global_LastImportPtr'>LastImportPtr</div>
-						<div class='macroItemDescription'> {dword} S65 Basepage pointer that contains the address at which the last S65_Import macro finished importing </div>
+						<div class='macroItemDescription'> Contains the address at which the last Asset_Import macro finished importing. Useful for chaining imports together </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_LastImportPtr</div>						
 					</div>
@@ -488,6 +455,63 @@ h4 {
 						<div class='macroItemDescription'>Width of the visible screen background layer in characters </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_VISIBLE_SCREEN_CHAR_WIDTH</div>						
+					</div><br><br>
+			<div class='categoryHeader' id='Asset'><span><h4>Namespace<h2>Asset</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Asset_Macros'><div class='sectionButton'>Macros</div></a></span>
+			<div class='categoryDescription'> API for the assets pipeline. Provides methods for importing assets and their metadata files </div>
+			<br>
+		
+				<div class='macroHeader' id='Asset_Macros'>Macros</div>
+			
+					<div class='macroIndex'><a href='#Asset_ImportSpritePalette'>ImportSpritePalette</a></div>
+				
+					<div class='macroIndex'><a href='#Asset_ImportSprites'>ImportSprites</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Asset_ImportSpritePalette'>ImportSpritePalette
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Data generation macro that imports the full 256 color palette for the given spriteset name. The spriteset must be imported already otherwise this will fail.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Asset_ImportSpritePalette(<i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The name of the spriteset to import the palette for</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Asset_ImportSprites'>ImportSprites
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Helper function to preload the sprites _chars file generated by png65 into a given address and load the _meta file to create the sprite to char index values for use in ...<br> S65 provides space for up to 16 sprite set imports at any one time<br> When loading using these imports you only need the first part of the path and file name. eg<br><br> S65_ImportSprites("player","assets/bin/sprites1", $8000)<br><br> Will load both the "assets/bin/sprites1_ncm.bin" (or _fcm) and the "assets/bin/sprites1_meta.s" files. NCM or FCM is determined from the metafile<br><br> NOTE: MUST be called before the Layer_InitScreen  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Asset_ImportSprites(<i>name</i>, <i>charpath</i>, <i>address</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The name to refer to this spriteset when using the Sprite_GetPointer function</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} charpath - The path to the _chars and _meta file generated by png65</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{word} address - The address to laod the sprites char data into</div></span>
+						</div>
+					
+						
+						
 					</div><br><br>
 			<div class='categoryHeader' id='DMA'><span><h4>Namespace<h2>DMA</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#DMA_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#DMA_Data'><div class='sectionButton'>Data</div></a></span>
@@ -1893,7 +1917,7 @@ h4 {
 						
 					</div><br><br>
 			<div class='categoryHeader' id='Sprite'><span><h4>Namespace<h2>Sprite</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Sprite_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Sprite_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Sprite_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Sprite_Vars'><div class='sectionButton'>Vars</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Sprite_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Sprite_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Sprite_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Sprite_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Sprite_Vars'><div class='sectionButton'>Vars</div></a></span>
 			<div class='categoryDescription'> Contains the API for managing RRB sprites  </div>
 			<br>
 		
@@ -1915,6 +1939,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Sprite_GetPositionY'>GetPositionY</a></div>
 				
+					<div class='macroIndex'><a href='#Sprite_ResetFlags'>ResetFlags</a></div>
+				
 					<div class='macroIndex'><a href='#Sprite_SetColor'>SetColor</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_SetDimensions'>SetDimensions</a></div>
@@ -1928,6 +1954,8 @@ h4 {
 					<div class='macroIndex'><a href='#Sprite_SetPositionX'>SetPositionX</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_SetPositionY'>SetPositionY</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_SetSpriteMeta'>SetSpriteMeta</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_Update'>Update</a></div>
 				
@@ -1955,7 +1983,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> This method is a prerequisite for getting or setting any sprites IO registers it sets the "current active" sprite used by the Sprite Get and Set methods by storing the pointer to that sprites IO area in <a href="#S65_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br> Note: This method will also call <a href="#S65_SetBasePage">S65_SetBasePage</a> which is required for the Sprite functions  </div>
+						<div class='macroItemDescription'> This method is a prerequisite for getting or setting any sprites IO registers it sets the "current active" sprite used by the Sprite Get and Set methods by storing the pointer to that sprites IO area in <a href="#S65_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br> Note: This method will also call <a href="#S65_SetBasePage">S65_SetBasePage</a> which is required for the subsequent Sprite functions  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_Get <i>layerNum</i> : <i>sprNum</i></div>
 						
@@ -2134,6 +2162,35 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_ResetFlags'>ResetFlags
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Resets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65 to abstract the values. The other flags are left untouched  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_ResetFlags <i>flags</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS} flags - Sprite flags</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_SetColor'>SetColor
 							
 							<div class='macroItemSubHeader'>
@@ -2240,7 +2297,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65 to abstract the values  </div>
+						<div class='macroItemDescription'> Sets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65 to abstract the values. The other flags are left untouched  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_SetFlags <i>flags</i></div>
 						
@@ -2341,6 +2398,41 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetSpriteMeta'>SetSpriteMeta
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Enables the currently selected sprite and popualtes its IO registers with the meta data for the given spriteset index. Affects:<br> - IOflags (Enabled, NCM)<br> - IOwidth<br> - IOheight<br> - IOptr<br> - IOcolor<br>    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetSpriteMeta <i>spritesId</i> : <i>spriteNum</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} spritesId - The spriteset index retrieved from Sprite_GetSprites</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABSXY} spriteNum - The sprite index from the spriteset (ordered left to right, top to bottom)</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_Update'>Update
 							
 							<div class='macroItemSubHeader'>
@@ -2359,15 +2451,30 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Sprite_GenerateLayerData'>GenerateLayerData</a></div>
 				
+					<div class='macroIndex'><a href='#Sprite_GenerateMetaData'>GenerateMetaData</a></div>
+				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_GenerateLayerData'>GenerateLayerData
 							<div class='macroItemSubHeader'>
 								<span  style='display:inline-flex;'></span>
 							</div>
 						</div>
-						<div class='macroItemDescription'> </div>
+						<div class='macroItemDescription'>Internally used macro for assigning sprite IO area during a <a href="#Layer_InitScreen">Layer_InitScreen</a> </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_GenerateLayerData()</div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GenerateMetaData'>GenerateMetaData
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Internally used to generate the runtime lookup tables for sprite meta data  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GenerateMetaData()</div>
 						
 						
 						
@@ -2375,6 +2482,8 @@ h4 {
 				<div class='macroHeader' id='Sprite_Functions'>Functions</div>
 			
 					<div class='macroIndex'><a href='#Sprite_GetIO'>GetIO</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_GetSprites'>GetSprites</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_GetIO'>GetIO
@@ -2399,6 +2508,78 @@ h4 {
 					
 						
 						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_GetSprites'>GetSprites
+						</div>
+						<div class='macroItemDescription'> Sprite sets are assigned numerical values from 0 to 15 in order as they are imported. This method retrieves that value for a given name and is a required parameter in <a href="#Sprite_SetSpriteMeta">Sprite_SetSpriteMeta</a><br>    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_GetSprites(<i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} name - <add a description here></div></span>
+						</div>
+					
+						
+						
+					</div><br>
+				<div class='macroHeader' id='Sprite_Data'>Data</div>
+			
+					<div class='macroIndex'><a href='#Sprite_MetaData'>MetaData</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_MetaData'>MetaData</div>
+						<div class='macroItemDescription'> This is a byte array used by the engine when Asset_ImportSprites and Asset_ImportSpritesMeta is used to store all the meta data for the sprites such as mappings from sprite to character numbers, colors etc.   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_MetaData</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $00 - Metafile version num</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $01 - NCM mode enable ($00 fcm, >$00 ncm)</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} $02 - Number of sprites</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $04 - Sprite width in chars</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $05 - Sprite height in chars</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $06-$1f - Reserved for future use</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{table} $20+ - character index LSB table</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{table} $xx+ - character index MSB table</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{table} $xx+ - sprite color table</div></span>
+						
+						</div>
+					
 					</div><br>
 				<div class='macroHeader' id='Sprite_Vars'>Vars</div>
 			
@@ -2429,6 +2610,8 @@ h4 {
 					<div class='macroIndex'><a href='#Sprite_IOy'>IOy</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_SpriteIOLength'>SpriteIOLength</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_Sprite_SpritesetMetaTable'>Sprite_SpritesetMetaTable</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOcolor'>IOcolor</div>
@@ -2513,6 +2696,12 @@ h4 {
 						<div class='macroItemDescription'> The size in bytes of the IO registers for a single sprite   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_SpriteIOLength</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_Sprite_SpritesetMetaTable'>Sprite_SpritesetMetaTable</div>
+						<div class='macroItemDescription'> Pointer to the lookup table for the spritesets meta data tables </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_Sprite_SpritesetMetaTable</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='System'><span><h4>Namespace<h2>System</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#System_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#System_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#System_Data'><div class='sectionButton'>Data</div></a></span>

@@ -1,5 +1,34 @@
-.var Sprite_SpriteList = Hashtable()
+.var Sprite_SpriteList = List()
 
+
+/**
+* .data MetaData
+*
+* This is a byte array used by the engine when Asset_ImportSprites and Asset_ImportSpritesMeta is used to store all the
+* meta data for the sprites such as mappings from sprite to character numbers, colors etc. 
+* 
+* @namespace Sprite
+* 
+* @addr {byte} $00 Metafile version num
+* @addr {byte} $01 NCM mode enable ($00 fcm, >$00 ncm)
+* @addr {word} $02 Number of sprites
+* @addr {byte} $04 Sprite width in chars
+* @addr {byte} $05 Sprite height in chars
+* @addr {byte} $06-$1f Reserved for future use
+* @addr {table} $20+ character index LSB table
+* @addr {table} $xx+ character index MSB table
+* @addr {table} $xx+ sprite color table
+*/
+.var Sprite_MetaData = List()
+
+
+/**
+* .var Sprite_SpritesetMetaTable
+*
+* Pointer to the lookup table for the spritesets meta data tables
+* @namespace Sprite
+*/
+.var Sprite_SpritesetMetaTable = $0000
 
 /**
 * .var SpriteIOLength
