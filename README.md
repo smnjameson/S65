@@ -15,7 +15,7 @@ Once you have met the prerequisites below you can install the toolkit by running
 
 ## Running the HelloWorld
 
-By default the framework is setup such that with main.s open if you press F8 it will assemble and start to deploy. If you get an error about connection refused, its because you dont have M65Debugger open. If you want to change the deploy method you can change the last line in make.bat
+By default the framework is setup such that with main.s open if you press F8 it will assemble and start to deploy. If you get an error about connection refused (ECONNREFUSED), its because you dont have M65Debugger open. If you want to change the deploy method you can change the last line in make.bat
 
 ```
 node build\m65debugger\client.js ./bin/main.prg
