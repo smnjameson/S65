@@ -10,6 +10,10 @@ class CustomCompletionListener(sublime_plugin.EventListener):
     def on_query_completions(self, view, prefix, locations):
         return ([], sublime.INHIBIT_WORD_COMPLETIONS )    
 
+class DeployAssetsAndBuildCommand(sublime_plugin.TextCommand): 
+   def run(self, edit):
+      self.view.window().run_command('exec', {'cmd': ["make.bat", "DEPLOY"]})
+
 
 
 class RunTestsCommand(sublime_plugin.TextCommand):

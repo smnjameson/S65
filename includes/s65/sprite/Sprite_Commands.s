@@ -6,7 +6,7 @@
 * pointer to that sprites IO area in 
 * <a href="#S65_LastSpriteIOPointer">S65_LastSpriteIOPointer</a><br><br>
 * Note: This method will also call <a href="#S65_SetBasePage">S65_SetBasePage</a> which 
-* is required for the Sprite functions
+* is required for the subsequent Sprite functions
 * 
 * @namespace Sprite
 * @param {byte} {IMM} layerNum The layer to get sprite from, note if this is NOT an RRB layer writing to addresses pointed to by S65_LastSpriteIOPointer can cause crashes and corruption
@@ -74,7 +74,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 * .pseudocommand SetFlags
 *
 * Sets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65
-* to abstract the values
+* to abstract the values. The other flags are left untouched
 * 
 * @namespace Sprite
 * @param {byte} {IMM|REG|ABS} flags Sprite flags
@@ -92,10 +92,42 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 				lda #flags.getValue()
 			}
 			ldy #[Sprite_IOflags]
+			ora (S65_LastSpriteIOPointer), y
 			sta (S65_LastSpriteIOPointer), y
 	pla
 	ply
 	S65_AddToMemoryReport("Sprite_SetFlags")	
+}
+
+/**
+* .pseudocommand ResetFlags
+*
+* Resets one or more of the currently selected sprites flags. You can use the <a href="#Sprite_IOflagEnabled">flag constants</a> provided by S65
+* to abstract the values. The other flags are left untouched
+* 
+* @namespace Sprite
+* @param {byte} {IMM|REG|ABS} flags Sprite flags
+* @flags nz 
+*/
+.pseudocommand Sprite_ResetFlags flags {
+	S65_AddToMemoryReport("Sprite_ResetFlags")
+	.if(!_isReg(flags) && !_isImm(flags)) .error "Sprite_SetFlags:"+ S65_TypeError
+	_saveIfReg(flags,	S65_PseudoReg + 1)	
+	phy
+	pha	
+			lda #$ff
+			sec
+			.if(_isReg(flags)) {
+				sbc.z S65_PseudoReg + 1
+			} else {
+				sbc #flags.getValue()
+			}
+			ldy #[Sprite_IOflags]
+			and (S65_LastSpriteIOPointer), y
+			sta (S65_LastSpriteIOPointer), y
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_ResetFlags")	
 }
 
 /**
@@ -542,6 +574,195 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	ply
 	S65_AddToMemoryReport("Sprite_GetColor")	
 }
+
+
+
+/**
+* .pseudocommand SetSpriteMeta
+*
+* Enables the currently selected sprite and popualtes its IO registers with the meta data for
+* the given spriteset index. Affects:<br>
+* - IOflags (Enabled, NCM)<br>
+* - IOwidth<br>
+* - IOheight<br>
+* - IOptr<br>
+* - IOcolor<br>
+* 
+* @namespace Sprite
+*
+* @param {byte} {IMM} spritesId The spriteset index retrieved from Sprite_GetSprites
+* @param {byte} {IMM|REG|ABSXY} spriteNum The sprite index from the spriteset (ordered left to right, top to bottom)
+
+* @flags nzc
+*/
+.pseudocommand Sprite_SetSpriteMeta spritesId : spriteNum {
+	S65_AddToMemoryReport("Sprite_SetSprite")
+	pha
+	phy
+		.if(spritesId.getValue() > S65_SPRITESET_LIMIT) .error "Sprite_SetSprite: spritesId must be between 0 and "+(S65_SPRITESET_LIMIT-1)
+		.if(!_isImm(spritesId)) .error "Sprite_SetSprite: "+S65_TypeError
+		.if(!_isImm(spriteNum) && !_isReg(spriteNum) && !_isAbs(spriteNum) && !_isAbsXY(spriteNum)) .error "Sprite_SetSprite: "+S65_TypeError
+
+		_saveIfReg(spriteNum, S65_PseudoReg + 0)
+
+
+		//We can use preloaded sprite meta data
+		.if(spritesId.getValue() < Asset_SpriteList.size() &&
+			_isImm(spriteNum) && !_isReg(spriteNum)) {
+
+					.var meta = Asset_SpriteList.get(spritesId.getValue()).get("meta")
+					.var numSprites = meta.get($02) + meta.get($03) * $100
+					.var isNcm = meta.get($01)!=0
+					//FLAGS
+					lda #[Sprite_IOflagEnabled | [isNcm ? Sprite_IOflagNCM : 0]]
+
+					ldy #[Sprite_IOflags]
+					sta (S65_LastSpriteIOPointer), y
+
+					//POINTER
+					lda #meta.get($20 + numSprites * 0 + spriteNum.getValue())		
+					ldy #[Sprite_IOptr]
+					sta (S65_LastSpriteIOPointer), y
+					lda #meta.get($20 + numSprites * 1 + spriteNum.getValue())	
+					iny 
+					sta (S65_LastSpriteIOPointer), y	
+
+					//DIMENSIONS
+					iny
+					lda #meta.get($04)
+					sta (S65_LastSpriteIOPointer), y
+					iny
+					lda #meta.get($05)
+					sta (S65_LastSpriteIOPointer), y	
+
+					.if(isNcm) {
+					//COLOR only req for ncm
+						iny
+						lda #meta.get($20 + numSprites * 2 + spriteNum.getValue())	
+						sta (S65_LastSpriteIOPointer), y
+					} 
+					// else {
+					// 	iny
+					// 	lda #$00
+					// 	sta (S65_LastSpriteIOPointer), y
+					// }											
+		} else {
+					//We must instead use lookup tables for meta data
+					.const SprMETA = S65_TempWord1
+					.const NumSPRITE = S65_TempWord2
+
+					lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 0]
+					sta.z SprMETA + 0 
+					lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 1]
+					sta.z SprMETA + 1				
+					
+					.if(_isReg(spriteNum)) {
+						lda S65_PseudoReg + 0
+					}  else {
+						lda spriteNum
+					}
+					jsr _Sprite_SetSpriteMeta.SetData
+		}
+	ply
+	pla
+	S65_AddToMemoryReport("Sprite_SetSprite")
+}
+_Sprite_SetSpriteMeta: {
+		.const SprMETA = S65_TempWord1
+		.const NumSPRITE = S65_TempWord2	
+
+		SetData: {
+					//Pass sprite index in A
+					sta SpriteIndex
+					//FLAGS
+					ldy #$01
+					lda (SprMETA), y //NCM mode?
+					pha
+					beq !+
+					lda #[Sprite_IOflagNCM]
+				!:
+					ora #[Sprite_IOflagEnabled]
+					ldy #[Sprite_IOflags]
+					sta (S65_LastSpriteIOPointer), y
+
+
+					//DIMENSIONS
+					ldy #$04
+					lda (SprMETA), y //width
+					ldy #[Sprite_IOwidth]
+					sta (S65_LastSpriteIOPointer), y
+
+					ldy #$05
+					lda (SprMETA), y //height
+					ldy #[Sprite_IOheight]
+					sta (S65_LastSpriteIOPointer), y	
+
+
+					//POINTER
+					ldy #$02
+					lda (SprMETA), y //numsprLo
+					sta.z NumSPRITE + 0 
+					iny
+					lda (SprMETA), y //numsprHi
+					sta.z NumSPRITE + 1
+
+					jsr _Sprite_SetSpriteMeta.AdvanceToTables
+
+					ldy SpriteIndex:#$00
+					lda (SprMETA), y //PtrLo
+					ldy #[Sprite_IOptr + 0]
+					sta (S65_LastSpriteIOPointer), y
+
+
+					jsr _Sprite_SetSpriteMeta.AdvanceToNextTable
+
+					ldy SpriteIndex
+					lda (SprMETA), y //PtrHi
+					ldy #[Sprite_IOptr + 1]
+					sta (S65_LastSpriteIOPointer), y
+
+					pla //NCM mode?
+					beq !+
+					jsr _Sprite_SetSpriteMeta.AdvanceToNextTable
+					//COLOR
+					ldy SpriteIndex
+					lda (SprMETA), y //PtrColor
+					ldy #[Sprite_IOcolor]
+					sta (S65_LastSpriteIOPointer), y
+				!:
+					rts			
+		}
+
+		AdvanceToTables: {
+			clc 
+			lda.z SprMETA + 0
+			adc #[$20]
+			sta.z SprMETA + 0
+			lda.z SprMETA + 1
+			adc #[$00]
+			sta.z SprMETA + 1	
+			rts
+		}
+
+		AdvanceToNextTable: {
+			clc 
+			lda.z SprMETA + 0
+			adc.z NumSPRITE + 0 
+			sta.z SprMETA + 0
+			lda.z SprMETA + 1
+			adc.z NumSPRITE + 1
+			sta.z SprMETA + 1
+			rts
+		}
+}
+
+
+
+
+
+
+
+
 
 
 

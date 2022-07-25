@@ -109,22 +109,26 @@
 * @param {word} {ABS} addr Pointer to the filename in CAPITALS and zero terminated
 * @flags nzc
 */
-.pseudocommand Palette_LoadFromSD paletteNum : addr {
+.pseudocommand Palette_LoadFromSD addr {
 	S65_AddToMemoryReport("Palette_LoadFromSD")
-	.if(!_isImm(paletteNum) || !_isAbs(addr) ) .error "Palette_LoadFromSD:"+S65_TypeError
+	.if(!_isAbs(addr) ) .error "Palette_LoadFromSD:"+S65_TypeError
 	S65_SaveRegisters()
-		SDCard_LoadToChipRam $d100 : addr
+		SDCard_LoadToChipRam Palette_SDBuffer : addr
+		jsr _CopyPaletteFromBuffer
+	S65_RestoreRegisters()
+	S65_AddToMemoryReport("Palette_LoadFromSD")
+}
 
+_CopyPaletteFromBuffer: {
 		ldx #$00
 	!:
-		lda addr.getValue(), x 
+		lda Palette_SDBuffer, x 
 		sta $d100, x
-		lda addr.getValue() + $100, x 
+		lda Palette_SDBuffer + $100, x 
 		sta $d200, x
-		lda addr.getValue() + $200, x 
+		lda Palette_SDBuffer + $200, x 
 		sta $d300, x
 		inx
 		bne !-
-	S65_RestoreRegisters()
-	S65_AddToMemoryReport("Palette_LoadFromSD")
+		rts
 }

@@ -17,8 +17,14 @@
  * @date       13/07/2022
  */
 .cpu _45gs02
-.const S65_MAX_LAYERS = $10
 
+//Constants for limits on various objects
+.const S65_MAX_LAYERS = $10
+.const S65_SPRITESET_LIMIT = $10
+
+* = $1400 "SDCard Palette Buffer"
+.const Palette_SDBuffer = *
+	.fill 768,0
 * = $2001 "S65 BasicUpstart"
 System_BasicUpstart65(S65_InitComplete)
 * = $2016 "S65 Base page area"
@@ -161,13 +167,7 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpriteRowTablePtr:	.word $0000
 			S65_SpriteFlags:	.byte $00
 
-/**
-* .var LastImportPtr
-*
-* {dword} S65 Basepage pointer that contains the address at which the last S65_Import
-* macro finished importing
-*/
-			S65_LastImportPtr:		.dword $00000000
+
 
 /** 
  * .var ReturnValue
@@ -214,7 +214,7 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/s65.s"
 #import "includes/s65/layer.s"
 #import "includes/s65/sprite.s"
-
+#import "includes/s65/asset.s"
 #import "includes/s65/system.s"
 #import "includes/s65/dma.s"
 #import "includes/s65/palette.s"

@@ -10,8 +10,11 @@
  * @flags izc
  */
 .pseudocommand SDCard_LoadToChipRam addr : filePtr {
+	.if(!_isAbs(addr) && !_isReg(filePtr)) .error "SDCard_LoadToChipRam:"+ S65_TypeError
 	S65_AddToMemoryReport("SDCard_LoadToChipRam")
 	S65_SaveRegisters()
+
+.print ("filePtr.getValue(): $" + toHexString(filePtr.getValue()))
 		lda #>filePtr.getValue()
 		ldx #<filePtr.getValue()
 		jsr SDIO.CopyFileName
@@ -20,9 +23,7 @@
 		ldy #>addr.getValue()
 		ldz #[[addr.getValue() & $ff0000] >> 16]
 
-		lda #HVC_SD_TO_CHIPRAM
-		sta $d640 
-		nop
+		jsr SDIO.LoadChip
 	S65_RestoreRegisters()
 	S65_AddToMemoryReport("SDCard_LoadToChipRam")
 }
@@ -39,19 +40,27 @@
  * @flags izc
  */
 .pseudocommand SDCard_LoadToAtticRam addr : filePtr {
+	.if(!_isAbs(addr) && !_isReg(filePtr)) .error "SDCard_LoadToAtticRam:"+ S65_TypeError
 	S65_AddToMemoryReport("SDCard_LoadToChipRam")
 	S65_SaveRegisters()	
-		lda #>filePtr.getValue()
-		ldx #<filePtr.getValue()
+
+		lda #>filePtr 
+		ldx #<filePtr 
+		jsr SDIO.CopyFileName
+
+		ldx #<addr
+		ldy #>addr
+		ldz #[[addr & $ff0000] >> 16]
+
+		ldx #>filePtr.getValue()
+		ldy #<filePtr.getValue()
 		jsr SDIO.CopyFileName
 
 		ldx #<addr.getValue()
 		ldy #>addr.getValue()
 		ldz #[[addr.getValue() & $ff0000] >> 16]
 
-		lda #HVC_SD_TO_ATTICRAM
-		sta $d640 
-		nop
+		jsr SDIO.LoadAttic
 	S65_RestoreRegisters()
 	S65_AddToMemoryReport("SDCard_LoadToChipRam")		
 }
@@ -60,6 +69,7 @@ SDIO: {
 	CopyFileName: {
 		sta FileName + 1
 		stx FileName + 0
+
 		ldx #$00
 	!:
 		lda FileName:$BEEF, x 
@@ -67,12 +77,41 @@ SDIO: {
 		inx
 		bne !-
 
-		//Make hypervisor call to set filename to load
 		ldx #<SDFILENAME
 		ldy #>SDFILENAME
 		lda #$2e	
 		sta $d640 
 		nop
+		bcs !success+
+		jmp SDIO.Error
+	!success:
 		rts
 	}
+	LoadAttic: {
+		lda #HVC_SD_TO_ATTICRAM
+		sta $d640 
+		nop
+		bcs !success+
+		jmp SDIO.Error
+	!success:		
+		rts		
+	}
+	LoadChip: {
+		lda #HVC_SD_TO_CHIPRAM
+		sta $d640 
+		nop
+		bcs !success+
+		jmp SDIO.Error
+	!success:
+		rts		
+	}
+
+	Error: {
+		lda #$38
+		sta $d640
+		clv 
+		inc $d020
+		jmp *-3
+	}
+
 }

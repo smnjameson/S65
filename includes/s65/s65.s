@@ -40,6 +40,14 @@
 */
 .var 		S65_SCREEN_TERMINATOR_OFFSET = 0
 
+/**
+* .var LastImportPtr
+*
+* Contains the address at which the last Asset_Import
+* macro finished importing. Useful for chaining imports together
+*/
+.var  S65_LastImportPtr = 0
+
 
 /**
  * .macro Trace
@@ -197,3 +205,5 @@ _S65_SetBasePage: {
         .eval _MemoryReport.get(name).put("start", 0)
     }
 }
+
+

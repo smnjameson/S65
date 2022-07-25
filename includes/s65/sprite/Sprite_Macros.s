@@ -1,6 +1,7 @@
 /**
 * .macro GenerateLayerData
-*
+* Internally used macro for assigning sprite IO area during a 
+* <a href="#Layer_InitScreen">Layer_InitScreen</a>
 * @namespace Sprite
 */
 .macro Sprite_GenerateLayerData(layerNum) {
@@ -47,5 +48,24 @@
 	S65_Trace("      Register dimensions $"+toHexString(count)+ " x $"+toHexString((*-startAddr)/count))	
 }
 
+
+/**
+* .macro GenerateMetaData
+*
+* Internally used to generate the runtime lookup tables for sprite meta data
+* 
+* @namespace Sprite
+*/
+.macro Sprite_GenerateMetaData() {
+		.for(var i=0; i<Asset_SpriteList.size(); i++) {
+			.var spriteSheet = Asset_SpriteList.get(i)
+			.var data = spriteSheet.meta
+			.var offset = spriteSheet.address / $40
+			.var numSprites = data.get($02) + data.get($03) * $100
+
+			.eval spriteSheet.metaAddress = *
+			.fill data.size(), data.get(i)
+		}
+}
 
 

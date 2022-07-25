@@ -23,6 +23,18 @@ let comments = {
 
 let openCount = 0
 let cssData = null
+
+let completions = {
+	"scope": "source.assembly.kickassembler",
+	"completions": []
+}
+
+let keywords = []
+let funcs=[]
+let macs=[]
+let vars=[]
+let structkeys = []
+
 //fetch css first
 fs.readFile('./build/theme.css', {}, (err, data)=> {
 	cssData = data.toString()
@@ -105,7 +117,7 @@ function checkForLinks(category, param) {
 	}
 }
 
-function addParams(trim) {
+function addParams(trim, structName) {
 	let type = trim.shift()
 	let name = trim.shift()
 	let support = ''
@@ -119,12 +131,24 @@ function addParams(trim) {
 	}
 	let description = trim.join(' ')
 
+	
+	if(structName) {
+		structkeys.push(name)
+		completions.completions.push({
+            "trigger": name,
+            "annotation": `${structName}`,
+            "kind": "snippet"
+		})	
+	}
+
 	currentComment.params.push({
 		type,
 		name,
 		description,
 		support
-	})
+	})	
+
+
 }
 
 function addReturnVals(trim) {
@@ -224,52 +248,55 @@ function onLine(line) {
   			currentComment.category = trim
 			comments[currentComment.category] = comments[currentComment.category] || emptyCategory()
 
-  		//Object macro params
-  		} else if(trim.substr(0,8) == "* @param") {
-  			trim = trim.substr(8).trim().split(" ")
-  			addParams(trim)
+	  		//Object macro params
+	  		} else if(trim.substr(0,8) == "* @param") {
+	  			trim = trim.substr(8).trim().split(" ")
+	  			addParams(trim)
 
-  		//Object macro params
-  		} else if(trim.substr(0,7) == "* @item") {
-  			trim = trim.substr(7).trim().split(" ")
-  			addParams(trim)
+	  		//Object macro params
+	  		} else if(trim.substr(0,7) == "* @item") {
+	  			trim = trim.substr(7).trim().split(" ")
+	  			addParams(trim)
 
-  		//Object hashtable keys
-  		} else if(trim.substr(0,6) == "* @key") {
-  			trim = trim.substr(6).trim().split(" ")
-  			addParams(trim)
+	  		//Object hashtable keys
+	  		} else if(trim.substr(0,6) == "* @key") {
+	  			trim = trim.substr(6).trim().split(" ")
+	  			addParams(trim)
 
-  		//Object data addr
-  		} else if(trim.substr(0,7) == "* @addr") {
-  			trim = trim.substr(7).trim().split(" ")
-  			addParams(trim)
+	  		//Object data addr
+	  		} else if(trim.substr(0,7) == "* @addr") {
+	  			trim = trim.substr(7).trim().split(" ")
+	  			addParams(trim)
 
 
+	  		//Object register effects
+	  		} else if(trim.substr(0,12) == "* @registers") {
+	  			trim = trim.substr(12).trim()
+	  			currentComment.registers = trim.split('')
 
-  		//Object register effects
-  		} else if(trim.substr(0,12) == "* @registers") {
-  			trim = trim.substr(12).trim()
-  			currentComment.registers = trim.split('')
+	  		//Object flag effects
+	  		} else if(trim.substr(0,8) == "* @flags") {
+	  			trim = trim.substr(8).trim()
+	  			currentComment.flags = trim.split('')
 
-  		//Object flag effects
-  		} else if(trim.substr(0,8) == "* @flags") {
-  			trim = trim.substr(8).trim()
-  			currentComment.flags = trim.split('')
+	  		//Object returns effects
+	  		} else if(trim.substr(0,9) == "* @setreg") {
+	  			trim = trim.substr(9).trim().split(" ")
+	  			addReturns(trim)
 
-  		//Object returns effects
-  		} else if(trim.substr(0,9) == "* @setreg") {
-  			trim = trim.substr(9).trim().split(" ")
-  			addReturns(trim)
+	  		//Object returns effects
+	  		} else if(trim.substr(0,10) == "* @returns") {
+	  			trim = trim.substr(10).trim().split(" ")
+	  			addReturnVals(trim)
 
-  		//Object returns effects
-  		} else if(trim.substr(0,10) == "* @returns") {
-  			trim = trim.substr(10).trim().split(" ")
-  			addReturnVals(trim)
+	  		//Struct info
+	  		} else if(trim.substr(0,9) == "* @struct") {
+	  			trim = trim.substr(9).trim().split(" ")
+	  			addParams(trim, currentComment.category+"_"+currentComment.name)
+
 
   		//ignore unknown tags
   	  	} else if(trim.substr(0,3) == "* @") {
-
-
   		//Otherwise assume part of the description
   		} else {
   			currentComment.description += trim.substr(2) + " "
@@ -303,15 +330,7 @@ function onClose(line){
 		<body>
 	`;
 
-	let completions = {
-    	"scope": "source.assembly.kickassembler",
-    	"completions": []
-	}
 
-	let keywords = []
-	let funcs=[]
-	let macs=[]
-	let vars=[]
 
 	let lastCategory = ""
 	let sortedCategorys = Object.keys(comments).sort();

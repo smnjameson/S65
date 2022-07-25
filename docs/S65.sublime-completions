@@ -2,6 +2,76 @@
     "scope": "source.assembly.kickassembler",
     "completions": [
         {
+            "trigger": "id",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "name",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "address",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "metaAddress",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "meta",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "palette",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "indices",
+            "annotation": "Asset_Spriteset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "id",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "name",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "address",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "colorAddress",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "palette",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "colors",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "indices",
+            "annotation": "Asset_Charset",
+            "kind": "snippet"
+        },
+        {
             "trigger": "S65_AddToMemoryReport",
             "annotation": "name",
             "contents": "S65_AddToMemoryReport(${1:name})",
@@ -65,27 +135,33 @@
         },
         {
             "trigger": "S65_ColorRamPointer",
-            "annotation": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
+            "annotation": "{dword} S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+            "details": "{dword} S65 BasePage pointer into color ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the color ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br> Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+        },
+        {
+            "trigger": "S65_LastImportPtr",
+            "annotation": "Contains the address at which the last Asset_Import macro finished importing. Useful for chaining imports together",
+            "kind": "snippet",
+            "details": "Contains the address at which the last Asset_Import macro finished importing. Useful for chaining imports together"
         },
         {
             "trigger": "S65_LastLayerIOPointer",
-            "annotation": "S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>",
+            "annotation": "{word} S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>"
+            "details": "{word} S65 BasePage pointer into to the IO data for the last layer that was fetched using <a href=\"#Layer_Get\">Layer_Get</a>"
         },
         {
             "trigger": "S65_LastSpriteIOPointer",
-            "annotation": "S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>",
+            "annotation": "{word} S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>"
+            "details": "{word} S65 BasePage pointer into to the IO data for the last sprite that was fetched using <a href=\"#Sprite_Get\">Sprite_Get</a>"
         },
         {
             "trigger": "S65_ReturnValue",
-            "annotation": "S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte.",
+            "annotation": "{word} S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte.",
             "kind": "snippet",
-            "details": "S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte."
+            "details": "{word} S65 BasePage value that is used as a return for many commands when the result is a word rather than a byte."
         },
         {
             "trigger": "S65_SCREEN_LOGICAL_ROW_WIDTH",
@@ -113,15 +189,15 @@
         },
         {
             "trigger": "S65_ScreenRamPointer",
-            "annotation": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
+            "annotation": "{dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
             "kind": "snippet",
-            "details": "S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
+            "details": "{dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes."
         },
         {
             "trigger": "S65_SpareBasePage",
-            "annotation": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page",
+            "annotation": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in S65 base page",
             "kind": "snippet",
-            "details": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in base page"
+            "details": "16 bytes of spare storage free for use when the S65 base page is active to assist with using commands that expect to be in S65 base page"
         },
         {
             "trigger": "S65_VISIBLE_SCREEN_CHAR_HEIGHT",
@@ -134,6 +210,66 @@
             "annotation": "Width of the visible screen background layer in characters",
             "kind": "snippet",
             "details": "Width of the visible screen background layer in characters"
+        },
+        {
+            "trigger": "Asset_ImportCharset",
+            "annotation": "name,charpath,address",
+            "contents": "Asset_ImportCharset(${1:name}, ${2:charpath}, ${3:address})",
+            "kind": "snippet",
+            "details": "Helper function to preload the _chars file generated by png65 into a given address and load the _ncm file <br> When loading using these imports you only need the first part of the path and file name. eg<br><br> Asset_ImportCharset(\"map\",\"assets/bin/tileset1\", $8000)<br><br> Will load both the \"assets/bin/tileset1_chars.bin\" and the \"assets/bin/tileset1_ncm.s\" files. NOTE: MUST be called before the Layer_InitScreen"
+        },
+        {
+            "trigger": "Asset_ImportCharsetPalette",
+            "annotation": "name",
+            "contents": "Asset_ImportCharsetPalette(${1:name})",
+            "kind": "snippet",
+            "details": "Data generation macro that imports the full 256 color palette for the given charset name. The charset must be imported already otherwise this will fail."
+        },
+        {
+            "trigger": "Asset_ImportSpriteset",
+            "annotation": "name,charpath,address",
+            "contents": "Asset_ImportSpriteset(${1:name}, ${2:charpath}, ${3:address})",
+            "kind": "snippet",
+            "details": "Helper function to preload the sprites _chars file generated by png65 into a given address and load the _meta file <br> S65 provides space for up to 16 sprite set imports at any one time<br> When loading using these imports you only need the first part of the path and file name. eg<br><br> Asset_ImportSpriteset(\"player\",\"assets/bin/sprites1\", $8000)<br><br> Will load both the \"assets/bin/sprites1_chars.bin\" and the \"assets/bin/sprites1_meta.s\" files. NCM or FCM is determined from the metafile<br><br> NOTE: MUST be called before the Layer_InitScreen"
+        },
+        {
+            "trigger": "Asset_ImportSpritesetPalette",
+            "annotation": "name",
+            "contents": "Asset_ImportSpritesetPalette(${1:name})",
+            "kind": "snippet",
+            "details": "Data generation macro that imports the full 256 color palette for the given spriteset name. The spriteset must be imported already otherwise this will fail."
+        },
+        {
+            "trigger": "Asset_GetCharset",
+            "annotation": "name",
+            "contents": "Asset_GetCharset(${1:name})",
+            "kind": "snippet",
+            "details": "This method returns the charset object containing all the vars needed to perform many operations.<br><br>  id - The numerical id of the charset assigned by Asset_ImportCharset name - The name of the spriteset<br> address - The start address for the spriteset char data <br> colorAddress - The start address for the colro table if present<br> palette - A {List} of bytes containign the palette data <br> colors - A {List} of bytes containign the ncm color mapping data <br>"
+        },
+        {
+            "trigger": "Asset_GetSpriteset",
+            "annotation": "name",
+            "contents": "Asset_GetSpriteset(${1:name})",
+            "kind": "snippet",
+            "details": "Sprite sets are assigned numerical values from 0 to 15 in order as they are imported. This method returns the spriteset object containing all the vars needed to perform many operations, .id is used whenever referencing a spriteset in commands e.g. <a href=\"#Sprite_SetSpriteMeta\">Sprite_SetSpriteMeta</a><br><br>  id - The numerical id of the spriteset assigned by Asset_ImportSpriteset name - The name of the spriteset<br> address - The start address for the spriteset char data <br> metaAddress - The start address for the spriteset metadata <br> meta - A {List} of bytes containing the metadata<br> palette - A {List} of bytes containign the palette data <br>"
+        },
+        {
+            "trigger": "Asset_Charset",
+            "annotation": "The object returned by GetCharset",
+            "kind": "snippet",
+            "details": "The object returned by GetCharset"
+        },
+        {
+            "trigger": "Asset_Spriteset",
+            "annotation": "The object returned by GetSpriteset",
+            "kind": "snippet",
+            "details": "The object returned by GetSpriteset"
+        },
+        {
+            "trigger": "Asset_Asset_SpriteListMetaTable",
+            "annotation": "Pointer to the lookup table for the spritesets meta data tables",
+            "kind": "snippet",
+            "details": "Pointer to the lookup table for the spritesets meta data tables"
         },
         {
             "trigger": "DMA_CopyJob",
@@ -513,7 +649,7 @@
             "annotation": "layerNum:sprNum",
             "contents": "Sprite_Get ${1:layerNum} : ${2:sprNum}",
             "kind": "snippet",
-            "details": "This method is a prerequisite for getting or setting any sprites IO registers it sets the \"current active\" sprite used by the Sprite Get and Set methods by storing the pointer to that sprites IO area in <a href=\"#S65_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br> Note: This method will also call <a href=\"#S65_SetBasePage\">S65_SetBasePage</a> which is required for the Sprite functions"
+            "details": "This method is a prerequisite for getting or setting any sprites IO registers it sets the \"current active\" sprite used by the Sprite Get and Set methods by storing the pointer to that sprites IO area in <a href=\"#S65_LastSpriteIOPointer\">S65_LastSpriteIOPointer</a><br><br> Note: This method will also call <a href=\"#S65_SetBasePage\">S65_SetBasePage</a> which is required for the subsequent Sprite functions"
         },
         {
             "trigger": "Sprite_GetColor",
@@ -565,6 +701,13 @@
             "details": "Returns the Y position of the current selected sprite into <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
         },
         {
+            "trigger": "Sprite_ResetFlags",
+            "annotation": "flags",
+            "contents": "Sprite_ResetFlags ${1:flags}",
+            "kind": "snippet",
+            "details": "Resets one or more of the currently selected sprites flags. You can use the <a href=\"#Sprite_IOflagEnabled\">flag constants</a> provided by S65 to abstract the values. The other flags are left untouched"
+        },
+        {
             "trigger": "Sprite_SetColor",
             "annotation": "color",
             "contents": "Sprite_SetColor ${1:color}",
@@ -590,7 +733,7 @@
             "annotation": "flags",
             "contents": "Sprite_SetFlags ${1:flags}",
             "kind": "snippet",
-            "details": "Sets one or more of the currently selected sprites flags. You can use the <a href=\"#Sprite_IOflagEnabled\">flag constants</a> provided by S65 to abstract the values"
+            "details": "Sets one or more of the currently selected sprites flags. You can use the <a href=\"#Sprite_IOflagEnabled\">flag constants</a> provided by S65 to abstract the values. The other flags are left untouched"
         },
         {
             "trigger": "Sprite_SetPointer",
@@ -614,6 +757,13 @@
             "details": "Sets the current selected sprite Y position. If position is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
         },
         {
+            "trigger": "Sprite_SetSpriteMeta",
+            "annotation": "spritesId:spriteNum",
+            "contents": "Sprite_SetSpriteMeta ${1:spritesId} : ${2:spriteNum}",
+            "kind": "snippet",
+            "details": "Enables the currently selected sprite and popualtes its IO registers with the meta data for the given spriteset index. Affects:<br> - IOflags (Enabled, NCM)<br> - IOwidth<br> - IOheight<br> - IOptr<br> - IOcolor<br>"
+        },
+        {
             "trigger": "Sprite_Update",
             "annotation": "",
             "contents": "Sprite_Update ",
@@ -625,7 +775,14 @@
             "annotation": "",
             "contents": "Sprite_GenerateLayerData()",
             "kind": "snippet",
-            "details": ""
+            "details": "Internally used macro for assigning sprite IO area during a <a href=\"#Layer_InitScreen\">Layer_InitScreen</a>"
+        },
+        {
+            "trigger": "Sprite_GenerateMetaData",
+            "annotation": "",
+            "contents": "Sprite_GenerateMetaData()",
+            "kind": "snippet",
+            "details": "Internally used to generate the runtime lookup tables for sprite meta data"
         },
         {
             "trigger": "Sprite_GetIO",
@@ -635,10 +792,16 @@
             "details": "Returns the base address for the given layer & IO register.<br> See <a href='#Sprite_Vars'>Sprite_IO<a> for register list"
         },
         {
-            "trigger": "Sprite_IOcolor",
-            "annotation": "The color to apply to all the cahrs in this sprite",
+            "trigger": "Sprite_MetaData",
+            "annotation": "This is a byte array used by the engine when Asset_ImportSpriteset and Asset_ImportSpritesetMeta is used to store all the meta data for the sprites such as mappings from sprite to character numbers, colors etc.",
             "kind": "snippet",
-            "details": "The color to apply to all the cahrs in this sprite"
+            "details": "This is a byte array used by the engine when Asset_ImportSpriteset and Asset_ImportSpritesetMeta is used to store all the meta data for the sprites such as mappings from sprite to character numbers, colors etc."
+        },
+        {
+            "trigger": "Sprite_IOcolor",
+            "annotation": "The color to apply to all the chars in this sprite.",
+            "kind": "snippet",
+            "details": "The color to apply to all the chars in this sprite."
         },
         {
             "trigger": "Sprite_IOflagEnabled",
