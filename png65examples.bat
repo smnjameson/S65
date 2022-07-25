@@ -37,3 +37,14 @@ rem files output:
 rem     assets\bin\spritesncm_chars.bin			- The chars data
 rem     assets\bin\spritesncm_palette.bin			- The NCM sorted palette
 %PNG65% sprites --ncm --size 16,32 --input "assets\source\sprites.png" --output "assets\bin"
+
+
+rem Processes three spritesets combining the palettes as it goes
+rem by passing --nofill the palette generated is not padded out to 256 colors allowing
+rem the following calls to use --palette option to prepend the previous nonpadded palette to the new one
+rem the end result is the thrid palette here will contain all the palette for all three exports with 
+rem the char data adjusted to match. You then only need to import the final palette (in this case assets\bin\sprites3_palette.bin)
+rem for use with all three spritesets
+%PNG65% sprites --ncm --size 16,16 --input "assets\source\sprites1.png" --output "assets\bin" --nofill
+%PNG65% sprites --fcm --size 8,8 --input "assets\source\sprites2.png" --output "assets\bin" --nofill --palette "assets\bin\sprites1_palette.bin"
+%PNG65% sprites --ncm --size 16,16 --input "assets\source\sprites3.png" --output "assets\bin" --palette "assets\bin\sprites2_palette.bin"
