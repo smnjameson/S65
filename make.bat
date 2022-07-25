@@ -1,38 +1,34 @@
 @echo off
-rem MAKE SURE NODE IS INSTALLED
-WHERE node.exe >nul
-IF %ERRORLEVEL% NEQ 0 (
-	echo NodeJS is not installed please install from https://nodejs.org/en/
-	exit /B 1	
-) else (
-	echo Found NodeJS...
-)
-cd build\aseparse65
-call npm install >nul
-cd ..\..
-cd build\m65debugger
-call npm install >nul
-cd ..\..
+rem Set this to match you COM port in Debugger
+set SERIAL=COM6
+rem Your path to the S65 Library
+set S65PATH=..\Shallan65
 
-rem echo GENERATING DOCS
-rem node build/gendocs ./includes/S65/start.s ./docs
-set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages\User"
-copy .\docs\S65*.* %SUBLIME_PACKAGES%
-set KICK=java -cp build\kickass.jar kickass.KickAssembler65CE02 -vicesymbols -showmem
-set PNG65=node build\aseparse65\png65.js
+set KICK=java -cp %S65PATH%\build\kickass.jar kickass.KickAssembler65CE02 -vicesymbols -showmem
+set PNG65=node %S65PATH%\build\aseparse65\png65.js
+set DEPLOY=node %S65PATH%\build\m65debugger\client.js
 
 
-rem echo GENERATING ASSETS
-rem NOT USED in the hello world, but left here for examples
-rem %PNG65% chars --fcm --input "assets\source\test5.png" --output "tests\assets\bin"
-rem %PNG65% chars --ncm --input "assets\source\test4.png" --output "tests\assets\bin"
+
+
+rem Do your asset building here
+echo GENERATING ASSETS
+rem %PNG65% sprites --ncm --size 16,16 --input "assets\source\sprites1.png" --output "assets\bin" --nofill
+rem %PNG65% sprites --fcm --size 8,8 --input "assets\source\sprites2.png" --output "assets\bin" --nofill --palette "assets\bin\sprites1_palette.bin"
+rem %PNG65% sprites --ncm --size 16,16 --input "assets\source\sprites3.png" --output "assets\bin" --palette "assets\bin\sprites2_palette.bin"
+rem %PNG65% chars --fcm --input "assets\source\tileset1.png" --output "assets\bin" --nofill
+rem %PNG65% chars --ncm --input "assets\source\tileset2.png" --output "assets\bin" --palette "assets\bin\tileset1_palette.bin"
+
 
 echo ASSEMBLING SOURCES...
-%KICK% main.s -odir ./bin
+%KICK% main.s -odir .\bin -libdir %S65PATH%
 
 echo DEPLOYING...
-rem Launch on HW using M65Debugger
-node build\m65debugger\client.js ./bin/main.prg
-
-rem Launch on Xemu 
-rem "C:\Program Files\xemu\xmega65.exe" -besure  -prg "./bin/main.prg"
+IF [%1]==[] GOTO NO_ARGUMENT
+	echo Deploy plus Assets to SDCard
+	%DEPLOY% %SERIAL% .\bin\main.prg  
+	GOTO DONE
+:NO_ARGUMENT
+	echo Deploy Without Assets
+	%DEPLOY% .\bin\main.prg
+:DONE
