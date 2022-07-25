@@ -78,6 +78,7 @@ function setOutputPath(pathName) {
 
 function getFCMData(png, palette) {
     let data = []
+    let highestCol = -1
     for(var y=0; y<png.height; y+=8) {
         for(var x=0; x<png.width; x+=8) {
             for(var r=0; r<8; r++) {
@@ -93,6 +94,7 @@ function getFCMData(png, palette) {
                         );
                     })
                     data.push(col)
+                    if(col > highestCol) highestCol = col
                 }
             }
         }
@@ -101,6 +103,16 @@ function getFCMData(png, palette) {
     return { data }
 }
 
+
+function trimFCMPalette(charData, pal) {
+    let data = []
+    let highestCol = -1
+    for(var i=0; i<charData.length; i++) {
+        if(charData.data[i] > highestCol) highestCol = charData.data[i]
+    }
+    console.log(highestCol, pal.length)
+    return pal
+}
 
 function sortFCMDataForSprites(png, sw, sh, palette, charData, isSprite) {
         let spriteData = {}
@@ -395,17 +407,17 @@ function getPaletteData(png) {
     console.log("Palette size: " + palette.length + " colors");
 
 
-    if (palette.length <256 && !argv.nofill) {
-        console.log("Padding to 256 colors")
-        while(palette.length <256) { 
-            palette.push({
-                red: 0,
-                green: 0,
-                blue: 0,
-                alpha: 0
-            });
-        }
-    }
+    // if (palette.length <256 && !argv.nofill) {
+    //     console.log("Padding to 256 colors")
+    //     while(palette.length <256) { 
+    //         palette.push({
+    //             red: 0,
+    //             green: 0,
+    //             blue: 0,
+    //             alpha: 0
+    //         });
+    //     }
+    // }
         
 
     let pal = { r: [], g: [], b: [] }
@@ -584,7 +596,7 @@ function fillPalette (palette) {
 }
 
 
-function appendPaletteFCM(palette, charData) {
+function appendPaletteFCM(palette, charData, isSprites) {
     let existingPalette = []
     let data = charData.data 
     let spriteData = charData.spriteData
@@ -645,10 +657,11 @@ function appendPaletteFCM(palette, charData) {
 }
 
 
-function appendPaletteNCM(palette, charData) {
+function appendPaletteNCM(palette, charData, isSprites) {
     let existingPalette = []
     let data = charData.data 
     let spriteData = charData.spriteData
+    let sliceOffset = 0
 
     existingPalette = fs.readFileSync(path.resolve(argv.palette), null)
         
@@ -657,7 +670,9 @@ function appendPaletteNCM(palette, charData) {
     let startIndex = Math.ceil(numCols / 16) * 16
 
     console.log(`Palette append: Existing ${numCols} from  ${startIndex}`)
-
+    if(!isSprites) {
+        sliceOffset = startIndex
+    }
     //put existing palette in place
     for(var i=0; i<startIndex; i++) {
         if(i<numCols) {
@@ -677,8 +692,10 @@ function appendPaletteNCM(palette, charData) {
             pal.b.push(palette.b[i])        
     }
 
-    for(var i=0; i<spriteData.colors.length; i++) {
-        spriteData.colors[i] += startIndex/16
+    if(isSprites) {
+        for(var i=0; i<spriteData.colors.length; i++) {
+            spriteData.colors[i] += startIndex/16
+        }
     }
     //now check every char and add a new color offset
     // let cnt = 0
@@ -688,7 +705,7 @@ function appendPaletteNCM(palette, charData) {
     pal.r.splice(256,pal.r.length)
     pal.g.splice(256,pal.g.length)
     pal.b.splice(256,pal.b.length)
-    return {pal, data, spriteData}
+    return {pal, data, spriteData, sliceOffset}
 }
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -713,6 +730,7 @@ async function runCharMapper(argv) {
     if(argv.fcm) {
         convertedPal = paletteData.pal
         charData = getFCMData(png, paletteData.palette)
+        // convertedPal = trimFCMPalette(charData, convertedPal)
     }
 
     if(argv.ncm) {
@@ -721,12 +739,36 @@ async function runCharMapper(argv) {
         paletteData = sortedPalette.paletteData
 
         convertedPal = paletteData.pal
+    }
 
+    let appendPal = null
+    if(argv.palette) {
+        
+        if(argv.ncm) {
+            appendPal = appendPaletteNCM(convertedPal, charData)
+        } else {
+            appendPal = appendPaletteFCM(convertedPal, charData)
+        }
+        if(!argv.nofill) {
+            convertedPal = fillPalette(appendPal.pal)
+        }  else {
+            convertedPal = appendPal.pal
+        }
+        charData.data = appendPal.data 
+        if(argv.ncm) charData.spriteData = appendPal.spriteData
+    }
+
+    if(argv.ncm){
         //save NCM color table
+        if(argv.palette) {
+            sortedPalette.charColors = sortedPalette.charColors.map(a => a+appendPal.sliceOffset)
+        }
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
     } else {
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from([]))
     }
+
+
     //SAVE PALETTE
     fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
     //SAVE CHARS
@@ -791,17 +833,12 @@ async function runSpriteMapper(argv) {
     }
 
 
-    if(argv.nofill) {
-        console.log("NOFILL")
-    }
-
-
     if(argv.palette) {
         let appendPal = null
         if(argv.ncm) {
-            appendPal = appendPaletteNCM(convertedPal, charData)
+            appendPal = appendPaletteNCM(convertedPal, charData, true)
         } else {
-            appendPal = appendPaletteFCM(convertedPal, charData)
+            appendPal = appendPaletteFCM(convertedPal, charData, true)
         }
         if(!argv.nofill) {
             convertedPal = fillPalette(appendPal.pal)
@@ -834,8 +871,6 @@ async function runSpriteMapper(argv) {
 
 
     fs.writeFileSync(path.resolve(outputPath, inputName+"_meta.bin"), Buffer.from(metaBuffer))
-    
-    
 
 
     //SAVE PALETTE

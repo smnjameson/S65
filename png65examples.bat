@@ -48,3 +48,9 @@ rem for use with all three spritesets
 %PNG65% sprites --ncm --size 16,16 --input "assets\source\sprites1.png" --output "assets\bin" --nofill
 %PNG65% sprites --fcm --size 8,8 --input "assets\source\sprites2.png" --output "assets\bin" --nofill --palette "assets\bin\sprites1_palette.bin"
 %PNG65% sprites --ncm --size 16,16 --input "assets\source\sprites3.png" --output "assets\bin" --palette "assets\bin\sprites2_palette.bin"
+
+rem Processes two tilesets spritesets combining the palettes as it goes
+rem by passing --nofill the palette generated is not padded out to 256 colors allowing
+rem the following calls to use --palette option to prepend the previous nonpadded palette to the new one
+%PNG65% chars --fcm --input "assets\source\tileset1.png" --output "assets\bin" --nofill
+%PNG65% chars --ncm --input "assets\source\tileset2.png" --output "assets\bin" --palette "assets\bin\tileset1_palette.bin"

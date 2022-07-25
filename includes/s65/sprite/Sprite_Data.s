@@ -4,7 +4,7 @@
 /**
 * .data MetaData
 *
-* This is a byte array used by the engine when Asset_ImportSprites and Asset_ImportSpritesMeta is used to store all the
+* This is a byte array used by the engine when Asset_ImportSpriteset and Asset_ImportSpritesetMeta is used to store all the
 * meta data for the sprites such as mappings from sprite to character numbers, colors etc. 
 * 
 * @namespace Sprite

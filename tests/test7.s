@@ -3,32 +3,38 @@
 // Sprite Asset pipeline test
 //////////////////////////////////////////////////
 
-#define NODEBUG
+// #define NODEBUG
 #import "includes/s65/start.s"
 	jmp Start 
 		//Safest to define all the data before your code to avoid assembler pass errors	
 
-		Asset_ImportSpriteset("player", "assets/bin/t6_sprites1", $8000)
-		Asset_ImportSpriteset("enemy", "assets/bin/t6_sprites2", S65_LastImportPtr)
-		Asset_ImportSpriteset("icons", "assets/bin/t6_sprites3", S65_LastImportPtr) //Carry on from above address
+		Asset_ImportSpriteset("player", "assets/bin/test7/sprites1", $6000)
+		Asset_ImportSpriteset("enemy", "assets/bin/test7/sprites2", S65_LastImportPtr)//Carry on from last asset import
+		Asset_ImportSpriteset("icons", "assets/bin/test7/sprites3", S65_LastImportPtr) //Carry on from last asset import
 		.const PlayerSprites = Asset_GetSpriteset("player")
 		.const EnemySprites = Asset_GetSpriteset("enemy")
 		.const IconSprites = Asset_GetSpriteset("icons")
 
+		Asset_ImportCharset("map", "assets/bin/test7/tileset1", S65_LastImportPtr) //Carry on from last asset import
+		Asset_ImportCharset("mapfg", "assets/bin/test7/tileset2", S65_LastImportPtr) //Carry on from last asset import
+		.const MapChars = Asset_GetCharset("map")
+		.const MapFGChars = Asset_GetCharset("mapfg")
+
 		paletteSpr:
-		Asset_ImportSpritesetPalette("icons")
-
-		message:
-		S65_Text16("multi layer sprite asset pipeline test")
-
+			Asset_ImportSpritesetPalette("icons")
 		palette:
-			.import binary "assets/bin/t6_tileset1_palette.bin"
-		testScreenChars:
-			.fill 20 * 8, [<[$280 + i], >[$280 + i]]
+			Asset_ImportCharsetPalette("mapfg")
+		message:
+			S65_Text16("multi asset palette merge pipeline test")
+		testScreen1Chars:
+			.fill 20 * 8, [<[MapChars.indices.get(0) + i], >[MapChars.indices.get(0)+ i]]
+		testScreen2Chars:
+			.fill 10 * 8, [<[MapFGChars.indices.get(0) + i], >[MapFGChars.indices.get(0) + i]]
 
 	Start:
-		.const BLANK = Asset_GetSpriteset("player").indices.get(0) - 1 //The char before a sprite is always blank
-		.const BRICK = $28c
+		.const BLANK = MapFGChars.indices.get(0) 
+		.const BRICK = MapFGChars.indices.get(6)
+
 		.const NUM_PLAYER_SPRITES = 100
 		.const NUM_ICON_SPRITES = 64
 	
@@ -36,12 +42,14 @@
 		Layer_DefineResolution(40, 28, false)		//Resolution
 
 		.const LYR_BG = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(40, 0, false) 
+		Layer_DefineScreenLayer(20, 0, true) 
 
 		.const LYR_SP1 = Layer_GetLayerCount()
 		Layer_DefineRRBSpriteLayer(32, NUM_PLAYER_SPRITES) 
 		.const LYR_LV = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(32, 0, false)  		
+		Layer_DefineScreenLayer(20, 0, false)  		
+		.const LYR_FG = Layer_GetLayerCount()
+		Layer_DefineScreenLayer(10, 0, true)  		
 		.const LYR_SP2 = Layer_GetLayerCount()
 		Layer_DefineRRBSpriteLayer(32, NUM_ICON_SPRITES) 
 		.const LYR_UI = Layer_GetLayerCount()
@@ -56,39 +64,43 @@
 		Palette_LoadFromMem paletteSpr : #$100
 
 
-		lda #$00 
+		lda #$ff 
 		sta $d020
 
 		//Clear layers
 		Layer_ClearAllLayers #BLANK
 		Layer_Get #LYR_BG
-		Layer_ClearLayer #BRICK : #$01
+		Layer_ClearLayer #BRICK : #$30
 
 		//Add some text to UI layer
 		Layer_Get #LYR_UI
-		Layer_AddText #1 : #14 : message : #$0f
+		Layer_AddText #1 : #14 : message : #$05
 
 
-		//Copy 8 rows of data from testScreenChars and testScreenColors to the
-		//screen and color ram 
+
+		//Now draw the char sets 
+		//Charset 1 - FCM
 		Layer_Get #LYR_LV
-		Layer_SetScreenPointersXY #0: #2 
+		Layer_SetScreenPointersXY #0: #3 		
+		ldy #$00 //Source offset
+		ldx #$00 
+	!rowloop:	
+			Layer_WriteToScreen testScreen1Chars,y  :  : #20 //FCM so leave color blank
+			Layer_AdvanceScreenPointers 
+		inx 
+		cpx #$08 //How many rows to draw
+		bne !rowloop-
 
-
-
-		//Now draw the char set 4 times slightly offset each time
-		ldz #$03
-	!charsetloop:
-			ldy #$00 //Source offset
-			ldx #$00 
-		!rowloop:	
-				Layer_WriteToScreen testScreenChars,y  :  : #$14
-				Layer_AdvanceScreenPointers 
-			inx 
-			cpx #$08 //How many rows to draw
-			bne !rowloop-
-		dez 
-		lbne !charsetloop-
+		Layer_Get #LYR_FG
+		Layer_SetScreenPointersXY #0: #16		
+		ldy #$00 //Source offset
+		ldx #$00 
+	!rowloop:	
+			Layer_WriteToScreen testScreen2Chars,y  :  MapFGChars.colorAddress,y : #10
+			Layer_AdvanceScreenPointers 
+		inx 
+		cpx #$08 //How many rows to draw
+		bne !rowloop-
 
 
 		//Add some RRB sprites
@@ -179,13 +191,6 @@
 
  	System_BorderDebug($ff)
 	jmp !mainloop-
-
-
+	
 S65_MemoryReport()
 
-// *=$8000
-// 	.import binary "assets/bin/sprites1_chars.bin"
-// *=$9000
-// 	.import binary "assets/bin/tileset1_chars.bin"
-*=$a000
-	.import binary "assets/bin/t6_tileset1_chars.bin"
