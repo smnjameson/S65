@@ -6,6 +6,6 @@ echo ASSEMBLING SOURCES...
 %KICK% %1.s -libdir ..\ -odir bin
 
 echo TEST %1 DEPLOYING...
-node ..\build\m65debugger\client.js bin\%1.prg
+node ..\build\m65debugger\client.js bin\main.prg
 
 

@@ -1,6 +1,6 @@
 @echo off
 rem MAKE SURE NODE IS INSTALLED
-set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages\User"
+set SUBLIME_PACKAGES="%APPDATA%\Sublime Text\Packages"
 WHERE node.exe >nul
 IF %ERRORLEVEL% NEQ 0 (
 	echo NodeJS is not installed please install from https://nodejs.org/en/
@@ -16,7 +16,10 @@ call npm install >nul
 cd ..\..
 
 echo Copying sublime files
-copy .\docs\S65*.* %SUBLIME_PACKAGES%
+mkdir %SUBLIME_PACKAGES%\S65
+copy .\docs\S65*.* %SUBLIME_PACKAGES%\User
+copy .\docs\Default.sublime-keymap %SUBLIME_PACKAGES%\S65
+
 
 echo .
 echo Installation complete

@@ -25,7 +25,7 @@ for %%i in (%cd%\*.s) do (
     %KICK% %%~ni.s -libdir ..\ -odir bin
 
     echo TEST %%~ni DEPLOYING...
-    node ..\build\m65debugger\client.js bin\%%~ni.prg
+    node ..\build\m65debugger\client.js bin\main.prg
 
     pause
 )

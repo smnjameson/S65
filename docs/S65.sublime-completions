@@ -240,6 +240,13 @@
             "details": "Data generation macro that imports the full 256 color palette for the given spriteset name. The spriteset must be imported already otherwise this will fail."
         },
         {
+            "trigger": "Asset_Preload",
+            "annotation": "",
+            "contents": "Asset_Preload()",
+            "kind": "snippet",
+            "details": "Internal macro used to preload assets when imports have been done at or above $f000. Before initialisation any preloaded assets get loaded here"
+        },
+        {
             "trigger": "Asset_GetCharset",
             "annotation": "name",
             "contents": "Asset_GetCharset(${1:name})",

@@ -8,3 +8,5 @@ build/m65debugger/package-lock.json
 build/m65debugger/node_modules/
 bin/main.prg
 bin/main.vs
+bin/sdcard/
+splash/

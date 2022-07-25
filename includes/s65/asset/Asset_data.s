@@ -31,6 +31,7 @@
 
 .var Asset_CharList = List()
 .var Asset_SpriteList = List()
+.var Asset_PreloaderList = List()
 
 /**
 * .var Asset_SpriteListMetaTable
@@ -41,3 +42,25 @@
 .var Asset_SpriteListMetaTable = $0000
 
 
+
+/*
+ * Segment definitions to enable the preloader system
+ */
+.macro Asset_PreloaderFetchSegment(num) {
+	.if(num==0) .segment Preload0 [outBin="./sdcard/P0"]
+	.if(num==1) .segment Preload1 [outBin="./sdcard/P1"]
+	.if(num==2) .segment Preload2 [outBin="./sdcard/P2"]
+	.if(num==3) .segment Preload3 [outBin="./sdcard/P3"]
+	.if(num==4) .segment Preload4 [outBin="./sdcard/P4"]
+	.if(num==5) .segment Preload5 [outBin="./sdcard/P5"]
+	.if(num==6) .segment Preload6 [outBin="./sdcard/P6"]
+	.if(num==7) .segment Preload7 [outBin="./sdcard/P7"]
+	.if(num==8) .segment Preload8 [outBin="./sdcard/P8"]
+	.if(num==9) .segment Preload9 [outBin="./sdcard/P9"]
+	.if(num==10) .segment Preload10 [outBin="./sdcard/P10"]
+	.if(num==11) .segment Preload11 [outBin="./sdcard/P11"]
+	.if(num==12) .segment Preload12 [outBin="./sdcard/P12"]
+	.if(num==13) .segment Preload13 [outBin="./sdcard/P13"]
+	.if(num==14) .segment Preload14 [outBin="./sdcard/P14"]
+	.if(num==15) .segment Preload15 [outBin="./sdcard/P15"]
+}

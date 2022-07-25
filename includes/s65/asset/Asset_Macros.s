@@ -1,3 +1,41 @@
+
+/**
+* .macro Preload
+* Internal macro used to preload assets when imports have been done at or above $f000.
+* Before initialisation any preloaded assets get loaded here
+* @namespace Asset
+*/
+.macro Asset_Preload() {
+	.if(Asset_PreloaderList.size() > 0) {
+		lda #$ff 
+		sta $d020 
+		lda #$6b 
+		sta $d011 
+
+		.for(var i=0; i<Asset_PreloaderList.size(); i++) {
+			.var asset = Asset_PreloaderList.get(i)
+			SDCard_LoadToChipRam  asset.get("addr") : asset.get("filename")
+			.print("preload "+asset.get("name")+" to $"+toHexString(asset.get("addr")) +"  fn: $"+toHexString(asset.get("filename")) )
+		}
+
+		lda #$1b 
+		sta $d011 		
+	}
+}
+_Asset_Preload: {
+.print ("Start: $" + toHexString(Start))
+	Start: {
+		.import binary "splash/bin/bin/splashstart.bin"
+	}
+	End: {
+		.import binary "splash/bin/bin/splashend.bin"
+	}	
+	Splash:
+		.encoding "ascii"
+		.text "SPL"
+		.byte $00
+		.encoding "screencode_mixed"
+}
 /**
 * .macro ImportSpriteset
 *
@@ -20,6 +58,32 @@
 			.eval address = (floor(address/$40) + 1) * $40 
 			S65_Trace("Aligning sprites for "+name+" to $40 boundary")
 		}
+
+		//preload?
+		.var preload = false
+		.if(address >= S65_HIGHEST_LOAD) {
+			.var name = "P"+Asset_PreloaderList.size()
+			Asset_PreloaderFetchSegment(Asset_PreloaderList.size())
+				.eval Asset_PreloaderList.add(Hashtable().put(
+					"name", name,
+					"addr", address,
+					"filename", Asset_PreloaderFilenamePointer 
+				))
+				.import binary path+"_chars.bin"
+				.print("Adding "+name+" spriteset asssets to the preloader")
+			.segment S65Code
+
+			.segment PreloadFilenames
+			.encoding "ascii"
+				.text name
+				.byte $00,$01
+				.eval Asset_PreloaderFilenamePointer = *
+			.encoding "screencode_mixed"
+			.segment S65Code
+
+			.eval preload = true
+		}
+
 		//Add an entry to the buildtime spriteset list
         .eval Asset_SpriteList.add( Asset_Spriteset(
         	Asset_SpriteList.size(), 	//id
@@ -33,8 +97,11 @@
 
         
         .var PC = *
-        * = address "Spriteset importing"
-    		.import binary path+"_chars.bin"
+        
+    		.if(!preload) {
+    			* = address "Spriteset importing"
+    			.import binary path+"_chars.bin"
+    		}
 
     		//Create meta data list from binary
     		.var spriteSheet = Asset_SpriteList.get(Asset_SpriteList.size() - 1)
@@ -62,8 +129,13 @@
     		S65_Trace(""+name+" spriteset metadata at $"+toHexString(*))
     		Sprite_GenerateMetaData()
 
-    		.eval S65_LastImportPtr = *
-        * = PC "Spriteset import"
+        .if(!preload) {
+        	.eval S65_LastImportPtr = *
+        	* = PC "Charset import"
+        } else {
+        	.var bin = LoadBinary(path+"_chars.bin")
+        	.eval S65_LastImportPtr = address + bin.getSize()
+        }
 }
 
 
@@ -87,29 +159,68 @@
 			.eval address = (floor(address/$40) + 1) * $40 
 			S65_Trace("Aligning chars for "+name+" to $40 boundary")
 		}
+		
 
 		//Add an entry to the buildtime spriteset list
 		//{ id, name, address, colorAddress, palette, colors }
         .eval Asset_CharList.add( Asset_Charset(
         	Asset_CharList.size(), 	//id
-
         	name,
             address,
             $0000,						//colorAddress
             List(),						//palette
             List(),						//colors
             List()						//Indices
-        ))       
+        ))   
 
-        .var PC = *
-        * = address "Charset importing"
-    		.import binary path+"_chars.bin"
 
-    		.var charSet = Asset_CharList.get(Asset_CharList.size() - 1)
+		//preload?
+		.var preload = false
+		.if(address >= S65_HIGHEST_LOAD) {
+			.var name = "P"+Asset_PreloaderList.size()
+			Asset_PreloaderFetchSegment(Asset_PreloaderList.size())
+				.eval Asset_PreloaderList.add(Hashtable().put(
+					"name", name,
+					"addr", address,
+					"filename", Asset_PreloaderFilenamePointer 
+				))
+				.import binary path+"_chars.bin"
+				.print("Adding "+name+" spriteset asssets to the preloader")
+			.segment S65Code
 
-    		.for(var i=0; i< (*-address)/$40; i++) {
+			.segment PreloadFilenames
+			.encoding "ascii"
+				.text name
+				.byte $00
+				.eval Asset_PreloaderFilenamePointer = *
+			.encoding "screencode_mixed"
+			.segment S65Code
+
+			.eval preload = true
+		}
+
+
+    
+
+        .var PC = *  
+         .var charSet = Asset_CharList.get(Asset_CharList.size() - 1)
+
+		.if(!preload) {
+			* = address "Charset importing"
+			.import binary path+"_chars.bin"
+			.for(var i=0; i< (*-address)/$40; i++) {
+    			.eval charSet.indices.add(address/$40 + i)
+    		}		
+		} else {
+			.var bin = LoadBinary(path+"_chars.bin")
+			.for(var i=0; i< [bin.getSize() / $40]; i++) {
     			.eval charSet.indices.add(address/$40 + i)
     		}	
+		}
+
+
+           
+
 
     		.var paletteBin = LoadBinary(path+"_palette.bin")
     		.eval charSet.palette = paletteBin
@@ -121,8 +232,14 @@
     			.fill ncmBin.getSize(), ncmBin.get(i)
     		}
 
-    		.eval S65_LastImportPtr = *
-        * = PC "Charset import"
+    		
+        .if(!preload) {
+        	.eval S65_LastImportPtr = *
+        	* = PC "Charset import"
+        } else {
+        	.var bin = LoadBinary(path+"_chars.bin")
+        	.eval S65_LastImportPtr = address + bin.getSize()
+        }
 }
 
 

@@ -212,10 +212,11 @@
  */
 .macro Layer_InitScreen(screenBaseAddress) {
 	S65_AddToMemoryReport("Layer_InitScreen")
+
+	
+
 	.const GOTOX = 1
-
 	.eval S65_SCREEN_RAM = screenBaseAddress
-
 
 	//Total screen width in chars = 
 	// Base screen width +
@@ -243,6 +244,8 @@
 	}
 
 
+
+
 	//Termination layer
 	lda #<[S65_SCREEN_ROW_WIDTH * 2]
 	sta [Layer_AddrOffsets + Layer_LayerList.size() * 2]
@@ -262,7 +265,9 @@
 	S65_Trace("")
 
 	jsr S65.Init
+	Asset_Preload()
 
+	
 	//Set logical row width
 	//bytes per screen row (16 bit value in $d058-$d059)
 	lda #<S65_SCREEN_LOGICAL_ROW_WIDTH

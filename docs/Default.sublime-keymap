@@ -1,0 +1,4 @@
+[
+	{ "keys": ["shift+f7"], "command": "run_tests"},
+	{ "keys": ["shift+f8"], "command": "deploy_assets_and_build"},
+]

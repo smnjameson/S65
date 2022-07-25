@@ -1,3 +1,7 @@
+ .file [name="main.prg", segments="S65Code,PreloadFilenames", allowOverlap]
+ .segmentdef S65Code [start=$2001]
+ .segmentdef PreloadFilenames [start=$1700]
+.segment S65Code
 
 /**
  * .global S65
@@ -21,10 +25,22 @@
 //Constants for limits on various objects
 .const S65_MAX_LAYERS = $10
 .const S65_SPRITESET_LIMIT = $10
+.const S65_HIGHEST_LOAD = $f000
+
 
 * = $1400 "SDCard Palette Buffer"
-.const Palette_SDBuffer = *
+	.const Palette_SDBuffer = *
 	.fill 768,0
+
+* = $1700 "SDCard preloader info"
+	.var Asset_PreloaderFilenamePointer = *
+	
+* = $1900 "Splash filename"
+		.encoding "ascii"
+			.text "SPL"
+			.byte $00
+		.encoding "screencode_mixed"
+
 * = $2001 "S65 BasicUpstart"
 System_BasicUpstart65(S65_InitComplete)
 * = $2016 "S65 Base page area"
