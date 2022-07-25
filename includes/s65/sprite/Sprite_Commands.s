@@ -607,10 +607,10 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 
 
 		//We can use preloaded sprite meta data
-		.if(spritesId.getValue() < Sprite_SpriteList.size() &&
+		.if(spritesId.getValue() < Asset_SpriteList.size() &&
 			_isImm(spriteNum) && !_isReg(spriteNum)) {
 
-					.var meta = Sprite_SpriteList.get(spritesId.getValue()).get("meta")
+					.var meta = Asset_SpriteList.get(spritesId.getValue()).get("meta")
 					.var numSprites = meta.get($02) + meta.get($03) * $100
 					.var isNcm = meta.get($01)!=0
 					//FLAGS
@@ -651,9 +651,9 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					.const SprMETA = S65_TempWord1
 					.const NumSPRITE = S65_TempWord2
 
-					lda [Sprite_SpritesetMetaTable + spritesId.getValue()* 2 + 0]
+					lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 0]
 					sta.z SprMETA + 0 
-					lda [Sprite_SpritesetMetaTable + spritesId.getValue()* 2 + 1]
+					lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 1]
 					sta.z SprMETA + 1				
 					
 					.if(_isReg(spriteNum)) {

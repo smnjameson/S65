@@ -636,7 +636,7 @@ function appendPaletteFCM(palette, charData) {
             }
             if(data[i] !== 0) data[i] = newVal
         } else {
-            
+
         }
 
     }
@@ -724,6 +724,8 @@ async function runCharMapper(argv) {
 
         //save NCM color table
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
+    } else {
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from([]))
     }
     //SAVE PALETTE
     fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))

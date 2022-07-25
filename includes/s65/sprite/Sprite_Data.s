@@ -1,19 +1,4 @@
-/**
-* .data Spriteset
-* The object returned by GetSpriteset
-* @namespace Sprite
-* 
-* @struct {byte} id The numerical id of the spriteset assigned by Asset_ImportSprites
-* @struct {string} name The name of the spriteset
-* @struct {word} address The start address for the spriteset char data
-* @struct {word} metaAddress The start address for the spriteset metadata
-* @struct {List} meta A List of bytes containing the metadata
-* @struct {List} palette A List of bytes containign the palette data
-* @struct {List} indices A List of character indexes for the sprites
-*/
-.struct Sprite_Spriteset { id, name, address, metaAddress, meta, palette, indices }
 
-.var Sprite_SpriteList = List()
 
 
 /**
@@ -37,13 +22,7 @@
 .var Sprite_MetaData = List()
 
 
-/**
-* .var Sprite_SpritesetMetaTable
-*
-* Pointer to the lookup table for the spritesets meta data tables
-* @namespace Sprite
-*/
-.var Sprite_SpritesetMetaTable = $0000
+
 
 /**
 * .var SpriteIOLength

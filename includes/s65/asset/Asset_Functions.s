@@ -22,10 +22,41 @@
 * 
 */
 .function Asset_GetSpriteset(name) {
-	.for(var i=0; i<Sprite_SpriteList.size(); i++) {
-		.if(Sprite_SpriteList.get(i).get("name") == name) {
-			.return Sprite_SpriteList.get(i)
+	.for(var i=0; i<Asset_SpriteList.size(); i++) {
+		.if(Asset_SpriteList.get(i).get("name") == name) {
+			.return Asset_SpriteList.get(i)
 		}
 	}
 	.error "Asset_GetSpriteset: " + name + " spriteset not found"
+}
+
+
+
+/**
+* .function GetCharset
+* 
+* This method returns the charset object containing all the vars needed to perform many
+* operations.<br><br>
+* 
+* id - The numerical id of the spriteset assigned by Asset_ImportSprites
+* name - The name of the spriteset<br>
+* address - The start address for the spriteset char data <br>
+* colorAddress - The start address for the colro table if present<br>
+* palette - A {List} of bytes containign the palette data <br>    
+* colors - A {List} of bytes containign the ncm color mapping data <br>    
+* 
+* @namespace Asset
+*
+* @param {byte} name The name of sprite set to retrieve
+* @return {Hashtable} The sprite set info
+* 
+* 
+*/
+.function Asset_GetCharset(name) {
+	.for(var i=0; i<Asset_CharList.size(); i++) {
+		.if(Asset_CharList.get(i).get("name") == name) {
+			.return Asset_CharList.get(i)
+		}
+	}
+	.error "Asset_GetCharset: " + name + " charset not found"
 }

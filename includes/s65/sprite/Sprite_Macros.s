@@ -57,8 +57,8 @@
 * @namespace Sprite
 */
 .macro Sprite_GenerateMetaData() {
-		.for(var i=0; i<Sprite_SpriteList.size(); i++) {
-			.var spriteSheet = Sprite_SpriteList.get(i)
+		.for(var i=0; i<Asset_SpriteList.size(); i++) {
+			.var spriteSheet = Asset_SpriteList.get(i)
 			.var data = spriteSheet.meta
 			.var offset = spriteSheet.address / $40
 			.var numSprites = data.get($02) + data.get($03) * $100
