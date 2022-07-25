@@ -612,8 +612,9 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 
 					.var meta = Sprite_SpriteList.get(spritesId.getValue()).get("meta")
 					.var numSprites = meta.get($02) + meta.get($03) * $100
+					.var isNcm = meta.get($01)!=0
 					//FLAGS
-					lda #[Sprite_IOflagEnabled | [meta.get($01)!=0 ? Sprite_IOflagNCM : 0]]
+					lda #[Sprite_IOflagEnabled | [isNcm ? Sprite_IOflagNCM : 0]]
 
 					ldy #[Sprite_IOflags]
 					sta (S65_LastSpriteIOPointer), y
@@ -634,10 +635,17 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					lda #meta.get($05)
 					sta (S65_LastSpriteIOPointer), y	
 
-					//COLOR
-					iny
-					lda #meta.get($20 + numSprites * 2 + spriteNum.getValue())	
-					sta (S65_LastSpriteIOPointer), y												
+					.if(isNcm) {
+					//COLOR only req for ncm
+						iny
+						lda #meta.get($20 + numSprites * 2 + spriteNum.getValue())	
+						sta (S65_LastSpriteIOPointer), y
+					} 
+					// else {
+					// 	iny
+					// 	lda #$00
+					// 	sta (S65_LastSpriteIOPointer), y
+					// }											
 		} else {
 					//We must instead use lookup tables for meta data
 					.const SprMETA = S65_TempWord1
@@ -660,9 +668,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	S65_AddToMemoryReport("Sprite_SetSprite")
 }
 _Sprite_SetSpriteMeta: {
-.print ("S65_TempWord1: $" + toHexString(S65_TempWord1))
 		.const SprMETA = S65_TempWord1
-.print ("S65_TempWord2: $" + toHexString(S65_TempWord2))
 		.const NumSPRITE = S65_TempWord2	
 
 		SetData: {
@@ -671,6 +677,7 @@ _Sprite_SetSpriteMeta: {
 					//FLAGS
 					ldy #$01
 					lda (SprMETA), y //NCM mode?
+					pha
 					beq !+
 					lda #[Sprite_IOflagNCM]
 				!:
@@ -714,13 +721,15 @@ _Sprite_SetSpriteMeta: {
 					ldy #[Sprite_IOptr + 1]
 					sta (S65_LastSpriteIOPointer), y
 
+					pla //NCM mode?
+					beq !+
 					jsr _Sprite_SetSpriteMeta.AdvanceToNextTable
-
 					//COLOR
 					ldy SpriteIndex
 					lda (SprMETA), y //PtrColor
 					ldy #[Sprite_IOcolor]
 					sta (S65_LastSpriteIOPointer), y
+				!:
 					rts			
 		}
 

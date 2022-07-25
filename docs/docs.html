@@ -457,7 +457,7 @@ h4 {
 						<div class='macroUsage'>S65_VISIBLE_SCREEN_CHAR_WIDTH</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='Asset'><span><h4>Namespace<h2>Asset</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Asset_Macros'><div class='sectionButton'>Macros</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Asset_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Asset_Functions'><div class='sectionButton'>Functions</div></a></span>
 			<div class='categoryDescription'> API for the assets pipeline. Provides methods for importing assets and their metadata files </div>
 			<br>
 		
@@ -508,6 +508,26 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{word} address - The address to laod the sprites char data into</div></span>
+						</div>
+					
+						
+						
+					</div><br>
+				<div class='macroHeader' id='Asset_Functions'>Functions</div>
+			
+					<div class='macroIndex'><a href='#Asset_GetSpriteset'>GetSpriteset</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Asset_GetSpriteset'>GetSpriteset
+						</div>
+						<div class='macroItemDescription'> Sprite sets are assigned numerical values from 0 to 15 in order as they are imported. This method returns the spriteset object containing all the vars needed to perform many operations, .id is used whenever referencing a spriteset in commands e.g. <a href="#Sprite_SetSpriteMeta">Sprite_SetSpriteMeta</a><br><br>  id - The numerical id of the spriteset assigned by Asset_ImportSprites name - The name of the spriteset<br> address - The start address for the spriteset char data <br> metaAddress - The start address for the spriteset metadata <br> meta - A {List} of bytes containing the metadata<br> palette - A {List} of bytes containign the palette data <br>     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Asset_GetSpriteset(<i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} name - The name of sprite set to retrieve</div></span>
 						</div>
 					
 						
@@ -2483,8 +2503,6 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Sprite_GetIO'>GetIO</a></div>
 				
-					<div class='macroIndex'><a href='#Sprite_GetSprites'>GetSprites</a></div>
-				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_GetIO'>GetIO
 						</div>
@@ -2508,26 +2526,12 @@ h4 {
 					
 						
 						
-					</div>
-					<div class='macroItem'>
-						<div class='macroItemHeader' id='Sprite_GetSprites'>GetSprites
-						</div>
-						<div class='macroItemDescription'> Sprite sets are assigned numerical values from 0 to 15 in order as they are imported. This method retrieves that value for a given name and is a required parameter in <a href="#Sprite_SetSpriteMeta">Sprite_SetSpriteMeta</a><br>    </div>
-						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Sprite_GetSprites(<i>name</i>)</div>
-						
-							<div class='macroUsageText'><i>Parameters:</i></div>
-						
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} name - <add a description here></div></span>
-						</div>
-					
-						
-						
 					</div><br>
 				<div class='macroHeader' id='Sprite_Data'>Data</div>
 			
 					<div class='macroIndex'><a href='#Sprite_MetaData'>MetaData</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_Spriteset'>Spriteset</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_MetaData'>MetaData</div>
@@ -2577,6 +2581,48 @@ h4 {
 					
 						<div class='macroUsage'>
 						<span><div class='paramHeader'>{table} $xx+ - sprite color table</div></span>
+						
+						</div>
+					
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_Spriteset'>Spriteset</div>
+						<div class='macroItemDescription'>The object returned by GetSpriteset  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_Spriteset</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} id - The numerical id of the spriteset assigned by Asset_ImportSprites</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{string} name - The name of the spriteset</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} address - The start address for the spriteset char data</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} metaAddress - The start address for the spriteset metadata</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{List} meta - A List of bytes containing the metadata</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{List} palette - A List of bytes containign the palette data</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{List} indices - A List of character indexes for the sprites</div></span>
 						
 						</div>
 					
@@ -2718,7 +2764,23 @@ h4 {
 						<div class='macroItemHeader' id='System_GetRandom16'>GetRandom16
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'></span>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
 							</div>
 							
 						</div>
@@ -2733,7 +2795,23 @@ h4 {
 						<div class='macroItemHeader' id='System_GetRandom8'>GetRandom8
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'></span>
+								<span  style='display:inline-flex;'>registers: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >A</td>
+		
+		</tr></table>
+	 flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
 							</div>
 							
 						</div>

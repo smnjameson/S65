@@ -19,12 +19,17 @@
 .macro Asset_ImportSprites (name, path, address) {
 		.if(address / $40 != floor(address/$40)) {
 			.eval address = (floor(address/$40) + 1) * $40 
-			.print "Aligning sprites for "+name+" to $40 boundary"
+			S65_Trace("Aligning sprites for "+name+" to $40 boundary")
 		}
-		//Add an entry to the buildtime hashtables
-        .eval Sprite_SpriteList.add(Hashtable().put(
-        	"name", name,
-            "address", address
+		//Add an entry to the buildtime spriteset list
+        .eval Sprite_SpriteList.add( Sprite_Spriteset(
+        	Sprite_SpriteList.size(), 	//id
+        	name,
+            address,
+            $0000,						//metAddress
+            List(),						//meta
+            List(),						//palette
+            List()						//indices
         ))
 
         
@@ -32,29 +37,34 @@
         .var PC = *
         .var val ="Sprites"
         * = address
+        	
+
     		.import binary path+"_chars.bin"
 
     		//Create meta data list from binary
+    		.var spriteSheet = Sprite_SpriteList.get(Sprite_SpriteList.size() - 1)
     		.var dataBin = LoadBinary(path+"_meta.bin")
-    		.var data = List()
+    		.var data = spriteSheet.meta
     		.for(var i=0; i<dataBin.getSize(); i++) .eval data.add(dataBin.get(i))
 
     		.var numSprites = data.get($02) + data.get($03) * $100
-    		.var spriteSheet = Sprite_SpriteList.get(Sprite_SpriteList.size() - 1)
+    		S65_Trace(""+name+" spriteset of "+numSprites+" sprites, data at $"+toHexString(address))
+
 
 			//adjust char indices to new offset
-			.var offset = spriteSheet.get("address") / $40
+			.var offset = spriteSheet.address / $40
 			.for(var i=0; i<numSprites; i++) {
 				.var indexLo = $20 + numSprites * 0 + i
 				.var indexHi = $20 + numSprites * 1 + i
 				.eval data.set(indexLo, (data.get(indexLo) + <offset))
 				.eval data.set(indexHi, (data.get(indexHi) + >offset))
+				.eval spriteSheet.indices.add(data.get(indexLo) + data.get(indexHi) * $100)
 			}
-    		.eval spriteSheet.put("meta", data) 
 
     		.var paletteBin = LoadBinary(path+"_palette.bin")
-    		.eval spriteSheet.put("palette", paletteBin) 
+    		.eval spriteSheet.palette = paletteBin
 
+    		S65_Trace(""+name+" spriteset metadata at $"+toHexString(*))
     		Sprite_GenerateMetaData()
 
     		.eval S65_LastImportPtr = *
@@ -74,7 +84,7 @@
 * @param {string} name The name of the spriteset to import the palette for
 */
 .macro Asset_ImportSpritePalette( name ) {
-	.var palette = Sprite_SpriteList.get(Sprite_GetSprites(name)).get("palette")
+	.var palette = Sprite_SpriteList.get(Asset_GetSpriteset(name).get("id")).get("palette")
 
 	.fill palette.getSize(), palette.get(i)
 }

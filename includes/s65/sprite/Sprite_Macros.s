@@ -59,24 +59,11 @@
 .macro Sprite_GenerateMetaData() {
 		.for(var i=0; i<Sprite_SpriteList.size(); i++) {
 			.var spriteSheet = Sprite_SpriteList.get(i)
-			.var data = spriteSheet.get("meta")
-			.var offset = spriteSheet.get("address") / $40
+			.var data = spriteSheet.meta
+			.var offset = spriteSheet.address / $40
 			.var numSprites = data.get($02) + data.get($03) * $100
 
-			.eval spriteSheet.put("metaAddress", *)
-
-			// //spriteset meta
-			// .for(var i=0; i<$20; i++) {
-			// 	.byte data.get(i)
-			// }
-			// //adjust char indices to new offset
-			// .for(var i=0; i<numSprites; i++) {
-			// 	.byte data.get($20 + numSprites * 0 + i) + <offset
-			// }
-			// .for(var i=0; i<numSprites; i++) {
-			// 	.byte data.get($20 + numSprites * 1 + i) + <offset
-			// }
-			//color data
+			.eval spriteSheet.metaAddress = *
 			.fill data.size(), data.get(i)
 		}
 }
