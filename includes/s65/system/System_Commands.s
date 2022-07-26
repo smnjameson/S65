@@ -11,12 +11,15 @@
 .pseudocommand System_GetRandom8 {
 		jsr _System_Random16
 		sta S65_ReturnValue + 0	
+        lda #$00
+        sta S65_ReturnValue + 1
 }
 /**
 * .pseudocommand GetRandom16
 *
 * Returns a random 16 bit number in
-* <a href="#Global_ReturnValue">S65_ReturnValue</a>
+* <a href="#Global_ReturnValue">S65_ReturnValue</a><br>
+* Accumulator will have the hi byte
 * 
 * @namespace System
 * @registers A

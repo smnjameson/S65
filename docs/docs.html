@@ -149,6 +149,8 @@ h4 {
 	
 			<div class='macroIndex'><a href='#Global'>Global (S65)</a></div>
 		
+			<div class='macroIndex'><a href='#Anim'>Anim</a></div>
+		
 			<div class='macroIndex'><a href='#Asset'>Asset</a></div>
 		
 			<div class='macroIndex'><a href='#DMA'>DMA</a></div>
@@ -455,6 +457,102 @@ h4 {
 						<div class='macroItemDescription'>Width of the visible screen background layer in characters </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>S65_VISIBLE_SCREEN_CHAR_WIDTH</div>						
+					</div><br><br>
+			<div class='categoryHeader' id='Anim'><span><h4>Namespace<h2>Anim</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Anim_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Anim_Data'><div class='sectionButton'>Data</div></a></span>
+			<div class='categoryDescription'> API for controlling the screen ram and color ram. Using the raster rewrite buffer to create and manipulate layers </div>
+			<br>
+		
+				<div class='macroHeader' id='Anim_Functions'>Functions</div>
+			
+					<div class='macroIndex'><a href='#Anim_Define'>Define</a></div>
+				
+					<div class='macroIndex'><a href='#Anim_Get'>Get</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Anim_Define'>Define
+						</div>
+						<div class='macroItemDescription'> Defines an animation sequence   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Anim_Define(<i>name</i>, <i>spriteSet</i>, <i>start</i>, <i>end</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} name - The name of this animation sequence</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} spriteSet - The Spriteset this animation is from</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} start - The start frame</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} end - The end frame</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Anim_Get'>Get
+						</div>
+						<div class='macroItemDescription'> Returns the animation sequence object    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Anim_Get(<i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The name of the animation to fetch</div></span>
+						</div>
+					
+						
+						
+					</div><br>
+				<div class='macroHeader' id='Anim_Data'>Data</div>
+			
+					<div class='macroIndex'><a href='#Anim_Sequence'>Sequence</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Anim_Sequence'>Sequence</div>
+						<div class='macroItemDescription'>The object returned by Anim_Get  / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}   * </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Anim_Sequence</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} id - The numerical id of the animation</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{string} name - The name of the aniamtion</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{word} address - The start address for the animation data</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{Asset_Spriteset} spriteSet - The struct for the spriteset</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} startFrame - The starting frame in the spriteset</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} endFrame - The end frame in the spriteset</div></span>
+						
+						</div>
+					
 					</div><br><br>
 			<div class='categoryHeader' id='Asset'><span><h4>Namespace<h2>Asset</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Asset_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Asset_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Asset_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Asset_Vars'><div class='sectionButton'>Vars</div></a></span>
@@ -2144,6 +2242,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Sprite_ResetFlags'>ResetFlags</a></div>
 				
+					<div class='macroIndex'><a href='#Sprite_SetAnim'>SetAnim</a></div>
+				
 					<div class='macroIndex'><a href='#Sprite_SetColor'>SetColor</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_SetDimensions'>SetDimensions</a></div>
@@ -2394,6 +2494,39 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SetAnim'>SetAnim
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Sets the sprites animation id and resets its timer and frame counter. A value of 0 turns off the animation and returns control of the sprites pointer to Sprite_IOptr.    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SetAnim <i>animId</i> : <i>speed</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABSX} animId - The id of the animation to assign</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM|REG|ABS|ABSX} speed - The speed of the animation, lower=faster, minimum 1 defaults to 4</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_SetColor'>SetColor
 							
 							<div class='macroItemSubHeader'>
@@ -2629,7 +2762,7 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM|REG|ABSXY} spriteNum - The sprite index from the spriteset (ordered left to right, top to bottom)</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM|REG|ABSXY} spriteNum - The sprite index from the spriteset (ordered left to right, top to bottom)</div></span>
 						</div>
 					
 						
@@ -2714,6 +2847,8 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Sprite_MetaData'>MetaData</a></div>
 				
+					<div class='macroIndex'><a href='#Sprite_SequenceData'>SequenceData</a></div>
+				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_MetaData'>MetaData</div>
 						<div class='macroItemDescription'> This is a byte array used by the engine when Asset_ImportSpriteset and Asset_ImportSpritesetMeta is used to store all the meta data for the sprites such as mappings from sprite to character numbers, colors etc.   </div>
@@ -2765,9 +2900,44 @@ h4 {
 						
 						</div>
 					
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_SequenceData'>SequenceData</div>
+						<div class='macroItemDescription'> This is a byte array used by the engine for storing animation sequences. Animations are not stored in a table but in a sequential list, specific aniamtion data addresses can be retrievd using Anim_Get().address   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_SequenceData</div>						
+						
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $00 - type (for now always 0)</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $01 - spritesetId</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $02 - startFrame</div></span>
+						
+						</div>
+					
+						<div class='macroUsage'>
+						<span><div class='paramHeader'>{byte} $03 - endFrame</div></span>
+						
+						</div>
+					
 					</div><br>
 				<div class='macroHeader' id='Sprite_Vars'>Vars</div>
 			
+					<div class='macroIndex'><a href='#Sprite_IOanim'>IOanim</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOanimFrame'>IOanimFrame</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOanimSpeed'>IOanimSpeed</a></div>
+				
+					<div class='macroIndex'><a href='#Sprite_IOanimTimer'>IOanimTimer</a></div>
+				
 					<div class='macroIndex'><a href='#Sprite_IOcolor'>IOcolor</a></div>
 				
 					<div class='macroIndex'><a href='#Sprite_IOflagEnabled'>IOflagEnabled</a></div>
@@ -2796,6 +2966,30 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Sprite_SpriteIOLength'>SpriteIOLength</a></div>
 				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOanim'>IOanim</div>
+						<div class='macroItemDescription'>Sprites animation id if non zero takes over control of the sprites pointer from Sprite_IOptr </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOanim</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOanimFrame'>IOanimFrame</div>
+						<div class='macroItemDescription'>Used internally to keep track of the current frame for the sprites animation </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOanimFrame</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOanimSpeed'>IOanimSpeed</div>
+						<div class='macroItemDescription'>The speed of the aniamtion, lower=faster, minimum 1 </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOanimSpeed</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Sprite_IOanimTimer'>IOanimTimer</div>
+						<div class='macroItemDescription'>Used internally to keep track of the time per frame for the sprites animation </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Sprite_IOanimTimer</div>						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Sprite_IOcolor'>IOcolor</div>
 						<div class='macroItemDescription'> The color to apply to all the chars in this sprite.  </div>
@@ -2915,7 +3109,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Returns a random 16 bit number in <a href="#Global_ReturnValue">S65_ReturnValue</a>  </div>
+						<div class='macroItemDescription'> Returns a random 16 bit number in <a href="#Global_ReturnValue">S65_ReturnValue</a><br> Accumulator will have the hi byte  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>System_GetRandom16 </div>
 						

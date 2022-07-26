@@ -234,6 +234,7 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/system.s"
 #import "includes/s65/dma.s"
 #import "includes/s65/palette.s"
+#import "includes/s65/anim.s"
 
 S65: {
 	Init: {

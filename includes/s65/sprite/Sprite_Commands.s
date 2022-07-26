@@ -578,6 +578,59 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 
 
 /**
+* .pseudocommand SetAnim
+*
+* Sets the sprites animation id and resets its timer and frame counter.
+* A value of 0 turns off the animation
+* and returns control of the sprites pointer to Sprite_IOptr.
+* 
+* @namespace Sprite
+*
+* @param {byte} {IMM|REG|ABS|ABSX} animId The id of the animation to assign
+* @param {byte?} {IMM|REG|ABS|ABSX} speed The speed of the animation, lower=faster, minimum 1 defaults to 4
+*
+* @flags nz
+*/
+.pseudocommand Sprite_SetAnim animId : speed {
+	S65_AddToMemoryReport("Sprite_SetAnim")
+	.if(!_isImm(animId) && !_isReg(animId) && !_isAbs(animId) && !_isAbsX(animId)) .error "Sprite_SetAnim:"+ S65_TypeError	
+	.if(!_isImm(speed)&& !_isReg(animId) && !_isAbs(animId) && !_isAbsX(animId) &&!_isNone(speed)) .error "Sprite_SetAnim:"+ S65_TypeError	
+	.if(_isImm(speed) && speed.getValue()<1) .error "Sprite_SetAnim: speed should be minimum 1"
+
+	_saveIfReg(animId, S65_PseudoReg + 0)
+	_saveIfReg(animId, S65_PseudoReg + 1)
+	phy
+	pha	
+			.if(_isReg(animId)) {
+				lda.z S65_PseudoReg + 0
+			} else {
+				lda animId
+			}
+			ldy #[Sprite_IOanim]
+			sta (S65_LastSpriteIOPointer), y	
+			lda #$00
+			iny	//timer
+			sta (S65_LastSpriteIOPointer), y
+			iny //frame
+			sta (S65_LastSpriteIOPointer), y
+			.if(_isReg(speed)) {
+				lda.z S65_PseudoReg + 1
+			} else {
+				.if(_isNone(speed)) {
+					lda #$04
+				} else {
+					lda speed
+				}
+			}		
+			iny //speed
+			sta (S65_LastSpriteIOPointer), y			
+	pla
+	ply
+	S65_AddToMemoryReport("Sprite_SetAnim")	
+}
+
+
+/**
 * .pseudocommand SetSpriteMeta
 *
 * Enables the currently selected sprite and popualtes its IO registers with the meta data for
@@ -591,7 +644,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 * @namespace Sprite
 *
 * @param {byte} {IMM} spritesId The spriteset index retrieved from Sprite_GetSprites
-* @param {byte} {IMM|REG|ABSXY} spriteNum The sprite index from the spriteset (ordered left to right, top to bottom)
+* @param {byte?} {IMM|REG|ABSXY} spriteNum The sprite index from the spriteset (ordered left to right, top to bottom)
 
 * @flags nzc
 */
@@ -601,7 +654,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	phy
 		.if(spritesId.getValue() > S65_SPRITESET_LIMIT) .error "Sprite_SetSprite: spritesId must be between 0 and "+(S65_SPRITESET_LIMIT-1)
 		.if(!_isImm(spritesId)) .error "Sprite_SetSprite: "+S65_TypeError
-		.if(!_isImm(spriteNum) && !_isReg(spriteNum) && !_isAbs(spriteNum) && !_isAbsXY(spriteNum)) .error "Sprite_SetSprite: "+S65_TypeError
+		.if(!_isNone(spriteNum) && !_isImm(spriteNum) && !_isReg(spriteNum) && !_isAbs(spriteNum) && !_isAbsXY(spriteNum)) .error "Sprite_SetSprite: "+S65_TypeError
 
 		_saveIfReg(spriteNum, S65_PseudoReg + 0)
 
@@ -635,7 +688,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					lda #meta.get($05)
 					sta (S65_LastSpriteIOPointer), y	
 
-					.if(isNcm) {
+					.if(isNcm && !_isNone(spriteNum)) {
 					//COLOR only req for ncm
 						iny
 						lda #meta.get($20 + numSprites * 2 + spriteNum.getValue())	
@@ -659,7 +712,11 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					.if(_isReg(spriteNum)) {
 						lda S65_PseudoReg + 0
 					}  else {
-						lda spriteNum
+						.if(_isNone(spriteNum)) {
+							lda #$00
+						} else {
+							lda spriteNum			
+						}
 					}
 					jsr _Sprite_SetSpriteMeta.SetData
 		}
@@ -799,7 +856,7 @@ _Sprite_SetSpriteMeta: {
 			//get the Base address of the IO
 			.const SprIO = S65_TempWord1
 			.const LayerIO = S65_TempWord2
-			// .const ScreenRowAddr = S65_TempWord3
+			.const AnimData = S65_TempWord3
 
 			// Sprite IO base
 			lda Layer_SpriteIOAddrLSB, x
@@ -854,6 +911,7 @@ MaskRowValue:
 .macro _Sprite_Update() {
 		.const SprIO = S65_TempWord1
 		.const LayerIO = S65_TempWord2
+		.const AnimData = S65_TempWord3
 
 		ldy #Layer_IOmaxSpritesRRB //maxSprite offset
 		lda (LayerIO), y 
@@ -903,8 +961,72 @@ MaskRowValue:
 				adc #Layer_IOrowCountTableRRB
 				sta.z S65_SpriteRowTablePtr
 
+				ldy #Sprite_IOanim
+				lda (SprIO), y	
+				beq !io+
+			!anim:
 
-				//get and store base pointer
+//get and store base pointer from sprites animation
+				sta SM_AnimID
+				iny // Sprite_IOanimTimer
+				lda (SprIO), y	
+				bne !noNewFrame+
+				iny // Sprite_IOanimFrame
+				lda (SprIO), y	 
+				sta SM_FrameID
+
+				//get sequence Data
+				ldy SM_AnimID:#$BEEF //data index is supplied +1
+				lda Anim_SequenceAddrTable - 1, y //LSB
+				sta.z AnimData + 0
+				lda Anim_SequenceAddrTable -1 + (Anim_SeqList.size()-1), y //MSB
+				sta.z AnimData + 1
+
+				//Speed
+				ldy #Sprite_IOanimSpeed
+				lda (SprIO), y
+				ldy #Sprite_IOanimTimer
+				sta (SprIO), y	
+				bra !animdone+	
+
+			!noNewFrame:
+				ldy #Sprite_IOanimTimer
+				sta (SprIO), y	
+				sec 
+				sbc #$01
+				sta (SprIO), y	
+				bne !animdone+
+				//speed not implemented yet
+			!nextframe:
+				//get frame
+				ldy #Sprite_IOanimFrame
+				lda (SprIO), y	
+				clc 
+				adc #$01
+				ldy SM_AnimID
+				cmp Anim_FrameCounts -1, y 
+				bcc !noWrap+
+				lda #$00
+			!noWrap:
+				ldy #Sprite_IOanimFrame
+				sta (SprIO), y	
+	
+			!animdone:
+
+				//get frame ptr
+				lda SM_FrameID:#$BEEF
+				asl
+				tay 
+				lda (AnimData), y //ptrLo
+				sta.z S65_SpritePointerTemp + 0 //byte 0
+				sta.z S65_SpritePointerOld + 0 //byte 0		
+				iny	
+				lda (AnimData), y //ptrHi
+				sta.z S65_SpritePointerTemp + 1 //byte 0
+				sta.z S65_SpritePointerOld + 1 //byte 0	
+				bra !ptrDone+
+//get and store base pointer from standard Sprite_IOptr
+			!io:
 				ldy #Sprite_IOptr
 				lda (SprIO), y	
 				sta.z S65_SpritePointerTemp + 0 //byte 0
@@ -913,6 +1035,7 @@ MaskRowValue:
 				lda (SprIO), y	
 				sta.z S65_SpritePointerTemp + 1 //byte 1
 				sta.z S65_SpritePointerOld + 1 //byte 1
+			!ptrDone:
 
 
 			///////////////////

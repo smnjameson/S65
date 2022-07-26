@@ -6,7 +6,7 @@
 	jmp Start 
 
 		//Import to $18000 thereby forcing the SDcard preloader, Make sure to deploy assets firs twith SHIFT+F8
-		Asset_ImportCharset("map", "tests/assets/bin/test7/tileset2", $18000)
+		Asset_ImportCharset("map", "tests/assets/bin/test7/tileset2", $8000)
 		.const MapChars = Asset_GetCharset("map")
 
 

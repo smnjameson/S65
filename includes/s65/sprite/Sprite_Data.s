@@ -170,6 +170,43 @@
 .var Sprite_IOflipVoffset = Sprite_SpriteIOLength
 .eval Sprite_SpriteIOLength += 1
 
+
+/**
+* .var IOanim
+* Sprites animation id if non zero takes over control of
+* the sprites pointer from Sprite_IOptr
+* @namespace Sprite
+*/
+.var Sprite_IOanim = Sprite_SpriteIOLength
+.eval Sprite_SpriteIOLength += 1
+
+/**
+* .var IOanimTimer
+* Used internally to keep track of the time per frame
+* for the sprites animation
+* @namespace Sprite
+*/
+.var Sprite_IOanimTimer = Sprite_SpriteIOLength
+.eval Sprite_SpriteIOLength += 1
+
+/**
+* .var IOanimFrame
+* Used internally to keep track of the current frame
+* for the sprites animation
+* @namespace Sprite
+*/
+.var Sprite_IOanimFrame = Sprite_SpriteIOLength
+.eval Sprite_SpriteIOLength += 1  //15 of 16
+
+
+/**
+* .var IOanimSpeed
+* The speed of the aniamtion, lower=faster, minimum 1
+* @namespace Sprite
+*/
+.var Sprite_IOanimSpeed= Sprite_SpriteIOLength
+.eval Sprite_SpriteIOLength += 1  //16 of 16
+
 //Pad out the array so it aligns to allow faster access
 .eval Sprite_SpriteIOLength = $10
 

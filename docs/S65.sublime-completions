@@ -72,6 +72,36 @@
             "kind": "snippet"
         },
         {
+            "trigger": "id",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "name",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "address",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "spriteSet",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "startFrame",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
+            "trigger": "endFrame",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
             "trigger": "S65_AddToMemoryReport",
             "annotation": "name",
             "contents": "S65_AddToMemoryReport(${1:name})",
@@ -210,6 +240,26 @@
             "annotation": "Width of the visible screen background layer in characters",
             "kind": "snippet",
             "details": "Width of the visible screen background layer in characters"
+        },
+        {
+            "trigger": "Anim_Define",
+            "annotation": "name,spriteSet,start,end",
+            "contents": "Anim_Define(${1:name}, ${2:spriteSet}, ${3:start}, ${4:end})",
+            "kind": "snippet",
+            "details": "Defines an animation sequence"
+        },
+        {
+            "trigger": "Anim_Get",
+            "annotation": "name",
+            "contents": "Anim_Get(${1:name})",
+            "kind": "snippet",
+            "details": "Returns the animation sequence object"
+        },
+        {
+            "trigger": "Anim_Sequence",
+            "annotation": "The object returned by Anim_Get  / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}   *",
+            "kind": "snippet",
+            "details": "The object returned by Anim_Get  / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}   *"
         },
         {
             "trigger": "Asset_ImportCharset",
@@ -715,6 +765,13 @@
             "details": "Resets one or more of the currently selected sprites flags. You can use the <a href=\"#Sprite_IOflagEnabled\">flag constants</a> provided by S65 to abstract the values. The other flags are left untouched"
         },
         {
+            "trigger": "Sprite_SetAnim",
+            "annotation": "animId:speed",
+            "contents": "Sprite_SetAnim ${1:animId} : ${2:speed}",
+            "kind": "snippet",
+            "details": "Sets the sprites animation id and resets its timer and frame counter. A value of 0 turns off the animation and returns control of the sprites pointer to Sprite_IOptr."
+        },
+        {
             "trigger": "Sprite_SetColor",
             "annotation": "color",
             "contents": "Sprite_SetColor ${1:color}",
@@ -805,6 +862,36 @@
             "details": "This is a byte array used by the engine when Asset_ImportSpriteset and Asset_ImportSpritesetMeta is used to store all the meta data for the sprites such as mappings from sprite to character numbers, colors etc."
         },
         {
+            "trigger": "Sprite_SequenceData",
+            "annotation": "This is a byte array used by the engine for storing animation sequences. Animations are not stored in a table but in a sequential list, specific aniamtion data addresses can be retrievd using Anim_Get().address",
+            "kind": "snippet",
+            "details": "This is a byte array used by the engine for storing animation sequences. Animations are not stored in a table but in a sequential list, specific aniamtion data addresses can be retrievd using Anim_Get().address"
+        },
+        {
+            "trigger": "Sprite_IOanim",
+            "annotation": "Sprites animation id if non zero takes over control of the sprites pointer from Sprite_IOptr",
+            "kind": "snippet",
+            "details": "Sprites animation id if non zero takes over control of the sprites pointer from Sprite_IOptr"
+        },
+        {
+            "trigger": "Sprite_IOanimFrame",
+            "annotation": "Used internally to keep track of the current frame for the sprites animation",
+            "kind": "snippet",
+            "details": "Used internally to keep track of the current frame for the sprites animation"
+        },
+        {
+            "trigger": "Sprite_IOanimSpeed",
+            "annotation": "The speed of the aniamtion, lower=faster, minimum 1",
+            "kind": "snippet",
+            "details": "The speed of the aniamtion, lower=faster, minimum 1"
+        },
+        {
+            "trigger": "Sprite_IOanimTimer",
+            "annotation": "Used internally to keep track of the time per frame for the sprites animation",
+            "kind": "snippet",
+            "details": "Used internally to keep track of the time per frame for the sprites animation"
+        },
+        {
             "trigger": "Sprite_IOcolor",
             "annotation": "The color to apply to all the chars in this sprite.",
             "kind": "snippet",
@@ -893,7 +980,7 @@
             "annotation": "",
             "contents": "System_GetRandom16 ",
             "kind": "snippet",
-            "details": "Returns a random 16 bit number in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a>"
+            "details": "Returns a random 16 bit number in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a><br> Accumulator will have the hi byte"
         },
         {
             "trigger": "System_GetRandom8",
