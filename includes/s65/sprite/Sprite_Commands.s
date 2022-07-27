@@ -894,15 +894,17 @@ _Sprite_SetSpriteMeta: {
 			cpz #S65_VISIBLE_SCREEN_CHAR_HEIGHT + Layer_IOrowCountTableRRB
 			bne !-
 
-			// jmp *
 
 			_Sprite_Update()
+
 		plx	
 	!nextlayer:
 		inx 
 		cpx #ListSize.getValue()
 		lbne !layerloop-
 }
+
+
 MaskRowValue:
 		.fill 8, 255 - pow(2, 8-i) 
 
@@ -933,6 +935,49 @@ MaskRowValue:
 			and #%11011111
 			sta S65_SpriteFlags
 
+						//Is the sprite on screen horizontal???					 
+						ldy #Sprite_IOwidth 
+						lda (SprIO), y //Width 
+						sta SM_AddLow
+						lda #$00
+						asl SM_AddLow
+						rol 
+						asl SM_AddLow
+						rol 
+						asl SM_AddLow
+						rol 
+						asl SM_AddLow
+						rol 
+						sta SM_AddHigh
+
+						ldy #Sprite_IOx +0
+						clc
+						lda (SprIO), y //x 	LSB					
+						adc SM_AddLow:#$BEEF 
+						sta SM_WidthX0
+						iny
+						lda (SprIO), y //x 	MSB				
+						adc SM_AddHigh:#$BEEF 
+						and #$03
+						sta SM_WidthX1
+
+						lda SM_WidthX0:#$BEEF
+						sec 
+						sbc #<S65_ScreenPixelWidth
+						sta SM_Test0
+						lda SM_WidthX1:#$BEEF
+						and #$03
+						sbc #>S65_ScreenPixelWidth
+						lbmi !dosprite+
+						sta SM_Test1 
+
+						sec 
+						lda SM_Test0:#$BEEF 
+						sbc SM_AddLow
+						lda SM_Test1:#$BEEF 
+						sbc SM_AddHigh
+						lbpl !nextsprite+
+			!dosprite:
 				//Sprite is active so add an entry to the RRB
 
 				//Figure out its screen row (ypos /8) and set screen/col pointers
@@ -969,18 +1014,21 @@ MaskRowValue:
 //get and store base pointer from sprites animation
 				sta SM_AnimID
 				iny // Sprite_IOanimTimer
-				lda (SprIO), y	
-				bne !noNewFrame+
 				iny // Sprite_IOanimFrame
 				lda (SprIO), y	 
 				sta SM_FrameID
 
-				//get sequence Data
+	
+				//get sequence Data pointer
 				ldy SM_AnimID:#$BEEF //data index is supplied +1
 				lda Anim_SequenceAddrTable - 1, y //LSB
 				sta.z AnimData + 0
 				lda Anim_SequenceAddrTable -1 + (Anim_SeqList.size()-1), y //MSB
 				sta.z AnimData + 1
+
+				ldy #Sprite_IOanimTimer
+				lda (SprIO), y	
+				bne !noNewFrame+
 
 				//Speed
 				ldy #Sprite_IOanimSpeed
@@ -990,12 +1038,11 @@ MaskRowValue:
 				bra !animdone+	
 
 			!noNewFrame:
-				ldy #Sprite_IOanimTimer
-				sta (SprIO), y	
 				sec 
 				sbc #$01
-				sta (SprIO), y	
+				sta (SprIO), y
 				bne !animdone+
+
 				//speed not implemented yet
 			!nextframe:
 				//get frame
@@ -1005,14 +1052,15 @@ MaskRowValue:
 				adc #$01
 				ldy SM_AnimID
 				cmp Anim_FrameCounts -1, y 
+				
 				bcc !noWrap+
 				lda #$00
 			!noWrap:
 				ldy #Sprite_IOanimFrame
 				sta (SprIO), y	
-	
+			
 			!animdone:
-
+			// System_WaitForRaster($100)
 				//get frame ptr
 				lda SM_FrameID:#$BEEF
 				asl
@@ -1026,6 +1074,7 @@ MaskRowValue:
 				sta.z S65_SpritePointerOld + 1 //byte 0	
 				bra !ptrDone+
 //get and store base pointer from standard Sprite_IOptr
+
 			!io:
 				ldy #Sprite_IOptr
 				lda (SprIO), y	

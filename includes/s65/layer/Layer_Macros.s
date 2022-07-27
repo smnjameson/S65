@@ -35,6 +35,9 @@
 		.eval S65_SCREEN_LOGICAL_ROW_WIDTH = 0//S65_SCREEN_ROW_WIDTH * 2 //16bit chars
 
 		.eval LAYER_RESOLUTION_STRETCHED = stretchWide
+
+		.eval S65_ScreenPixelWidth = charWidth * 8
+		.eval S65_ScreenPixelHeight = charHeight * 8
 }
 
 /**
@@ -611,12 +614,12 @@
 				.word spriteset.indices.get(frame)
 			}
 			.word $201
-			.word $201
-			.word $201
+			// .word $201
+			// .word $201
 	}
 	.eval Anim_FrameCounts = *
 	.for(var i=1; i<Anim_SeqList.size(); i++){
-		.byte Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame
+		.byte [Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame] 
 	}
 	.eval Anim_SequenceAddrTable = *
 			.lohifill Anim_SeqList.size() - 1, Anim_SeqList.get(i + 1).address

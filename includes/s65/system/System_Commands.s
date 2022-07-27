@@ -8,11 +8,12 @@
 * @registers A
 * @flags nzc 
 */
-.pseudocommand System_GetRandom8 {
-		jsr _System_Random16
-		sta S65_ReturnValue + 0	
+.pseudocommand System_GetRandom8 {        
         lda #$00
         sta S65_ReturnValue + 1
+		jsr _System_Random16
+		sta S65_ReturnValue + 0	
+
 }
 /**
 * .pseudocommand GetRandom16

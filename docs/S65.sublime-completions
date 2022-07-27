@@ -218,6 +218,18 @@
             "details": "Screen row offset for the row terminator bytes"
         },
         {
+            "trigger": "S65_ScreenPixelHeight",
+            "annotation": "Contains the height of the visible screen in pixels",
+            "kind": "snippet",
+            "details": "Contains the height of the visible screen in pixels"
+        },
+        {
+            "trigger": "S65_ScreenPixelWidth",
+            "annotation": "Contains the width of the visible screen in pixels",
+            "kind": "snippet",
+            "details": "Contains the width of the visible screen in pixels"
+        },
+        {
             "trigger": "S65_ScreenRamPointer",
             "annotation": "{dword} S65 BasePage pointer into screen ram. It is guaranteed to have the upper two bytes set at all times so can be used to access the screen ram using 32bit indirect z addressing. DO NOT change bytes 2 and 3!<br><br>  For this reason you MUST use a Screen RAM location that does not cross a 64kb boundary and aligned to page boundarys as the engine assumes this for speed<br><br>  Note: Requires <a href=\"#Global_SetBasePage\">S65_SetBasePage</a> or <a href=\"#Layer_SetScreenPointersXY\">Layer_SetScreenPointersXY</a> to correctly set up the base page before using indirect indexed adressing modes.",
             "kind": "snippet",

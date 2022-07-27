@@ -50,6 +50,19 @@
 
 
 /**
+* .var ScreenPixelWidth
+*
+* Contains the width of the visible screen in pixels
+*/
+.var S65_ScreenPixelWidth = 0
+
+/**
+* .var ScreenPixelHeight
+*
+* Contains the height of the visible screen in pixels
+*/
+.var S65_ScreenPixelHeight = 0
+/**
  * .macro Trace
  * 
  * Outputs a string to the kick assembler console at build time

@@ -204,6 +204,7 @@
 * The speed of the aniamtion, lower=faster, minimum 1
 * @namespace Sprite
 */
+
 .var Sprite_IOanimSpeed= Sprite_SpriteIOLength
 .eval Sprite_SpriteIOLength += 1  //16 of 16
 

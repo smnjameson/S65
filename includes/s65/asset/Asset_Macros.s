@@ -23,7 +23,6 @@
 	}
 }
 _Asset_Preload: {
-.print ("Start: $" + toHexString(Start))
 	Start: {
 		.import binary "splash/bin/bin/splashstart.bin"
 	}
