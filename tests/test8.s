@@ -9,8 +9,8 @@
 
 		Asset_ImportSpriteset("hero", "tests/assets/bin/test8/characters", $8000)
 		.const HeroSprites = Asset_GetSpriteset("hero")
-		.const AnimKnight = Anim_Define("knight", HeroSprites, 0, 8)
-		.const AnimWizard = Anim_Define("wizard", HeroSprites, 9, 17)
+		.const AnimKnight = Anim_Define("knight", HeroSprites, 3, 7)
+		.const AnimWizard = Anim_Define("wizard", HeroSprites, 12, 16)
 
 
 		.const BLANK = $0020
@@ -38,13 +38,14 @@
 
 		Layer_InitScreen($10000)							//Initialize
 
-		Palette_Assign #$01: #$00 : #$03	
+		Palette_Assign #$03: #$00 : #$03	
 		Palette_Set #$03
 		Palette_LoadFromMem paletteSpr : #$100
 
 
-		lda #$ff 
+		lda #$00
 		sta $d020
+		sta $d021
 
 		//Clear layers
 		Layer_ClearAllLayers #BLANK
