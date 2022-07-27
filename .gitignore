@@ -9,4 +9,12 @@ build/m65debugger/node_modules/
 bin/main.prg
 bin/main.vs
 bin/sdcard/
-splash/
+
+docs/logodraft.png
+splash/logo.png
+splash/make.bat
+splash/splash.s
+splash/bin/logo_chars.bin
+splash/bin/logo_ncm.bin
+splash/bin/logo_palette.bin
+splash/bin/splash.vs

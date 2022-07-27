@@ -605,21 +605,20 @@
 
 	//Animations
 
+
 	.eval Anim_SequenceData = *
+	.print ("Anim_SequenceData: $" + toHexString(Anim_SequenceData))
 	.for(var i=1; i<Anim_SeqList.size(); i++){
 			.eval Anim_SeqList.get(i).address = *
-			.for(var j=0; j<Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame; j++) {
+			.for(var j=0; j<Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame + 1; j++) {
 				.var frame = Anim_SeqList.get(i).startFrame + j
 				.var spriteset = Asset_SpriteList.get(Anim_SeqList.get(i).spriteSet.id)
 				.word spriteset.indices.get(frame)
 			}
-			.word $201
-			// .word $201
-			// .word $201
 	}
 	.eval Anim_FrameCounts = *
 	.for(var i=1; i<Anim_SeqList.size(); i++){
-		.byte [Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame] 
+		.byte [Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame] + 1 
 	}
 	.eval Anim_SequenceAddrTable = *
 			.lohifill Anim_SeqList.size() - 1, Anim_SeqList.get(i + 1).address
