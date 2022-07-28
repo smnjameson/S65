@@ -607,7 +607,6 @@
 
 
 	.eval Anim_SequenceData = *
-	.print ("Anim_SequenceData: $" + toHexString(Anim_SequenceData))
 	.for(var i=1; i<Anim_SeqList.size(); i++){
 			.eval Anim_SeqList.get(i).address = *
 			.for(var j=0; j<Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame + 1; j++) {

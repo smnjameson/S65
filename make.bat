@@ -6,6 +6,7 @@ set S65PATH=.
 
 set KICK=java -cp %S65PATH%\build\kickass.jar kickass.KickAssembler65CE02 -vicesymbols -showmem
 set PNG65=node %S65PATH%\build\aseparse65\png65.js
+set LDTK65=node %S65PATH%\build\ldtk65\ldtk65.js
 set DEPLOY=node %S65PATH%\build\m65debugger\client.js
 
 

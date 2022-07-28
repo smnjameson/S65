@@ -11,6 +11,9 @@ IF %ERRORLEVEL% NEQ 0 (
 cd build\aseparse65
 call npm install >nul
 cd ..\..
+cd build\ldtk65
+call npm install >nul
+cd ..\..
 cd build\m65debugger
 call npm install >nul
 cd ..\..
