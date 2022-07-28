@@ -28,18 +28,13 @@
 .const S65_HIGHEST_LOAD = $f000
 
 
-* = $1400 "SDCard Palette Buffer"
-	.const Palette_SDBuffer = *
-	.fill 768,0
+// * = $1400 "SDCard Palette Buffer"
+	.const Palette_SDBuffer = $1400
+// 	.fill 768,0
 
-* = $1700 "SDCard preloader info"
-	.var Asset_PreloaderFilenamePointer = *
-	
-* = $1900 "Splash filename"
-		.encoding "ascii"
-			.text "SPL"
-			.byte $00
-		.encoding "screencode_mixed"
+// * = $1700 "SDCard preloader info"
+	.var Asset_PreloaderFilenamePointer = $1700
+
 
 * = $2001 "S65 BasicUpstart"
 System_BasicUpstart65(S65_InitComplete)
