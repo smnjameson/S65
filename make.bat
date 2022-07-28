@@ -2,7 +2,7 @@
 rem Set this to match you COM port in Debugger
 set SERIAL=COM6
 rem Your path to the S65 Library
-set S65PATH=..\Shallan65
+set S65PATH=.
 
 set KICK=java -cp %S65PATH%\build\kickass.jar kickass.KickAssembler65CE02 -vicesymbols -showmem
 set PNG65=node %S65PATH%\build\aseparse65\png65.js

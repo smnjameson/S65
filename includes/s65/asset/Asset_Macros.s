@@ -22,19 +22,7 @@
 		sta $d011 		
 	}
 }
-_Asset_Preload: {
-	Start: {
-		.import binary "splash/bin/bin/splashstart.bin"
-	}
-	End: {
-		.import binary "splash/bin/bin/splashend.bin"
-	}	
-	Splash:
-		.encoding "ascii"
-		.text "SPL"
-		.byte $00
-		.encoding "screencode_mixed"
-}
+
 /**
 * .macro ImportSpriteset
 *
