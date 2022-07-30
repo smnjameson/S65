@@ -16,71 +16,135 @@
 
 	.var tilemap = Asset_TilemapList.get(tilemapId.getValue())
 	pha
+	phy
 	S65_SetBasePage()
 
-		lda #<tilemap.tilemapAddress
-		sta.z S65_TilemapPointer + 0
-		lda #>tilemap.tilemapAddress
-		sta.z S65_TilemapPointer + 1
-		lda #[[tilemap.tilemapAddress >> 16] & $ff]
-		sta.z S65_TilemapPointer + 2
-		lda #[[tilemap.tilemapAddress >> 24] & $ff]
-		sta.z S65_TilemapPointer + 3
-
-		lda #<tilemap.tiledefAddress
-		sta.z S65_TiledefPointer + 0
-		lda #>tilemap.tiledefAddress
-		sta.z S65_TiledefPointer + 1
-		lda #[[tilemap.tiledefAddress >> 16] & $ff]
-		sta.z S65_TiledefPointer + 2
-		lda #[[tilemap.tiledefAddress >> 24] & $ff]
-		sta.z S65_TiledefPointer + 3	
-
-
-		lda #<tilemap.colorAddress
-		sta.z S65_TileColordefPointer + 0
-		lda #>tilemap.colorAddress
-		sta.z S65_TileColordefPointer + 1
-		lda #[[tilemap.colorAddress >> 16] & $ff]
-		sta.z S65_TileColordefPointer + 2
-		lda #[[tilemap.colorAddress >> 24] & $ff]
-		sta.z S65_TileColordefPointer + 3
-
-
 		lda #tilemapId.getValue()	
-		sta.z S65_CurrentTilemap		
+		sta.z S65_CurrentTilemap
+
+
+			lda #<tilemap.tilemapAddress
+			sta.z S65_TilemapPointer + 0
+			lda #>tilemap.tilemapAddress
+			sta.z S65_TilemapPointer + 1
+			lda #[[tilemap.tilemapAddress >> 16] & $ff]
+			sta.z S65_TilemapPointer + 2
+			lda #[[tilemap.tilemapAddress >> 24] & $ff]
+			sta.z S65_TilemapPointer + 3
+
+			lda #<tilemap.tiledefAddress
+			sta.z S65_TiledefPointer + 0
+			lda #>tilemap.tiledefAddress
+			sta.z S65_TiledefPointer + 1
+			lda #[[tilemap.tiledefAddress >> 16] & $ff]
+			sta.z S65_TiledefPointer + 2
+			lda #[[tilemap.tiledefAddress >> 24] & $ff]
+			sta.z S65_TiledefPointer + 3	
+
+
+			lda #<tilemap.colorAddress
+			sta.z S65_TileColordefPointer + 0
+			lda #>tilemap.colorAddress
+			sta.z S65_TileColordefPointer + 1
+			lda #[[tilemap.colorAddress >> 16] & $ff]
+			sta.z S65_TileColordefPointer + 2
+			lda #[[tilemap.colorAddress >> 24] & $ff]
+			sta.z S65_TileColordefPointer + 3
+
+
+		// jsr _Tilemap_RestorePointers
+	ply
 	pla
 	S65_AddToMemoryReport("Tilemap_Get")	
 }	
 
+_Tilemap_RestorePointers: {
+		ldy.z S65_CurrentTilemap
 
+
+
+		lda tilemap0:$BEEF, y
+		sta.z S65_TilemapPointer + 0
+		lda tilemap1:$BEEF, y
+		sta.z S65_TilemapPointer + 1
+		lda tilemap2:$BEEF, y
+		sta.z S65_TilemapPointer + 2
+		lda #$00
+		sta.z S65_TilemapPointer + 3
+
+		lda tiledef0:$BEEF, y
+		sta.z S65_TiledefPointer + 0
+		lda tiledef1:$BEEF, y
+		sta.z S65_TiledefPointer + 1
+		lda tiledef2:$BEEF, y
+		sta.z S65_TiledefPointer + 2
+		lda #$00
+		sta.z S65_TiledefPointer + 3	
+
+
+		lda tilecolors0:$BEEF, y
+		sta.z S65_TileColordefPointer + 0
+		lda tilecolors1:$BEEF, y
+		sta.z S65_TileColordefPointer + 1
+		lda tilecolors2:$BEEF, y
+		sta.z S65_TileColordefPointer + 2
+		lda #$00
+		sta.z S65_TileColordefPointer + 3
+
+		rts
+
+		// lda _Tilemap_#<tilemap.tilemapAddress
+		// sta.z S65_TilemapPointer + 0
+		// lda #>tilemap.tilemapAddress
+		// sta.z S65_TilemapPointer + 1
+		// lda #[[tilemap.tilemapAddress >> 16] & $ff]
+		// sta.z S65_TilemapPointer + 2
+		// lda #[[tilemap.tilemapAddress >> 24] & $ff]
+		// sta.z S65_TilemapPointer + 3
+
+		// lda #<tilemap.tiledefAddress
+		// sta.z S65_TiledefPointer + 0
+		// lda #>tilemap.tiledefAddress
+		// sta.z S65_TiledefPointer + 1
+		// lda #[[tilemap.tiledefAddress >> 16] & $ff]
+		// sta.z S65_TiledefPointer + 2
+		// lda #[[tilemap.tiledefAddress >> 24] & $ff]
+		// sta.z S65_TiledefPointer + 3	
+
+
+		// lda #<tilemap.colorAddress
+		// sta.z S65_TileColordefPointer + 0
+		// lda #>tilemap.colorAddress
+		// sta.z S65_TileColordefPointer + 1
+		// lda #[[tilemap.colorAddress >> 16] & $ff]
+		// sta.z S65_TileColordefPointer + 2
+		// lda #[[tilemap.colorAddress >> 24] & $ff]
+		// sta.z S65_TileColordefPointer + 3
+}
 
 /**
 * .pseudocommand Draw
 *
 * Draws a rectangle from the currently active tilemap to 
 * the currently active layer using the current screenpointers<br>
-* NOTE: that this routine will NOT wrap at tthe edge of the later so make sure to 
+* NOTE: that this routine will NOT wrap at the edge of the later so make sure to 
 * not ewxceed the layers right edge or you may cause RRB corruption
 * 
 * @namespace Tilemap
 *
-* @param {byte} {IMM|REG|ABSX} srcX <add a description here>
-* @param {byte} {IMM|REG|ABSX} srcY <add a description here>
-* @param {byte} {IMM|REG|ABSX} srcWidth <add a description here>
-* @param {byte} {IMM|REG|ABSX} srcHeight <add a description here>
-*
-* @registers
-* @flags
-* 
-* @return {byte} A <add description here> 
+* @param {byte} {IMM|REG|BS|ABSX|ABSY} srcX The source rectangle X 
+* @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcY The source rectangle Y
+* @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcWidth The source rectangle width
+* @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcHeight The source rectangel height
+
+* @flags nzc
 */
 .pseudocommand Tilemap_Draw srcX : srcY : srcWidth : srcHeight {
 	S65_AddToMemoryReport("Tilemap_Draw")	
-	.if(!_isImm(srcX) && !_isReg(srcX) && !_isAbsX(srcX) && !_isAbs(srcX)) .error "Tilemap_Draw:" + S65_TypeError
-	.if(!_isImm(srcY) && !_isReg(srcY) && !_isAbsX(srcY) && !_isAbs(srcY)) .error "Tilemap_Draw:" + S65_TypeError
-	.if(!_isImm(srcWidth) && !_isReg(srcWidth) && !_isAbsX(srcWidth) && !_isAbs(srcWidth)) .error "Tilemap_Draw:" + S65_TypeError
-	.if(!_isImm(srcHeight) && !_isReg(srcHeight) && !_isAbsX(srcHeight) && !_isAbs(srcHeight)) .error "Tilemap_Draw:" + S65_TypeError
+	.if(!_isImm(srcX) && !_isReg(srcX) && !_isAbsXY(srcX) && !_isAbs(srcX)) .error "Tilemap_Draw:" + S65_TypeError
+	.if(!_isImm(srcY) && !_isReg(srcY) && !_isAbsXY(srcY) && !_isAbs(srcY)) .error "Tilemap_Draw:" + S65_TypeError
+	.if(!_isImm(srcWidth) && !_isReg(srcWidth) && !_isAbsXY(srcWidth) && !_isAbs(srcWidth)) .error "Tilemap_Draw:" + S65_TypeError
+	.if(!_isImm(srcHeight) && !_isReg(srcHeight) && !_isAbsXY(srcHeight) && !_isAbs(srcHeight)) .error "Tilemap_Draw:" + S65_TypeError
 	pha 
 	phz 
 	phy
@@ -121,31 +185,80 @@
 		lda [Tilemap_TilemapData + S65_MAX_TILEMAPS * 0], y
 		sta _Tilemap_Draw.mapWidthLSB
 
-		.if(_isReg(srcX)) {
-			lda S65_PseudoReg + 0
-		} else {
-			lda srcX 
-		}
+
+		//Do Y first as We need to store X in accumulator
 		.if(_isReg(srcY)) {
 			ldy S65_PseudoReg + 1
-		} else {
-			ldy srcY
+		} 		
+		.if(_isImm(srcY) || _isAbs(srcY)) {
+			ldy srcY 
 		}
+		.if(_isAbsX(srcY)) {
+			lda srcY.getValue(), x  
+			tay 
+		}
+		.if(_isAbsY(srcY)) {
+			ply 
+			phy
+			lda srcY.getValue(), y 
+			tay 
+		}
+
+
+		.if(_isReg(srcX)) {
+			lda S65_PseudoReg + 0
+		} 
+		.if(_isImm(srcX) || _isAbs(srcX)) {
+			lda srcX 
+		}
+		.if(_isAbsX(srcX)) {
+			lda srcX.getValue(), x  
+		}
+		.if(_isAbsY(srcX)) {
+			ply 
+			phy
+			lda srcX.getValue(), y  
+		}
+
+
 		jsr _Tilemap_Draw_ResetPointers
+
+
 
 
 		.if(_isReg(srcHeight)) {
 			lda S65_PseudoReg + 2
-		} else {
+		} 		
+		.if(_isImm(srcHeight) || _isAbs(srcHeight)) {
 			lda srcHeight 
+		}
+		.if(_isAbsX(srcHeight)) {
+			lda srcHeight.getValue(), x  
+		}
+		.if(_isAbsY(srcHeight)) {
+			ply 
+			phy
+			lda srcHeight.getValue(), y 
 		}
 		sta _Tilemap_Draw.RectHeight
 
+
+
+
 		.if(_isReg(srcWidth)) {
 			lda S65_PseudoReg + 3
-		} else {
+		}
+		.if(_isImm(srcWidth) || _isAbs(srcWidth)) {
 			lda srcWidth 
-		}		
+		}
+		.if(_isAbsX(srcWidth)) {
+			lda srcWidth.getValue(), x  
+		}
+		.if(_isAbsY(srcHeight)) {
+			ply 
+			phy
+			lda srcHeight.getValue(), y 
+		}
 		sta _Tilemap_Draw.RectWidth
 
 		jsr _Tilemap_Draw
@@ -371,8 +484,6 @@ _Tilemap_Draw: {
 
 
 
-
-
 				//next screen row
 				clc 
 				lda.z MapPtr + 0
@@ -385,7 +496,6 @@ _Tilemap_Draw: {
 				bcc !+
 				inw.z MapPtr + 2
 			!:
-
 
 				dec.z RectHeightCount 
 				lbne !screencolloop-

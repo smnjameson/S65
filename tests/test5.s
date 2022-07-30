@@ -21,8 +21,7 @@
 	Start:
 		
 
-		.const BLANK = $2ff
-		.const BRICK = $2ff
+		.const BLANK = $200
 		.const NUM_SPRITES = 32
 
 		//Define and initlayers
@@ -46,7 +45,7 @@
 		//Clear layers
 		Layer_ClearAllLayers #BLANK
 		Layer_Get #LYR_BG
-		Layer_ClearLayer #BRICK : #$01
+		Layer_ClearLayer #BLANK : #$01
 
 		//Add some text to UI layer
 		Layer_Get #LYR_UI

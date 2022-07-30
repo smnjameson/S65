@@ -187,6 +187,7 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	.var Layer_src = $0000
 	.var Layer_width = $0000
 	.var Layer_offsetAdd = $0000
+	.var Layer_offsetAbsolute = $0000
 
 	/**
 	 * .data LogicalWidth

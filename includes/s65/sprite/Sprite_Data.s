@@ -204,12 +204,22 @@
 * The speed of the aniamtion, lower=faster, minimum 1
 * @namespace Sprite
 */
-
 .var Sprite_IOanimSpeed= Sprite_SpriteIOLength
 .eval Sprite_SpriteIOLength += 1  //16 of 16
 
+
+// /**
+// * .var IOpixelWidth
+// * The width of the sprite in pixels, calculated automatically on Sprite_SetMeta
+// * and Sprite_SetWidth. Required for optimisation in Sprite_Update
+// * @namespace Sprite
+// */
+// .var Sprite_IOpixelWidth = Sprite_SpriteIOLength
+// .eval Sprite_SpriteIOLength += 2 //18 of 16
+
+
 //Pad out the array so it aligns to allow faster access
-.eval Sprite_SpriteIOLength = $10
+// .eval Sprite_SpriteIOLength = $20
 
 
 

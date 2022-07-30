@@ -331,13 +331,7 @@
         }
 }
 .macro _Asset_ImportTilemap_StripTilemapHeader(path) {
-		.var bin = LoadBinary(path+"_map.bin")
-		// .for(var i=6; i<bin.getSize(); i+=2) {
-		// 	.var tileNum = bin.uget(i) + $100 * bin.uget(i+1)
-		// 	.print (""+toHexString(tileNum)+"          "+toHexString(charset.colors))
-		// 	.byte <tileNum		//lsb
-		// 	.byte >tileNum 		//msb
-		// }		
+		.var bin = LoadBinary(path+"_map.bin")	
 		.fill bin.getSize()-6, bin.uget(i+6)
 }
 .macro _Asset_ImportTilemap_AddBaseToTiles(path, base, charset) {
@@ -347,10 +341,6 @@
 			.var tileNum = bin.uget(i) + $100 * bin.uget(i+1)
 
 			.byte <addr, [>addr] + charset.colors.get(tileNum)
-		}
-
-		.for(var i=0;i<charset.colors.size();i++) {
-			// .print (""+toHexString(charset.colors.get(i)))
 		}
 }
 

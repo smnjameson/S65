@@ -1276,7 +1276,7 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX|ABY} color - Color to write to color ram</div></span>
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABSXY} color - Color to write to color ram</div></span>
 						</div>
 					
 						
@@ -1335,14 +1335,14 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Fills the screen RAM area for ALL layers with a given 16bit value. Note this will overwrite any RRB GotoX markers also  </div>
+						<div class='macroItemDescription'> Fills the screen RAM area for ALL layers with a given 16bit value. Note this will overwrite any RRB GotoX markers also<br> NOTE: Absolute addressing will fetch 2 bytes from the target address (aka ABS16)<br>  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_ClearAllLayers <i>clearChar</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {IMM} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS16|ABX16|ABY16} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
 						</div>
 					
 						
@@ -1366,18 +1366,18 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Fills the screen RAM area for the currently selected layer with a given 16bit value.   </div>
+						<div class='macroItemDescription'> Fills the screen RAM area for the currently selected layer with a given 16bit value. Optionally clearing the color too   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_ClearLayer <i>clearChar</i> : <i>clearColor</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS16|ABX16|ABY16} clearChar - The 16bit char value to clear with, defaults to $0000</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM} clearColor - The 8bit char value to clear with, defaults to $00</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{word} {REG|IMM|ABS|ABX|ABY} clearColor - The 8bit char value to clear with, defaults to $00</div></span>
 						</div>
 					
 						
@@ -1414,7 +1414,7 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} layerNum - The layer to fetch</div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABSXY} layerNum - The layer to fetch</div></span>
 						</div>
 					
 						
@@ -1459,14 +1459,14 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the gotox value for the current selected layer so that it is rendered in a <a href="#Layer_Update">Layer_Update</a> with a new shifted X position<br>  </div>
+						<div class='macroItemDescription'> Sets the gotox value for the current selected layer so that it is rendered in a <a href="#Layer_Update">Layer_Update</a> with a new shifted X position<br> NOTE: Absolute addressing will fetch 2 bytes from the target address (aka ABS16)<br>  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_SetGotoX <i>gotox</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{bool} {IMM|REG|ABS} gotox - The gotox value to set</div></span>
+						<span><div class='paramHeader'>{word} {IMM|REG|ABS16|ABX16|ABY16} gotox - The gotox value to set</div></span>
 						</div>
 					
 						
@@ -1497,11 +1497,11 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {REG|IMM} xpos - x position on layer</div></span>
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX|ABY} xpos - x position on layer</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {REG|IMM} ypos - y position on layer</div></span>
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABX|ABY} ypos - y position on layer</div></span>
 						</div>
 					
 						
@@ -1511,18 +1511,28 @@ h4 {
 						<div class='macroItemHeader' id='Layer_Shift'>Shift
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'></span>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Shift the cahrs on this layer horizontally     </div>
+						<div class='macroItemDescription'> Shift the cahrs on this layer horizontally   </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_Shift <i>xshift</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} xshift - The number of chars to shift</div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABX|ABY} xshift - The number of chars to shift</div></span>
 						</div>
 					
 						
@@ -1568,11 +1578,11 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {ABSY|IMM|REG} screenSource - The color source data address to use or a value to use if IMM defaults to #$00</div></span>
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABS|ABSY} screenSource - The color source data address to use or a value to use if IMM defaults to #$00</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {ABSY|IMM|REG} colorSource - The color source data address to use or a value to use if IMM defaults to #$00</div></span>
+						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {REG|IMM|ABS|ABSY} colorSource - The color source data address to use or a value to use if IMM defaults to #$00</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
@@ -3237,10 +3247,47 @@ h4 {
 		
 				<div class='macroHeader' id='System_Pseudocommands'>Pseudocommands</div>
 			
+					<div class='macroIndex'><a href='#System_Compare16'>Compare16</a></div>
+				
 					<div class='macroIndex'><a href='#System_GetRandom16'>GetRandom16</a></div>
 				
 					<div class='macroIndex'><a href='#System_GetRandom8'>GetRandom8</a></div>
 				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_Compare16'>Compare16
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> peforms a 16bit compare between value A and valueB, setting flags accordingly    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_Compare16 <i>valueA</i> : <i>valueB</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|ABS16|ABX16|ABY16} valueA - Vlaue to compare against valueB</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM|ABS16|ABX16|ABY16} valueB - Value to compare against valueA</div></span>
+						</div>
+					
+						
+						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_GetRandom16'>GetRandom16
 							
@@ -3591,30 +3638,40 @@ h4 {
 						<div class='macroItemHeader' id='Tilemap_Draw'>Draw
 							
 							<div class='macroItemSubHeader'>
-								<span  style='display:inline-flex;'></span>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Draws a rectangle from the currently active tilemap to the currently active layer using the current screenpointers<br> NOTE: that this routine will NOT wrap at tthe edge of the later so make sure to not ewxceed the layers right edge or you may cause RRB corruption     </div>
+						<div class='macroItemDescription'> Draws a rectangle from the currently active tilemap to the currently active layer using the current screenpointers<br> NOTE: that this routine will NOT wrap at the edge of the later so make sure to not ewxceed the layers right edge or you may cause RRB corruption    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Tilemap_Draw <i>srcX</i> : <i>srcY</i> : <i>srcWidth</i> : <i>srcHeight</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM|REG|ABSX} srcX - <add a description here></div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|BS|ABSX|ABSY} srcX - The source rectangle X</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM|REG|ABSX} srcY - <add a description here></div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABSX|ABSY} srcY - The source rectangle Y</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM|REG|ABSX} srcWidth - <add a description here></div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABSX|ABSY} srcWidth - The source rectangle width</div></span>
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM|REG|ABSX} srcHeight - <add a description here></div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABSX|ABSY} srcHeight - The source rectangel height</div></span>
 						</div>
 					
 						

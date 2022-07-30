@@ -14,7 +14,6 @@
 	S65_AddToMemoryReport("SDCard_LoadToChipRam")
 	S65_SaveRegisters()
 
-.print ("filePtr.getValue(): $" + toHexString(filePtr.getValue()))
 		lda #>filePtr.getValue()
 		ldx #<filePtr.getValue()
 		jsr SDIO.CopyFileName
