@@ -452,8 +452,10 @@
 
 		lda #<S65_COLOR_RAM
 		sta S65_BaseColorRamPointer + 0	
+		sta $d064
 		lda #>S65_COLOR_RAM
 		sta S65_BaseColorRamPointer + 1
+		sta $d065
 		lda #[S65_COLOR_RAM >> 16]
 		sta S65_BaseColorRamPointer + 2
 		sta S65_ColorRamPointer + 2
@@ -481,6 +483,15 @@
 		lda #S65_VISIBLE_SCREEN_CHAR_HEIGHT
 		sta _Layer_Update.ScreenHeight
 
+
+
+		lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
+		sta DMA_Layer_Shift_ExecuteRows.RowWidthLSB
+		lda #>S65_SCREEN_LOGICAL_ROW_WIDTH
+		sta DMA_Layer_Shift_ExecuteRows.RowWidthMSB
+		lda #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		sta DMA_Layer_Shift_ExecuteRows.RowCount
+		
 		jmp end
 
 
@@ -507,7 +518,26 @@
 		sta S65_DynamicLayerData + 0
 		lda #>Layer_DynamicDataTable
 		sta S65_DynamicLayerData + 1
-		
+			
+		lda #<Layer_RowAddressBaseLSB 
+		sta S65_Layer_RowAddressLSB + 0
+		lda #>Layer_RowAddressBaseLSB 
+		sta S65_Layer_RowAddressLSB + 1
+		lda #<Layer_RowAddressBaseMSB 
+		sta S65_Layer_RowAddressMSB + 0
+		lda #>Layer_RowAddressBaseMSB 
+		sta S65_Layer_RowAddressMSB + 1
+
+		lda #<Layer_offsetAbsolute
+		sta S65_Layer_OffsetTable + 0
+		lda #>Layer_offsetAbsolute
+		sta S65_Layer_OffsetTable + 1
+
+		lda #<[S65_COLOR_RAM - S65_SCREEN_RAM]
+		sta S65_ColorRamLSBOffset
+		lda #>[S65_COLOR_RAM - S65_SCREEN_RAM]
+		sta S65_ColorRamMSBOffset
+
 		lda #<Layer_SpriteIOAddrLSB 
 		sta S65_SpriteIOAddrLSB + 0
 		lda #>Layer_SpriteIOAddrLSB
@@ -516,6 +546,77 @@
 		sta S65_SpriteIOAddrMSB + 0
 		lda #>Layer_SpriteIOAddrMSB
 		sta S65_SpriteIOAddrMSB + 1	
+
+
+		//Screen cl;ear dmas
+		lda #>[S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT]
+		sta DMA_Layer_ClearAllLayersZero.job1 + $03
+		lsr 
+		sta DMA_Layer_ClearAllLayersFull.job1 + $03
+		sta DMA_Layer_ClearAllLayersFull.job2 + $03
+		lda #<[S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT]
+		sta DMA_Layer_ClearAllLayersZero.job1 + $02
+		ror
+		sta DMA_Layer_ClearAllLayersFull.job1 + $02
+		sta DMA_Layer_ClearAllLayersFull.job2 + $02
+		lda #<[S65_SCREEN_RAM]
+		sta DMA_Layer_ClearAllLayersZero.job1 + $07
+		sta DMA_Layer_ClearAllLayersFull.job1 + $07
+		clc 
+		adc #$01
+		sta DMA_Layer_ClearAllLayersFull.job2 + $07
+		lda #>[S65_SCREEN_RAM]
+		sta DMA_Layer_ClearAllLayersZero.job1 + $08
+		sta DMA_Layer_ClearAllLayersFull.job1 + $08
+		adc #$00
+		sta DMA_Layer_ClearAllLayersFull.job2 + $08
+		lda #[[S65_SCREEN_RAM >> 16] & $0f]
+		sta DMA_Layer_ClearAllLayersZero.job1 + $09
+		sta DMA_Layer_ClearAllLayersFull.job1 + $09
+		adc #$00
+		and #$0f
+		sta DMA_Layer_ClearAllLayersFull.job2 + $09	
+
+
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 10]
+		sta _Tilemap_RestorePointers.tilemap0 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 10]
+		sta _Tilemap_RestorePointers.tilemap0 + 1
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 11]
+		sta _Tilemap_RestorePointers.tilemap1 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 11]
+		sta _Tilemap_RestorePointers.tilemap1 + 1
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 12]
+		sta _Tilemap_RestorePointers.tilemap2 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 12]
+		sta _Tilemap_RestorePointers.tilemap2 + 1
+
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 13]
+		sta _Tilemap_RestorePointers.tiledef0 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 13]
+		sta _Tilemap_RestorePointers.tiledef0 + 1
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 14]
+		sta _Tilemap_RestorePointers.tiledef1 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 14]
+		sta _Tilemap_RestorePointers.tiledef1 + 1
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 15]
+		sta _Tilemap_RestorePointers.tiledef2 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 15]
+		sta _Tilemap_RestorePointers.tiledef2 + 1
+
+
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 7]
+		sta _Tilemap_RestorePointers.tilecolors0 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 7]
+		sta _Tilemap_RestorePointers.tilecolors0 + 1
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 8]
+		sta _Tilemap_RestorePointers.tilecolors1 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 8]
+		sta _Tilemap_RestorePointers.tilecolors1 + 1
+		lda #<[Tilemap_TilemapData + Asset_TilemapList.size() * 9]
+		sta _Tilemap_RestorePointers.tilecolors2 + 0
+		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 9]
+		sta _Tilemap_RestorePointers.tilecolors2 + 1
 
 		* = * "Post Layer_InitScreen User Code and Data"
 		.eval PostLayerInitScreen = *
@@ -584,7 +685,8 @@
 		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("ncm") ? $08: $00
 	.eval Layer_width = *		
 		.fill Layer_LayerList.size(), Layer_LayerList.get(i).get("charWidth") * 2
-	.eval Layer_offsetAdd = *		
+
+	.eval Layer_offsetAdd = *	
 		.var layerOffset = 0
 		.for(var i=0; i<Layer_LayerList.size(); i++) {
 			.var layer = Layer_LayerList.get(i)
@@ -592,6 +694,12 @@
 			.if( i == Layer_LayerList.size()-1) .byte [[layer.get("charWidth") * 2] + 4]
 			.eval layerOffset = layer.get("startAddr")
 		}		
+
+	.eval Layer_offsetAbsolute = *
+		.for(var i=0; i<Layer_LayerList.size(); i++) {
+			.var layer = Layer_LayerList.get(i)
+			.word [layer.get("startAddr") ]
+		}	
 
 	//Sprite meta
 	.eval Asset_SpriteListMetaTable = *
@@ -604,10 +712,7 @@
 	}
 
 	//Animations
-
-
 	.eval Anim_SequenceData = *
-	.print ("Anim_SequenceData: $" + toHexString(Anim_SequenceData))
 	.for(var i=1; i<Anim_SeqList.size(); i++){
 			.eval Anim_SeqList.get(i).address = *
 			.for(var j=0; j<Anim_SeqList.get(i).endFrame - Anim_SeqList.get(i).startFrame + 1; j++) {
@@ -622,7 +727,40 @@
 	}
 	.eval Anim_SequenceAddrTable = *
 			.lohifill Anim_SeqList.size() - 1, Anim_SeqList.get(i + 1).address
-		
+	
+
+	//Tilemaps
+	//
+
+
+	.eval Tilemap_TilemapData = *
+	.var tilemapList = Asset_TilemapList
+	.var size = Asset_TilemapList.size()
+
+	//0
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).width & $ff]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [tilemapList.get(i).width >> 8 ] & $ff]
+	//2
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).height & $ff]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [tilemapList.get(i).height >> 8 ] & $ff]
+	//4
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tilewidth]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tileheight]
+	//6
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tileheight * tilemapList.get(i).tilewidth]
+	//7
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).colorAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).colorAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).colorAddress >> 16] & $ff] ]
+	//10
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).tilemapAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).tilemapAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).tilemapAddress >> 16] & $ff] ]
+	//13
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).tiledefAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).tiledefAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).tiledefAddress >> 16] & $ff] ]
+
 	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 }
 

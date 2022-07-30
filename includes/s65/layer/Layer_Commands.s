@@ -6,17 +6,46 @@
 * is required for the Layer functions
 * 
 * @namespace Layer
-* @param {byte} {IMM} layerNum The layer to fetch
+* @param {byte} {IMM|REG|ABSXY} layerNum The layer to fetch
 * @registers B
 * @flags nzc
 */
 .pseudocommand Layer_Get layer {
+	S65_AddToMemoryReport("Layer_Get")
+	.if(!_isImm(layer) && !_isReg(layer) && !_isAbs(layer) && !_isAbsXY(layer)) .error "Layer_Get:"+ S65_TypeError
+	_saveIfReg(layer, S65_PseudoReg + 0)
+
 	pha
 	S65_SetBasePage()
-			.eval LastLayerValue = layer.getValue()
+		.if(!_isReg(layer)) {
+			lda layer
+			.eval LastLayerValue2 = layer.getValue() 
+		} else {
+			lda.z S65_PseudoReg + 0
+			.eval LastLayerValue2 = 0
+
+		}
+		jsr _Layer_Get_SetPointers
+
 	pla
+	S65_AddToMemoryReport("Layer_Get")
 }
-.var LastLayerValue = 0
+_Layer_Get_SetPointers: {
+	phy
+		sta.z S65_CurrentLayer
+		asl 
+		tay 
+		lda (S65_DynamicLayerData), y 
+		sta.z S65_LastLayerIOPointer + 0
+		lda (S65_DynamicLayerData), y 
+		sta.z S65_LastLayerIOPointer + 0
+		iny
+		lda (S65_DynamicLayerData), y 
+		sta.z S65_LastLayerIOPointer + 1
+	ply
+	rts
+}	
+.var LastLayerValue2 = 0
 
 
 
@@ -25,39 +54,75 @@
 *
 * Sets the gotox value for the current selected layer so that it is rendered in a 
 * <a href="#Layer_Update">Layer_Update</a> with a new shifted X position<br>
+* NOTE: Absolute addressing will fetch 2 bytes from the target address (aka ABS16)<br>
 * 
 * @namespace Layer
-* @param {bool} {IMM|REG|ABS} gotox The gotox value to set
+* @param {word} {IMM|REG|ABS16|ABX16|ABY16} gotox The gotox value to set
 * @flags nz
-* @returns {word} S65_ReturnValue
 */
 .pseudocommand Layer_SetGotoX gotox {
 	S65_AddToMemoryReport("Layer_SetGotoX")
 	.if(!_isReg(gotox) && !_isImm(gotox) && !_isAbs(gotox) && !_isAbsXY(gotox)) .error "Layer_SetGotoX:"+ S65_TypeError
+
 	_saveIfReg(gotox, S65_PseudoReg + 0)
 	pha	
-
+	phy	
+		//REG
 		.if(_isReg(gotox)) {
 			lda S65_PseudoReg + 0
-			sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+			ldy #$00
+			sta (S65_LastLayerIOPointer), y
 			lda #$00
-			sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
-		} else {
-			.if(_isImm(gotox)) {
+			iny
+			sta (S65_LastLayerIOPointer), y
+
+		} 
+		//IMM
+		.if(_isImm(gotox)) {
+				ldy #$00
 				lda #<gotox.getValue()
-				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+				sta (S65_LastLayerIOPointer), y
+				iny
 				lda #>gotox.getValue()
-				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
-			} else {	
-				lda gotox.getValue() + 0
-				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+				sta (S65_LastLayerIOPointer), y
+
+		} 
+		//ABS
+		.if(_isAbs(gotox)) {	
+				lda gotox.getValue()
+				ldy #$00
+				sta (S65_LastLayerIOPointer), y
+				iny
 				lda gotox.getValue() + 1
-				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1			
-			}
+				sta (S65_LastLayerIOPointer), y
 		}
+
+		.if(_isAbsX(gotox)) {	
+				lda gotox.getValue(), x
+				ldy #$00
+				sta (S65_LastLayerIOPointer), y
+				iny
+				lda gotox.getValue() + 1, x
+				sta (S65_LastLayerIOPointer), y
+		}
+
+		.if(_isAbsY(gotox)) {	
+			ply 
+			phy
+				lda gotox.getValue(), y
+				ldy #$00
+				sta (S65_LastLayerIOPointer), y
+			ply 
+			phy
+				lda gotox.getValue() + 1, y
+				ldy #$01
+				sta (S65_LastLayerIOPointer), y
+		}				
+	ply
 	pla
 	S65_AddToMemoryReport("Layer_SetGotoX")
 }
+
 /**
 * .pseudocommand GetGotoX
 *
@@ -66,18 +131,24 @@
 * 
 * @namespace Layer
 * @flags nz
-* @returns {bool} S65_ReturnValue
+* @returns {word} S65_ReturnValue
 */
-.pseudocommand Layer_GetGotoX gotox {
+.pseudocommand Layer_GetGotoX  {
 	S65_AddToMemoryReport("Layer_GetGotoX")
 	pha
-			lda Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
+	phy
+			ldy #$00
+			lda (S65_LastLayerIOPointer), y
 			sta.z S65_ReturnValue + 0
-			lda Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
+			iny
+			lda (S65_LastLayerIOPointer), y
 			sta.z S65_ReturnValue + 1
+	ply
 	pla
 	S65_AddToMemoryReport("Layer_GetGotoX")	
 }
+
+
 
 /**
 * .pseudocommand AddText
@@ -95,7 +166,7 @@
 * @param {word} {REG|IMM} xpos Layer char X position
 * @param {word} {REG|IMM} ypos Layer char Y position
 * @param {word} {ABS} textPtr The address to fetch char data from
-* @param {byte} {REG|IMM|ABS|ABX|ABY} color Color to write to color ram
+* @param {byte} {REG|IMM|ABSXY} color Color to write to color ram
 * @flags znc
 */
 .pseudocommand Layer_AddText xpos: ypos: textPtr : color {
@@ -105,106 +176,110 @@
 	.if(!_isReg(ypos) && !_isImm(ypos)) .error "Layer_AddText:"+ S65_TypeError
 	.if(!_isAbs(textPtr)) .error "Layer_AddText:"+ S65_TypeError
 	.if(!_isAbsXY(color) && !_isImm(color) && !_isReg(color)) .error "Layer_AddText:"+ S65_TypeError	
-	_saveIfReg(color,	SMcolor)
+	_saveIfReg(color,	S65_PseudoReg + 0)
 	_saveIfReg(xpos, 	S65_PseudoReg + 1)
 	_saveIfReg(ypos, 	S65_PseudoReg + 2)
-
+	pha
+	phx
+	phy
 		.const SCREEN_PTR = S65_ScreenRamPointer
 		.const COLOR_PTR = S65_ColorRamPointer
 		.const TEXT_PTR = S65_TempWord1
 
-
-			.var ADDRESS = Layer_GetScreenAddress(LastLayerValue, xpos.getValue(), ypos.getValue())
-
 			.if(_isImm(xpos) && _isImm(ypos)) {
-				.eval ADDRESS = Layer_GetScreenAddress(LastLayerValue, xpos.getValue(), ypos.getValue())
-				lda #<ADDRESS
-				sta.z S65_ScreenRamPointer + 0
-				lda #>ADDRESS
-				sta.z S65_ScreenRamPointer + 1
+					ldy #ypos.getValue()
+					ldx #xpos.getValue()
+					jsr _Layer_AddText_CalcAddressFromXY
 			}
-			.if(_isReg(xpos) && _isImm(ypos)) {
-					.eval ADDRESS = Layer_GetScreenAddress(LastLayerValue, 0, ypos.getValue())
-					asl.z S65_PseudoReg + 1
-					clc
-					lda #<ADDRESS
-					adc.z S65_PseudoReg + 1
-					sta.z S65_ScreenRamPointer + 0
-					lda #>ADDRESS
-					adc #$00
-					sta.z S65_ScreenRamPointer + 1
-			}
-			.if(_isReg(xpos) && _isReg(ypos)) {
-				phx
-					asl.z S65_PseudoReg + 1 //xpos
-					ldx S65_PseudoReg + 2 //ypos
-					clc 
-					lda Layer_RowAddressLSB, x 
-					adc.z S65_PseudoReg + 1
-					sta.z S65_ScreenRamPointer + 0
-					lda Layer_RowAddressMSB, x 
-					adc #$00
-					sta.z S65_ScreenRamPointer + 1
 
-					lda #LastLayerValue
-					asl 
-					tax
-					clc 	
-					lda.z S65_ScreenRamPointer + 0 
-					adc.z Layer_AddrOffsets + 0, x
-					sta.z S65_ScreenRamPointer + 0
-					lda.z S65_ScreenRamPointer + 1
-					adc.z Layer_AddrOffsets + 1, x
-					sta.z S65_ScreenRamPointer + 1
-				plx
+			.if(_isReg(xpos) && _isImm(ypos)) {
+					ldy #ypos.getValue()
+					ldx.z S65_PseudoReg + 1
+					jsr _Layer_AddText_CalcAddressFromXY		
+			}
+
+
+			.if(_isReg(xpos) && _isReg(ypos)) {
+					ldy.z S65_PseudoReg + 2 //ypos
+					ldx.z S65_PseudoReg + 1 //xpos
+					jsr _Layer_AddText_CalcAddressFromXY	
 			} 
 
 			.if(_isImm(xpos) && _isReg(ypos)) {
-				phx
-					ldx S65_PseudoReg + 2
-
-					clc 
-					lda Layer_RowAddressLSB, x 
-					adc.z #[xpos.getValue() * 2]
-					sta.z S65_ScreenRamPointer + 0
-					lda Layer_RowAddressMSB, x 
-					adc #$00
-					sta.z S65_ScreenRamPointer + 1
-
-
-					lda #LastLayerValue
-					asl 
-					tax
-					clc 	
-					lda.z S65_ScreenRamPointer + 0 
-					adc.z Layer_AddrOffsets + 0, x
-					sta.z S65_ScreenRamPointer + 0
-					lda.z S65_ScreenRamPointer + 1
-					adc.z Layer_AddrOffsets + 1, x
-					sta.z S65_ScreenRamPointer + 1	
-				plx				
+					ldy.z S65_PseudoReg + 2 //ypos
+					ldx #xpos.getValue()
+					jsr _Layer_AddText_CalcAddressFromXY
 			}
 		
-			clc
-			lda.z S65_ScreenRamPointer + 0
-			adc #<[S65_COLOR_RAM - S65_SCREEN_RAM]
-			sta.z S65_ColorRamPointer + 0
-			lda.z S65_ScreenRamPointer + 1
-			adc #>[S65_COLOR_RAM - S65_SCREEN_RAM]
-			sta.z S65_ColorRamPointer + 1					
-
+	
 			lda #<textPtr.getValue()
 			sta.z TEXT_PTR + 0
 			lda #>textPtr.getValue()
 			sta.z TEXT_PTR + 1
 
-			lda SMcolor: color 		
+
+			.if(_isReg(color)) {
+				lda S65_PseudoReg + 0
+			} else {
+				.if(_isAbsXY(color)) {
+					ply 
+					plx 
+					lda color 
+					phx 
+					phy
+				} else {
+					lda color
+				}
+			} 		
 			sta _Layer_AddText.VALUE 
 			jsr _Layer_AddText
+
+	ply
+	plx 
+	pla
 	S65_RestoreRegisters()
 	S65_AddToMemoryReport("Layer_AddText")
 }
+_Layer_AddText_CalcAddressFromXY: {
+		lda (S65_Layer_RowAddressLSB), y
+		sta.z S65_ScreenRamPointer + 0
+		lda (S65_Layer_RowAddressMSB), y
+		sta.z S65_ScreenRamPointer + 1
+		
+		lda.z S65_CurrentLayer
+		asl 
+		tay
+		clc 
+		lda (S65_Layer_OffsetTable), y
+		adc.z S65_ScreenRamPointer + 0
+		sta.z S65_ScreenRamPointer + 0
+		lda.z S65_ScreenRamPointer + 1
+		iny
+		adc (S65_Layer_OffsetTable), y
+		sta.z S65_ScreenRamPointer + 1	
+
+		txa 
+		asl //double for 16 bit chars
+		clc 
+		adc.z S65_ScreenRamPointer + 0
+		sta.z S65_ScreenRamPointer + 0
+		lda.z S65_ScreenRamPointer + 1 
+		adc #$00
+		sta.z S65_ScreenRamPointer + 1	
+
+		//Now adjust color ram pointer
+		clc
+		lda.z S65_ScreenRamPointer + 0
+		adc.z S65_ColorRamLSBOffset
+		sta.z S65_ColorRamPointer + 0
+		lda.z S65_ScreenRamPointer + 1
+		adc.z S65_ColorRamMSBOffset
+		sta.z S65_ColorRamPointer + 1	
+
+		rts
+}
 _Layer_AddText: {
+	phz
 			.const TEXT_PTR = S65_TempWord1
 			ldz #$00
 			ldy #$00
@@ -230,7 +305,8 @@ _Layer_AddText: {
 				iny
 			bra !loop-
 		!exit:
-		rts
+	plz
+	rts
 }	
 
 
@@ -239,116 +315,181 @@ _Layer_AddText: {
 * .pseudocommand ClearAllLayers
 *
 * Fills the screen RAM area for ALL layers with a given 16bit value. Note this will overwrite any 
-* RRB GotoX markers also
+* RRB GotoX markers also<br>
+* NOTE: Absolute addressing will fetch 2 bytes from the target address (aka ABS16)<br>
 * 
 * @namespace Layer 
-* @param {word?} {IMM} clearChar The 16bit char value to clear with, defaults to $0000
+* @param {word?} {REG|IMM|ABS16|ABX16|ABY16} clearChar The 16bit char value to clear with, defaults to $0000
 * @flags zn
 */
 .pseudocommand Layer_ClearAllLayers clearChar {
 	S65_AddToMemoryReport("Layer_ClearAllLayers")
-	.if(!_isAbsImmOrNone(clearChar) && !_isReg(clearChar)) .error "Layer_ClearAllLayers:"+ S65_TypeError
+	.if(!_isAbsImmOrNone(clearChar) && !_isReg(clearChar) && !_isAbsXY(clearChar)) .error "Layer_ClearAllLayers:"+ S65_TypeError
 	_saveIfReg(clearChar, S65_PseudoReg + 0)
 	phy
 	phx
 	pha        
-		.const SCREEN_BYTE_SIZE = S65_SCREEN_LOGICAL_ROW_WIDTH * S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		
 		//REGISTER
 		.if(_isReg(clearChar)) {
 			lda S65_PseudoReg + 0
-			sta jobIf.Job1_Source
+			sta DMA_Layer_ClearAllLayersFull.job1 + $04
 			lda #$00
-			sta jobIf.Job2_Source	
+			sta DMA_Layer_ClearAllLayersFull.job2 + $04
 		} 
-
-		//ABSOLUTE
+		//IMM
+		.if(_isImm(clearChar)) {
+			lda #<clearChar.getValue()
+			sta DMA_Layer_ClearAllLayersFull.job1 + $04
+			lda #>clearChar.getValue()
+			sta DMA_Layer_ClearAllLayersFull.job2 + $04
+		} 
+		//ABS16
 		.if(_isAbs(clearChar) && !_isReg(clearChar)) {
 			lda clearChar.getValue()
-			sta jobIf.Job1_Source
+			sta DMA_Layer_ClearAllLayersFull.job1 + $04
 			lda clearChar.getValue() + 1
-			sta jobIf.Job2_Source
+			sta DMA_Layer_ClearAllLayersFull.job2 + $04
+		}
+		//ABX16
+		.if(_isAbsX(clearChar)) {
+			lda clearChar.getValue(),x
+			sta DMA_Layer_ClearAllLayersFull.job1 + $04
+			lda clearChar.getValue() + 1,x 
+			sta DMA_Layer_ClearAllLayersFull.job2 + $04
+		}
+		//ABY16
+		.if(_isAbsY(clearChar)) {
+			lda clearChar.getValue(),y
+			sta DMA_Layer_ClearAllLayersFull.job1 + $04
+			lda clearChar.getValue() + 1,y 
+			sta DMA_Layer_ClearAllLayersFull.job2 + $04
 		}
 
-		DMA_Execute job
-		jmp end
+		.if(clearChar.getType() != AT_NONE) {
+			DMA_Execute DMA_Layer_ClearAllLayersFull
 
-		job:
-			DMA_Header #$00 : #$00
-			jobIf:
-			.if(clearChar.getType() != AT_NONE) {
-				DMA_Step #$0100 : #$0200 
-				.label Job1_Source = * + $04
-				DMA_FillJob #<clearChar.getValue() : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE/2 : #TRUE
-				.label Job2_Source = * + $04		
-				DMA_FillJob #>clearChar.getValue() : S65_SCREEN_RAM + 1 : #SCREEN_BYTE_SIZE/2 : #FALSE
-
-			} else {
-				DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #SCREEN_BYTE_SIZE : #FALSE												
-			}
-		end:
+		} else {
+			DMA_Execute DMA_Layer_ClearAllLayersZero
+		}
 	pla
 	plx 
 	ply
 	S65_AddToMemoryReport("Layer_ClearAllLayers")
+}
+DMA_Layer_ClearAllLayersFull: {
+	DMA_Header #$00 : #$00
+	DMA_Step #$0100 : #$0200 
+	job1:
+	DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #$100 : #TRUE
+	job2:		
+	DMA_FillJob #$00 : S65_SCREEN_RAM + 1 : #$100 : #FALSE	
+}
+DMA_Layer_ClearAllLayersZero: {
+	DMA_Header #$00 : #$00
+	job1:
+	DMA_FillJob #$00 : S65_SCREEN_RAM + 0 : #$100 : #FALSE	
 }
 
 
 /**
 * .pseudocommand ClearLayer
 *
-* Fills the screen RAM area for the currently selected layer with a given 16bit value. 
+* Fills the screen RAM area for the currently selected layer with a given 16bit value. Optionally clearing the color too
 * 
 * @namespace Layer
 *
-* @param {word?} {REG|IMM} clearChar The 16bit char value to clear with, defaults to $0000
-* @param {word?} {REG|IMM} clearColor The 8bit char value to clear with, defaults to $00
+* @param {word?} {REG|IMM|ABS16|ABX16|ABY16} clearChar The 16bit char value to clear with, defaults to $0000
+* @param {word?} {REG|IMM|ABS|ABX|ABY} clearColor The 8bit char value to clear with, defaults to $00
 * @flags nzc
 */
 .pseudocommand Layer_ClearLayer clearChar : clearColor {
 	S65_AddToMemoryReport("Layer_ClearLayer")
-	.if(!_isImmOrNone(clearChar) && !_isReg(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
-	.if(!_isImmOrNone(clearColor) && !_isReg(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
+	.if(!_isAbsImmOrNone(clearChar) && !_isReg(clearChar)  && !_isAbsXY(clearChar)) .error "Layer_ClearLayer:"+ S65_TypeError
+	.if(!_isAbsImmOrNone(clearColor) && !_isReg(clearColor)  && !_isAbsXY(clearColor)) .error "Layer_ClearLayer:"+ S65_TypeError
 	_saveIfReg(clearChar, S65_PseudoReg + 0)
-	_saveIfReg(clearChar, S65_PseudoReg + 1)
-	phx 
+	_saveIfReg(clearColor, S65_PseudoReg + 1)
 	pha 
+	phx 
 	phy	
 
 		//X=charLo, Y=charHi, A = layer
-		//REGISTER
+		//NONE
 		.if(_isNone(clearChar)) {
-				ldx #$00
-				ldy #$00
-		} else {
-			.if(_isReg(clearChar)) {
-				lda S65_PseudoReg + 0
-				tax 
-				ldy #$00
-			}  else {
-				ldx #<clearChar.getValue()
-				ldy #>clearChar.getValue()
-			}
+			ldx #$00
+			ldy #$00
+		} 
+		//REG
+		.if(_isReg(clearChar)) {
+			lda S65_PseudoReg + 0
+			tax 
+			ldy #$00
+		} 
+		//IMM
+		.if(_isImm(clearChar)) {
+			ldx #<clearChar.getValue()
+			ldy #>clearChar.getValue()
 		}
-		lda #LastLayerValue
-		.if(!_isNone(clearColor)) {
-			pha
-		}
-		jsr Layer_DMAClear
-		
-		.if(!_isNone(clearColor)) {
-			.if(_isReg(clearColor)) {
-				lda S65_PseudoReg + 1
-				tax 
-				ldx #$00
-			}  else {
-				ldx #<clearColor.getValue()
-			}
-			pla
-			jsr Layer_DMAClearColor
+		//ABS16
+		.if(_isAbs(clearChar)) {
+			ldx clearChar.getValue() + 0
+			ldy clearChar.getValue() + 1
 		}		
+		//ABX16
+		.if(_isAbsX(clearChar)) {
+			lda clearChar.getValue() + 1, x
+			tay
+			lda clearChar.getValue() + 0, x
+			tax
+		}	
+		//ABY16
+		.if(_isAbsY(clearChar)) {
+			lda clearChar.getValue() + 0, y
+			tax
+			lda clearChar.getValue() + 1, y
+			tay			
+		}	
+		lda S65_CurrentLayer
+		jsr Layer_DMAClear
+
+
+
+		//REG
+		.if(_isReg(clearColor)) {
+			ldx S65_PseudoReg + 1
+		} 
+		//IMM
+		.if(_isImm(clearColor)) {
+			ldx #clearColor.getValue()
+		}
+		//ABS16
+		.if(_isAbs(clearColor)) {
+			ldx clearColor.getValue()
+		}		
+		//ABX16
+		.if(_isAbsX(clearColor)) {
+			ply 
+			plx 
+			phx 
+			phy
+			lda clearColor.getValue(), x
+			tax
+		}	
+		//ABY16
+		.if(_isAbsY(clearColor)) {
+			ply 
+			phy
+			lda clearColor.getValue(), y
+			tax		
+		}	
+		.if(!_isNone(clearColor)) {
+			lda S65_CurrentLayer
+			jsr Layer_DMAClearColor
+		}
+
 	ply
+	plx		
 	pla 
-	plx	
 	S65_AddToMemoryReport("Layer_ClearLayer")
 }
 
@@ -364,20 +505,16 @@ _Layer_AddText: {
 * 
 * @namespace Layer
 */
-
 .pseudocommand Layer_Update {
-
 		S65_AddToMemoryReport("Layer_Update")
 		pha
 		phx 
 		phy
 		phz
-
-		System_BorderDebug($01)
+			System_BorderDebug($0c)
 			jsr _Layer_Update
-		System_BorderDebug($03)
+			System_BorderDebug($09)
 			Sprite_Update Layer_LayerList.size()
-		System_BorderDebug($0f)	
 
 		plz
 		ply
@@ -592,6 +729,296 @@ _Layer_Update: {
 	S65_AddToMemoryReport("Layer_AdvanceScreenPointers")
 }
 
+
+
+
+
+/**
+* .pseudocommand Shift
+*
+* Shift the cahrs on this layer horizontally
+* 
+* @namespace Layer
+*
+* @param {byte} {IMM|REG|ABS|ABX|ABY} xshift The number of chars to shift (Currently values other than -1 or 1 may cause issues)
+* @flags nzc
+*/
+.pseudocommand Layer_Shift xshift {
+	S65_AddToMemoryReport("Layer_Shift")
+	.if(!_isAbsImmOrNone(xshift) && !_isReg(xshift) && !_isAbsXY(xshift)) .error "Layer_Shift:" +S65_TypeError
+	_saveIfReg(xshift, S65_TempByte1)
+
+	.var lengthJob= DMA_Layer_Shift.job + $02
+	.var lengthJob2 = DMA_Layer_Shift.job2 + $02
+	pha 
+	phx 
+	phy 
+		
+		//ALL but REG
+		.if(!_isReg(xshift)) {
+			lda xshift
+			asl 
+			sta.z S65_TempByte1
+		} else {
+			asl.z S65_TempByte1
+		}
+
+		
+		jsr _Layer_Shift_ResetScreen
+		
+		ldy.z S65_CurrentLayer
+		lda.z S65_TempByte1
+		bmi !negative+
+	!postitive:
+		lda Layer_width, y
+		jsr _Layer_Shift_PrepPos
+
+		bra !done+
+
+	!negative:
+
+		lda Layer_width, y
+		jsr _Layer_Shift_PrepNeg
+	!done:
+
+	ply 
+	plx 
+	pla
+	S65_AddToMemoryReport("Layer_Shift")
+}
+
+_Layer_Shift_ResetScreen: {
+	Layer_SetScreenPointersXY #0 : #0
+	rts
+}
+_Layer_Shift_PrepPos: {
+
+		jsr _Layer_Shift_SetLength
+		lda S65_TempByte1
+		sta _Layer_Shift_X_Positive.ScreenAdd
+		sta _Layer_Shift_X_Positive.ColorAdd
+		jmp _Layer_Shift_X_Positive	//tail call	
+
+}
+_Layer_Shift_PrepNeg: {
+		lda Layer_width, y
+		jsr _Layer_Shift_SetLength
+		lda S65_TempByte1
+		neg
+		sta _Layer_Shift_X_Negative.ScreenAdd
+		sta _Layer_Shift_X_Negative.ColorAdd
+		jmp _Layer_Shift_X_Negative //tail call		
+}
+
+_Layer_Shift_SetLength: {
+		.var lengthJob= DMA_Layer_Shift.job + $02
+		.var lengthJob2 = DMA_Layer_Shift.job2 + $02	
+
+		sec 
+		sbc.z S65_TempByte1
+		sta lengthJob
+		sta lengthJob2
+		rts
+}
+_Layer_Shift_X_Negative: {
+		.var lengthJob= DMA_Layer_Shift.job + $02
+		.var destJob = DMA_Layer_Shift.job + $07
+		.var srcJob = DMA_Layer_Shift.job + $04
+
+		.var lengthJob2= DMA_Layer_Shift.job2 + $02
+		.var destJob2 = DMA_Layer_Shift.job2 + $07
+		.var srcJob2 = DMA_Layer_Shift.job2 + $04
+		
+		sec 
+		lda.z S65_ScreenRamPointer  + 0
+		sta destJob + 0
+		sbc ScreenAdd:#$02
+		sta srcJob + 0
+
+		lda.z S65_ScreenRamPointer  + 1
+		sta destJob + 1
+		sbc #$00
+		sta srcJob + 1	
+
+		lda.z S65_ScreenRamPointer  + 2
+		and #$0f
+		ora #$40	//backwards
+		sta destJob + 2
+		sbc #$00
+		sta srcJob + 2
+
+			//adjust src and dest as we go backwards
+				clc 
+				lda srcJob+0
+				adc lengthJob 
+				sta srcJob+0
+				lda srcJob+1
+				adc #$00
+				sta srcJob+1
+
+				clc 
+				lda destJob+0
+				adc lengthJob
+				sta destJob+0
+				lda destJob+1
+				adc #$00
+				sta destJob+1
+
+
+
+		sec 
+		lda.z S65_ColorRamPointer  + 0
+		sta destJob2 + 0
+		sbc ColorAdd:#$02
+		sta srcJob2 + 0
+
+		lda.z S65_ColorRamPointer  + 1
+		sta destJob2 + 1
+		sbc #$00
+		sta srcJob2 + 1	
+
+		lda.z S65_ColorRamPointer  + 2
+		and #$0f
+		ora #$40	//backwards
+		sta destJob2 + 2
+		sbc #$00
+		sta srcJob2 + 2	
+
+				clc 
+				lda srcJob2+0
+				adc lengthJob
+				sta srcJob2+0
+				lda srcJob2+1
+				adc #$00
+				sta srcJob2+1
+
+				clc 
+				lda destJob2+0
+				adc lengthJob
+				sta destJob2+0
+				lda destJob2+1
+				adc #$00
+				sta destJob2+1
+
+
+
+		jsr DMA_Layer_Shift_ExecuteRows
+		rts
+}
+
+_Layer_Shift_X_Positive: {
+		.var lengthJob= DMA_Layer_Shift.job + $02
+		.var destJob = DMA_Layer_Shift.job + $07
+		.var srcJob = DMA_Layer_Shift.job + $04
+
+		.var lengthJob2= DMA_Layer_Shift.job2 + $02
+		.var destJob2 = DMA_Layer_Shift.job2 + $07
+		.var srcJob2 = DMA_Layer_Shift.job2 + $04
+		
+		clc 
+		lda.z S65_ScreenRamPointer  + 0
+		sta destJob + 0
+		adc ScreenAdd:#$02
+		sta srcJob + 0
+
+		lda.z S65_ScreenRamPointer  + 1
+		sta destJob + 1
+		adc #$00
+		sta srcJob + 1	
+
+		lda.z S65_ScreenRamPointer  + 2
+		and #$0f
+		sta destJob + 2
+		adc #$00
+		sta srcJob + 2
+
+	
+		clc 
+		lda.z S65_ColorRamPointer  + 0
+		sta destJob2 + 0
+		adc ColorAdd:#$02
+		sta srcJob2 + 0
+
+		lda.z S65_ColorRamPointer  + 1
+		sta destJob2 + 1
+		adc #$00
+		sta srcJob2 + 1	
+
+		lda.z S65_ColorRamPointer  + 2
+		and #$0f
+		sta destJob2 + 2
+		adc #$00
+		sta srcJob2 + 2	
+
+		jsr DMA_Layer_Shift_ExecuteRows
+		rts
+}
+DMA_Layer_Shift_ExecuteRows: {
+			.var lengthJob= DMA_Layer_Shift.job + $02
+			.var destJob = DMA_Layer_Shift.job + $07
+			.var srcJob = DMA_Layer_Shift.job + $04
+
+			.var lengthJob2= DMA_Layer_Shift.job2 + $02
+			.var destJob2 = DMA_Layer_Shift.job2 + $07
+			.var srcJob2 = DMA_Layer_Shift.job2 + $04
+
+			ldx #$00
+	!:
+			DMA_Execute DMA_Layer_Shift
+
+			clc 
+			lda srcJob + 0
+			adc RowWidthLSB:#$BEEF
+			sta srcJob  + 0
+			lda srcJob  + 1
+			adc RowWidthMSB:#$BEEF
+			sta srcJob  + 1
+
+			clc 
+			lda destJob + 0
+			adc RowWidthLSB
+			sta destJob  + 0
+			lda destJob  + 1
+			adc RowWidthMSB
+			sta destJob  + 1
+
+			clc 
+			lda srcJob2 + 0
+			adc RowWidthLSB
+			sta srcJob2  + 0
+			lda srcJob2  + 1
+			adc RowWidthMSB
+			sta srcJob2  + 1
+
+			clc 
+			lda destJob2 + 0
+			adc RowWidthLSB
+			sta destJob2  + 0
+			lda destJob2  + 1
+			adc RowWidthMSB
+			sta destJob2  + 1
+
+		inx 
+		cpx RowCount:#$BEEF
+		bne !-
+		rts
+}
+DMA_Layer_Shift: {
+		DMA_Header #0 : #0
+	job:
+		.var lengthJob = * + $02
+		.var destJob = * + $07
+		.var srcJob = * + $04
+		DMA_CopyJob S65_ScreenRamPointer : S65_ScreenRamPointer : #$0002 : #TRUE : #FALSE
+		DMA_Header #$ff : #$ff
+	job2:
+		.var lengthJob2 = * + $02
+		.var destJob2 = * + $07
+		.var srcJob2 = * + $04		
+		DMA_CopyJob S65_ScreenRamPointer : S65_ScreenRamPointer : #$0002 : #FALSE : #FALSE
+}
+
+
 /**
 * .pseudocommand WriteToScreen
 *
@@ -614,8 +1041,8 @@ _Layer_Update: {
 * 
 * @namespace Layer
 *
-* @param {byte} {ABSY|IMM|REG} screenSource The color source data address to use or a value to use if IMM defaults to #$00
-* @param {byte?} {ABSY|IMM|REG} colorSource The color source data address to use or a value to use if IMM defaults to #$00
+* @param {byte} {REG|IMM|ABS|ABSY} screenSource The color source data address to use or a value to use if IMM defaults to #$00
+* @param {byte?} {REG|IMM|ABS|ABSY} colorSource The color source data address to use or a value to use if IMM defaults to #$00
 * @param {byte} {REG|IMM} size The lengh of the data in CHARS (so bytes/2)
 *
 * @flags nzc
@@ -698,11 +1125,11 @@ _Layer_Update: {
 						sta ((S65_ScreenRamPointer)), z 		
 					} else {
 						//screen IMM
-						lda #screenSource.getValue()
+						lda #<screenSource.getValue()
 						sta ((S65_ScreenRamPointer)), z 
 						inz 
 						inx 
-						lda #$00 //char msb
+						lda #>screenSource.getValue() //char msb
 						sta ((S65_ScreenRamPointer)), z 					
 					}
 				}
@@ -773,87 +1200,66 @@ _Layer_Update: {
 * to point to the given layers x and y co-ordinate
 * @namespace Layer
 *
-* @param {byte} {REG|IMM} xpos x position on layer
-* @param {byte} {REG|IMM} ypos y position on layer
+* @param {byte} {REG|IMM|ABS|ABX|ABY} xpos x position on layer
+* @param {byte} {REG|IMM|ABS|ABX|ABY} ypos y position on layer
 * @flags nzc
 */
 .pseudocommand Layer_SetScreenPointersXY xpos : ypos {
 	S65_AddToMemoryReport("Layer_SetScreenPointersXY")
-	.if(!_isImmOrReg(xpos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
-	.if(!_isImmOrReg(ypos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
+	.if(!_isAbsImmOrReg(xpos) && !_isAbsXY(xpos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
+	.if(!_isAbsImmOrReg(ypos) && !_isAbsXY(ypos)) .error "Layer_SetScreenPointersXY:"+S65_TypeError
 	_saveIfReg(xpos, S65_PseudoReg + 0)
 	_saveIfReg(ypos, S65_PseudoReg + 1)
-	phx
 	pha 
-
-	.var address = S65_SCREEN_RAM
-	.if(!_isReg(ypos)) .eval address += ypos.getValue() * S65_SCREEN_LOGICAL_ROW_WIDTH
-	.if(!_isReg(xpos)) .eval address += xpos.getValue() * 2
-	.eval address += Layer_LayerList.get(LastLayerValue).get("startAddr")
-
-		.if(!_isReg(xpos) && !_isReg(ypos)) {
-				lda #<address 
-				sta.z S65_ScreenRamPointer + 0
-				sta.z S65_ColorRamPointer + 0	
-				lda #>address 
-				sta.z S65_ScreenRamPointer + 1
-				lda #>[address - S65_SCREEN_RAM]
-				sta.z S65_ColorRamPointer + 1	
-					
-		} else {
-
-				.if(_isReg(xpos) && _isReg(ypos)) {
-						ldx S65_PseudoReg + 1 //YPOS
-						clc 
-						lda Layer_RowAddressLSB, x 
-						adc S65_PseudoReg + 0 //XPOS
-						php
-						clc
-						adc #<address
-						sta.z S65_ScreenRamPointer + 0
-						sta.z S65_ColorRamPointer + 0
-						lda Layer_RowAddressMSB, x 
-						adc #>address
-						plp 
-						adc #$00
-						sta.z S65_ScreenRamPointer + 1
-						sec 
-						sbc #<S65_SCREEN_RAM 
-						sta.z S65_ColorRamPointer + 1
-
-
-				} else {
-					.if(_isReg(ypos)) {
-						ldx S65_PseudoReg + 1
-						clc 
-						lda Layer_RowAddressLSB, x 
-						adc #<address
-						sta.z S65_ScreenRamPointer + 0
-						sta.z S65_ColorRamPointer + 0
-						lda Layer_RowAddressMSB, x 
-						adc #>address
-						sta.z S65_ScreenRamPointer + 1
-						sec 
-						sbc #<S65_SCREEN_RAM 
-						sta.z S65_ColorRamPointer + 1
-
-					} else {
-						clc 
-						lda #<address 
-						adc S65_PseudoReg + 0 //XPOS
-						sta.z S65_ScreenRamPointer + 0
-						sta.z S65_ColorRamPointer + 0
-						lda Layer_RowAddressMSB, x 
-						adc #$00
-						sta.z S65_ScreenRamPointer + 1
-						sec 
-						sbc #<S65_SCREEN_RAM 
-						sta.z S65_ColorRamPointer + 1
-					}
-				}
-
+	phy
+	phx
+		//xpos
+		.if(_isReg(xpos)) {
+			ldx S65_PseudoReg + 0
 		}
-	pla
+		.if(_isImm(xpos)) {
+			ldx #xpos.getValue()
+		}
+		.if(_isAbs(xpos)) {
+			ldx xpos.getValue()
+		}
+		.if(_isAbsX(xpos)) {
+			lda xpos.getValue(), x 
+			tax 
+		}
+		.if(_isAbsY(xpos)) {
+			lda xpos.getValue(), y 
+			tax 
+		}
+
+		//ypos
+		.if(_isReg(ypos)) {
+			ldy S65_PseudoReg + 1
+		}
+		.if(_isImm(ypos)) {
+			ldy #ypos.getValue()
+		}
+		.if(_isAbs(ypos)) {
+			ldy ypos.getValue()
+		}
+		.if(_isAbsX(ypos)) {
+			plx
+			phx
+			lda ypos.getValue(), x 
+			tay 
+		}
+		.if(_isAbsY(ypos)) {
+			plx 
+			ply
+			phy
+			phx
+			lda ypos.getValue(), y 
+			tay 
+		}
+
+		jsr _Layer_AddText_CalcAddressFromXY
 	plx
+	ply		
+	pla
 	S65_AddToMemoryReport("Layer_SetScreenPointersXY")	
 }

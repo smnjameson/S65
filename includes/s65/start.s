@@ -25,6 +25,9 @@
 //Constants for limits on various objects
 .const S65_MAX_LAYERS = $10
 .const S65_SPRITESET_LIMIT = $10
+.const S65_MAX_TILEMAPS = $20
+
+
 .const S65_HIGHEST_LOAD = $f000
 
 
@@ -118,6 +121,24 @@ System_BasicUpstart65(S65_InitComplete)
 	}	
 }
 
+//Hardware math unit addresses
+.const HW_MULTA0 = $d770
+.const HW_MULTA1 = $d771
+.const HW_MULTA2 = $d772
+.const HW_MULTA3 = $d773
+.const HW_MULTB0 = $d774
+.const HW_MULTB1 = $d775
+.const HW_MULTB2 = $d776
+.const HW_MULTB3 = $d777
+.const HW_MULTRES0 = $d778
+.const HW_MULTRES1 = $d779
+.const HW_MULTRES2 = $d77a
+.const HW_MULTRES3 = $d77b
+.const HW_MULTRES4 = $d77c
+.const HW_MULTRES5 = $d77d
+.const HW_MULTRES6 = $d77e
+.const HW_MULTRES7 = $d77f
+
 ////////////////////////////////////////////
 //Base page vars
 ////////////////////////////////////////////
@@ -157,7 +178,7 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_BaseColorRamPointer: .dword $00000000
 
 
-			S65_DynamicLayerData: .word $0000
+
  			S65_PseudoReg:	
  				.byte $00,$00,$00,$00
  				.byte $00,$00,$00,$00
@@ -165,12 +186,17 @@ System_BasicUpstart65(S65_InitComplete)
 
  			S65_TempDword1:	.dword $00000000
  			S65_TempDword2:	.dword $00000000
+ 			S65_TempDword3:	.dword $00000000
+ 			S65_TempDword4:	.dword $00000000
+ 			S65_TempDword5:	.dword $00000000
  			S65_TempWord1:	.word $0000
  			S65_TempWord2:	.word $0000
  			S65_TempWord3:	.word $0000
  			S65_TempWord4:	.word $0000
  			S65_TempByte1:	.byte $00
  			S65_TempByte2:	.byte $00
+ 			S65_TempByte3:	.byte $00
+ 			S65_TempByte4:	.byte $00
 
 			S65_SpritePointerTemp:	.word $0000
 			S65_SpritePointerOld:	.word $0000
@@ -178,8 +204,27 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpriteRowTablePtr:	.word $0000
 			S65_SpriteFlags:	.byte $00
 
+/** 
+ * .var LastLayerIOPointer
+ * 
+ * {word} S65 BasePage pointer into to the IO data for the last layer that was
+ * fetched using <a href="#Layer_Get">Layer_Get</a>
+ */	
+
+			S65_LastLayerIOPointer: .word $0000	
+			S65_CurrentLayer:		.byte $00
+			S65_DynamicLayerData: .word $0000
+			S65_Layer_RowAddressLSB:	.word $0000
+			S65_Layer_RowAddressMSB:	.word $0000
+			S65_Layer_OffsetTable:	.word $0000
+			S65_ColorRamLSBOffset:	.byte $00
+			S65_ColorRamMSBOffset:	.byte $00
 
 
+			S65_TilemapPointer:		.dword $00000000
+			S65_TiledefPointer:		.dword $00000000
+			S65_TileColordefPointer: .dword $00000000
+			S65_CurrentTilemap:		.byte $00
 /** 
  * .var ReturnValue
  * 
@@ -196,13 +241,7 @@ System_BasicUpstart65(S65_InitComplete)
  */	
 			S65_LastSpriteIOPointer: .word $0000
 
-/** 
- * .var LastLayerIOPointer
- * 
- * {word} S65 BasePage pointer into to the IO data for the last layer that was
- * fetched using <a href="#Layer_Get">Layer_Get</a>
- */	
-			S65_LastLayerIOPointer: .word $0000		
+	
 
 			S65_SpriteIOAddrLSB: .word $0000
 			S65_SpriteIOAddrMSB: .word $0000
@@ -230,6 +269,7 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/dma.s"
 #import "includes/s65/palette.s"
 #import "includes/s65/anim.s"
+#import "includes/s65/tilemap.s"
 
 S65: {
 	Init: {

@@ -489,6 +489,8 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 			ldy #[Sprite_IOflipHoffset]
 			sta (S65_LastSpriteIOPointer), y
 
+
+
 	pla
 	ply
 	S65_AddToMemoryReport("Sprite_SetDimensions")	
@@ -719,6 +721,8 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 						}
 					}
 					jsr _Sprite_SetSpriteMeta.SetData
+
+					// jsr _Sprite_SetDimensions
 		}
 	ply
 	pla
@@ -812,14 +816,6 @@ _Sprite_SetSpriteMeta: {
 			rts
 		}
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -950,6 +946,7 @@ MaskRowValue:
 						rol 
 						sta SM_AddHigh
 
+
 						ldy #Sprite_IOx +0
 						clc
 						lda (SprIO), y //x 	LSB					
@@ -963,11 +960,11 @@ MaskRowValue:
 
 						lda SM_WidthX0:#$BEEF
 						sec 
-						sbc #<S65_ScreenPixelWidth
+						sbc #<[S65_ScreenPixelWidth]
 						sta SM_Test0
 						lda SM_WidthX1:#$BEEF
 						and #$03
-						sbc #>S65_ScreenPixelWidth
+						sbc #>[S65_ScreenPixelWidth]
 						lbmi !dosprite+
 						sta SM_Test1 
 
@@ -988,7 +985,8 @@ MaskRowValue:
 				sta S65_TempByte1
 				dey
 				lda (SprIO), y //LSB
-		pha 	//store so we can grab the 0-7 fine Y
+				//store so we can grab the 0-7 fine Y
+				sta YposLSB
 				lsr S65_TempByte1
 				ror 
 				lsr S65_TempByte1
@@ -1112,7 +1110,7 @@ MaskRowValue:
 
 
 				//retrieve the ypos lsb and use it to get the inverse 0-7 fine y
-		pla 
+		lda YposLSB:#$BEEF 
 				and #$07
 				sta YscrollOffset
 				sta S65_SpriteFineY
@@ -1157,12 +1155,19 @@ MaskRowValue:
 					inc.z S65_SpritePointerTemp + 0
 					inc.z S65_SpritePointerOld + 0
 				jmp !skiprow+
-			!continue:
+			!continue:	
 
-				//Where do we start? get offset from rowcount table into z
-				//and double it to give the byte offset
+				//Store some stuff up front
+				ldy #Sprite_IOcolor
+				lda (SprIO), y	
+				sta SpriteColor				
+
 				ldy #Sprite_IOwidth
 				lda (SprIO), y 
+				sta WidthIncrement
+
+				//Where do we start? get offset from rowcount table into z
+				//and double it to give the byte offset			
 				ldz S65_SpriteRowTablePtr //RowCountTable y position offset
 				clc 
 				adc (LayerIO), z
@@ -1170,7 +1175,6 @@ MaskRowValue:
 					//Skip if no room left in line buffer
 					ldy #Layer_IOmaxCharsRRB
 					cmp (LayerIO), y
-					// jmp *
 					lbcs !nextsprite+ 
 				lda (LayerIO), z
 				asl
@@ -1200,37 +1204,30 @@ MaskRowValue:
 				//COLUMNS
 				/////////////////////////
 				//Loop through the width of the char
-						phx 
-						ldy #Sprite_IOwidth
-						lda (SprIO), y	
-						sta WidthIncrement
-						tax
-
+				// phx 
+				stx RestX
+						ldx WidthIncrement
 						!charwidthLoop:
 							//CHAR RAM 
 							lda.z S65_SpritePointerTemp + 0
 							sta ((S65_ScreenRamPointer)), z //scr byte 0
-							lda S65_SpriteFlags
+							lda.z S65_SpriteFlags
 							sta ((S65_ColorRamPointer)), z //col byte 0
 
 							inz
 							lda.z S65_SpritePointerTemp + 1	
 							sta ((S65_ScreenRamPointer)), z //scr byte 1
 
-							// inz
 							// COLOR RAM 
-							ldy #Sprite_IOcolor
-							lda (SprIO), y	
+							lda SpriteColor:#$BEEF//(SprIO), y	
 							sta ((S65_ColorRamPointer)), z //col byte 1
 							inz
-								
+							
 
 							//increment pointer to next column
-							ldy #Sprite_IOwidth
-							lda (SprIO), y
+							lda WidthIncrement:#$BEEF
 							cmp #$01
 							beq !columnadvDone+
-
 
 								//deal with hflip flag
 								bbr6 S65_SpriteFlags, !noHflip+
@@ -1274,37 +1271,37 @@ MaskRowValue:
 							sta.z S65_SpritePointerTemp + 1
 						!rowadvDone:
 
-						plx
+				ldx RestX:#$BEEF
 
 				//increment row count table entry by width + 1
-				ldz S65_SpriteRowTablePtr //RowCountTable 
+				ldy.z S65_SpriteRowTablePtr //RowCountTable 
 
-				lda (LayerIO), z
+				lda (LayerIO), y
 				clc 
-				adc WidthIncrement:#$00
+				adc WidthIncrement
 				adc #$01
-				sta (LayerIO), z
+				sta (LayerIO), y
 				
 		!skiprow:
 			dec.z S65_SpriteRowCounter
 			beq !nextsprite+		//Sprite is complete
 			//Increment for next row
 			clc 
-			lda S65_ScreenRamPointer + 0
+			lda.z S65_ScreenRamPointer + 0
 			adc #<S65_SCREEN_LOGICAL_ROW_WIDTH
-			sta S65_ScreenRamPointer + 0
-			sta S65_ColorRamPointer + 0
+			sta.z S65_ScreenRamPointer + 0
+			sta.z S65_ColorRamPointer + 0
 			php
-			lda S65_ScreenRamPointer + 1
+			lda.z S65_ScreenRamPointer + 1
 			adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-			sta S65_ScreenRamPointer + 1
+			sta.z S65_ScreenRamPointer + 1
 			plp
-			lda S65_ColorRamPointer + 1
+			lda.z S65_ColorRamPointer + 1
 			adc #>S65_SCREEN_LOGICAL_ROW_WIDTH
-			sta S65_ColorRamPointer + 1	
+			sta.z S65_ColorRamPointer + 1	
 
-			inc S65_SpriteRowTablePtr	
-			ldy S65_SpriteRowTablePtr
+			inc.z S65_SpriteRowTablePtr	
+			ldy.z S65_SpriteRowTablePtr
 			
 
 
@@ -1317,9 +1314,8 @@ MaskRowValue:
 
 			jsr ResetScreenPointer
 			ldy #Layer_IOrowCountTableRRB
-			sty S65_SpriteRowTablePtr
+			sty.z S65_SpriteRowTablePtr
 
-			// jmp *
 		!noreset:	
 			jmp !nextrow-
 

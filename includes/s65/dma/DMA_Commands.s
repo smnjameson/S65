@@ -137,10 +137,10 @@
  * @param {dword} {ABS} destination The destination data pointer
  * @param {word} {IMM} length The number of bytes to copy
  * @param {bool} {IMM} chain Job chains to another
- * @param {bool} {IMM} Destination pointer progresses backwards
+ * @param {bool} {IMM} backwards pointer progresses backwards
  * 
  */
-.pseudocommand DMA_CopyJob source : destination : length : chain : backwards : modulo : rowcount {
+.pseudocommand DMA_CopyJob source : destination : length : chain : backwards {
     S65_AddToMemoryReport("DMA_CopyJob")
     .if(!_isAbs(source)) .error "DMA_CopyJob:"+ S65_TypeError
     .if(!_isAbs(destination)) .error "DMA_CopyJob:"+ S65_TypeError
@@ -151,7 +151,6 @@
     .var backwardsVal = false
     .if(!_isNone(backwards)) .eval backwardsVal = [backwards.getValue() == 1]
 
-    .var isModulo = !_isNone(modulo)
 
 	.byte $00 //No more options
 	.if(chain.getValue() != 0) {

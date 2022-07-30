@@ -62,6 +62,12 @@
 * Contains the height of the visible screen in pixels
 */
 .var S65_ScreenPixelHeight = 0
+
+//Helpful pointers to precalced stuff
+.const S65_ROW_WIDTH_LSB = DMA_Layer_Shift_ExecuteRows.RowWidthLSB
+.const S65_ROW_WIDTH_MSB = DMA_Layer_Shift_ExecuteRows.RowWidthMSB
+
+
 /**
  * .macro Trace
  * 
