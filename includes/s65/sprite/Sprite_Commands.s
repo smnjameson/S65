@@ -816,14 +816,6 @@ _Sprite_SetSpriteMeta: {
 
 
 
-
-
-
-
-
-
-
-
 /**
 * .pseudocommand Update
 * 
@@ -963,11 +955,11 @@ MaskRowValue:
 
 						lda SM_WidthX0:#$BEEF
 						sec 
-						sbc #<S65_ScreenPixelWidth
+						sbc #<[S65_ScreenPixelWidth + 64]
 						sta SM_Test0
 						lda SM_WidthX1:#$BEEF
 						and #$03
-						sbc #>S65_ScreenPixelWidth
+						sbc #>[S65_ScreenPixelWidth + 64]
 						lbmi !dosprite+
 						sta SM_Test1 
 

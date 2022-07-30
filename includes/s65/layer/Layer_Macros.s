@@ -452,8 +452,10 @@
 
 		lda #<S65_COLOR_RAM
 		sta S65_BaseColorRamPointer + 0	
+		sta $d064
 		lda #>S65_COLOR_RAM
 		sta S65_BaseColorRamPointer + 1
+		sta $d065
 		lda #[S65_COLOR_RAM >> 16]
 		sta S65_BaseColorRamPointer + 2
 		sta S65_ColorRamPointer + 2
@@ -604,8 +606,6 @@
 	}
 
 	//Animations
-
-
 	.eval Anim_SequenceData = *
 	.for(var i=1; i<Anim_SeqList.size(); i++){
 			.eval Anim_SeqList.get(i).address = *
@@ -621,7 +621,32 @@
 	}
 	.eval Anim_SequenceAddrTable = *
 			.lohifill Anim_SeqList.size() - 1, Anim_SeqList.get(i + 1).address
-		
+	
+
+	//Tilemaps
+	//
+
+
+	.eval Tilemap_TilemapData = *
+	.print ("Tilemap_TilemapData: $" + toHexString(Tilemap_TilemapData))
+	.var tilemapList = Asset_TilemapList
+	.var size = Asset_TilemapList.size()
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).width & $ff]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [tilemapList.get(i).width >> 8 ] & $ff]
+
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).height & $ff]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [tilemapList.get(i).height >> 8 ] & $ff]
+
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tilewidth]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tileheight]
+
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tileheight * tilemapList.get(i).tilewidth]
+
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).colorAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).colorAddress]
+	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).colorAddress >> 16] & $ff] ]
+
+
 	S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 }
 

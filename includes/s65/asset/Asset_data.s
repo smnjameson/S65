@@ -37,12 +37,17 @@
 * 
 * @struct {byte} id The numerical id of the tilemap assigned by Asset_ImportTilemap
 * @struct {string} name The name of the tilemap
-* @struct {word} tilemapAddress The start address for the tile definitions data
-* @struct {word} tiledefAddress The start address for the tile definitions data
+* @struct {dword} tilemapAddress The start address for the tile definitions data
+* @struct {dword} tiledefAddress The start address for the tile definitions data
+* @struct {dword} colorAddress The start address for the ncm color lookups
+* @struct {word} width The width of the tilemap in tiles
+* @struct {word} height The height of the tilemap in tiles
+* @struct {byte} tilewidth The width of a tile in chars
+* @struct {byte} tileheight The height of a tile in chars
 * @struct {List} tilemap A List of bytes containing the tilemap data
 * @struct {List} tiles A List of bytes containing the tile definition data
 */
-.struct Asset_Tilemap { id, name, tilemapAddress, tiledefAddress, tilemap, tiles }
+.struct Asset_Tilemap { id, name, tilemapAddress, tiledefAddress, colorAddress, width, height, tilewidth, tileheight, tilemap, tiles }
 
 
 .var Asset_CharList = List()

@@ -438,7 +438,7 @@ function findBestFitForCharColors(inp, out) {
             let matches = inp.filter(a => out[i].includes(a));
             let uniques = inp.filter(a => !out[i].includes(a));
             if( matches.length > best && //most matches in this palette slice
-                uniques.length + out[i].length <= 16) {
+                uniques.length + out[i].length <= 15) {
                 best = i 
                 max = matches.length
                 unq = uniques
@@ -761,7 +761,7 @@ async function runCharMapper(argv) {
     if(argv.ncm){
         //save NCM color table
         if(argv.palette) {
-            sortedPalette.charColors = sortedPalette.charColors.map(a => a+appendPal.sliceOffset)
+            sortedPalette.charColors = sortedPalette.charColors.map(a => a + appendPal.sliceOffset + 0x0f)
         }
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
     } else {

@@ -11,6 +11,7 @@
 * @flags nzc
 */
 .pseudocommand Layer_Get layer {
+	.if(!_isImm(layer)) .error "Layer_Get:"+ S65_TypeError
 	pha
 	S65_SetBasePage()
 			.eval LastLayerValue = layer.getValue()
@@ -49,15 +50,16 @@
 				lda #>gotox.getValue()
 				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1
 			} else {	
-				lda gotox.getValue() + 0
+				lda gotox
 				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 0
-				lda gotox.getValue() + 1
+				lda #$00
 				sta Layer_GetIO(LastLayerValue, Layer_IOgotoX) + 1			
 			}
 		}
 	pla
 	S65_AddToMemoryReport("Layer_SetGotoX")
 }
+
 /**
 * .pseudocommand GetGotoX
 *
@@ -373,11 +375,9 @@ _Layer_AddText: {
 		phy
 		phz
 
-		System_BorderDebug($01)
+
 			jsr _Layer_Update
-		System_BorderDebug($03)
 			Sprite_Update Layer_LayerList.size()
-		System_BorderDebug($0f)	
 
 		plz
 		ply
@@ -797,7 +797,7 @@ _Layer_Update: {
 				sta.z S65_ColorRamPointer + 0	
 				lda #>address 
 				sta.z S65_ScreenRamPointer + 1
-				lda #>[address - S65_SCREEN_RAM]
+				lda #>[address - S65_SCREEN_RAM + S65_COLOR_RAM]
 				sta.z S65_ColorRamPointer + 1	
 					
 		} else {
@@ -818,7 +818,9 @@ _Layer_Update: {
 						adc #$00
 						sta.z S65_ScreenRamPointer + 1
 						sec 
-						sbc #<S65_SCREEN_RAM 
+						sbc #>S65_SCREEN_RAM 
+						clc 
+						adc #>S65_COLOR_RAM
 						sta.z S65_ColorRamPointer + 1
 
 
@@ -834,7 +836,9 @@ _Layer_Update: {
 						adc #>address
 						sta.z S65_ScreenRamPointer + 1
 						sec 
-						sbc #<S65_SCREEN_RAM 
+						sbc #>S65_SCREEN_RAM 
+						clc 
+						adc #>S65_COLOR_RAM
 						sta.z S65_ColorRamPointer + 1
 
 					} else {
@@ -847,7 +851,9 @@ _Layer_Update: {
 						adc #$00
 						sta.z S65_ScreenRamPointer + 1
 						sec 
-						sbc #<S65_SCREEN_RAM 
+						sbc #>S65_SCREEN_RAM 
+						clc 
+						adc #>S65_COLOR_RAM
 						sta.z S65_ColorRamPointer + 1
 					}
 				}

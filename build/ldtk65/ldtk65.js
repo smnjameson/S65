@@ -113,7 +113,7 @@ function fetchMap(ldtk)  {
         let y=data.gridTiles[i].px[1] / size
         map[x][y] = data.gridTiles[i].t
     }
-    return {width, height, map}
+    return {width, height, size, map}
 }
 
 function saveMap(map) {
@@ -126,6 +126,8 @@ function saveMap(map) {
     out.push((map.width >> 8) & 0xff)
     out.push(map.height & 0xff)
     out.push((map.height >> 8) & 0xff)    
+    out.push((map.size / (argv.ncm ? 16 : 8)) & 0xff)    
+    out.push((map.size / 8) & 0xff)       
     for(var y=0; y<map.height; y++) {
         for(var x=0; x<map.width; x++) {
             out.push(map.map[x][y])

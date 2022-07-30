@@ -25,6 +25,9 @@
 //Constants for limits on various objects
 .const S65_MAX_LAYERS = $10
 .const S65_SPRITESET_LIMIT = $10
+.const S65_MAX_TILEMAPS = $20
+
+
 .const S65_HIGHEST_LOAD = $f000
 
 
@@ -165,12 +168,17 @@ System_BasicUpstart65(S65_InitComplete)
 
  			S65_TempDword1:	.dword $00000000
  			S65_TempDword2:	.dword $00000000
+ 			S65_TempDword3:	.dword $00000000
+ 			S65_TempDword4:	.dword $00000000
+ 			S65_TempDword5:	.dword $00000000
  			S65_TempWord1:	.word $0000
  			S65_TempWord2:	.word $0000
  			S65_TempWord3:	.word $0000
  			S65_TempWord4:	.word $0000
  			S65_TempByte1:	.byte $00
  			S65_TempByte2:	.byte $00
+ 			S65_TempByte3:	.byte $00
+ 			S65_TempByte4:	.byte $00
 
 			S65_SpritePointerTemp:	.word $0000
 			S65_SpritePointerOld:	.word $0000
@@ -178,8 +186,12 @@ System_BasicUpstart65(S65_InitComplete)
 			S65_SpriteRowTablePtr:	.word $0000
 			S65_SpriteFlags:	.byte $00
 
+			S65_LayerIOPointer:		.word $0000
 
-
+			S65_TilemapPointer:		.dword $00000000
+			S65_TiledefPointer:		.dword $00000000
+			S65_TileColordefPointer: .dword $00000000
+			S65_CurrentTilemap:		.byte $00
 /** 
  * .var ReturnValue
  * 
@@ -230,6 +242,7 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/dma.s"
 #import "includes/s65/palette.s"
 #import "includes/s65/anim.s"
+#import "includes/s65/tilemap.s"
 
 S65: {
 	Init: {
