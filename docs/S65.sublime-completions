@@ -417,8 +417,8 @@
         },
         {
             "trigger": "DMA_CopyJob",
-            "annotation": "source:destination:length:chain:Destination",
-            "contents": "DMA_CopyJob ${1:source} : ${2:destination} : ${3:length} : ${4:chain} : ${5:Destination}",
+            "annotation": "source:destination:length:chain:backwards",
+            "contents": "DMA_CopyJob ${1:source} : ${2:destination} : ${3:length} : ${4:chain} : ${5:backwards}",
             "kind": "snippet",
             "details": "Data generator that copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s <br>This is NOT executable code, only data and should be used as such<br><br>"
         },
@@ -525,6 +525,13 @@
             "contents": "Layer_SetScreenPointersXY ${1:xpos} : ${2:ypos}",
             "kind": "snippet",
             "details": "Sets the basepage to point to the S65 base page area and then sets screen and color ram pointers <a href=\"#Global_ScreenRamPointer\">ScreenRamPointer<a> and <a href=\"#Global_ColorRamPointer\">ColorRamPointer<a> to point to the given layers x and y co-ordinate"
+        },
+        {
+            "trigger": "Layer_Shift",
+            "annotation": "xshift",
+            "contents": "Layer_Shift ${1:xshift}",
+            "kind": "snippet",
+            "details": "Shift the cahrs on this layer horizontally"
         },
         {
             "trigger": "Layer_Update",

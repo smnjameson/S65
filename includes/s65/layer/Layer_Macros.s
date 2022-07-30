@@ -483,6 +483,13 @@
 		lda #S65_VISIBLE_SCREEN_CHAR_HEIGHT
 		sta _Layer_Update.ScreenHeight
 
+		lda #<S65_SCREEN_LOGICAL_ROW_WIDTH
+		sta _Layer_Shift.RowWidthLSB
+		lda #>S65_SCREEN_LOGICAL_ROW_WIDTH
+		sta _Layer_Shift.RowWidthMSB
+		lda #S65_VISIBLE_SCREEN_CHAR_HEIGHT
+		sta _Layer_Shift.RowCount
+		
 		jmp end
 
 

@@ -105,6 +105,8 @@
 		ldy.z S65_CurrentTilemap
 		lda [Tilemap_TilemapData + S65_MAX_TILEMAPS * 6], y
 		sta _Tilemap_Draw.TilemapTilesize
+		asl
+		sta _Tilemap_Draw.TilemapTilesizeDouble
 
 		lda [Tilemap_TilemapData + S65_MAX_TILEMAPS * 5], y
 		sta _Tilemap_Draw.TilemapTileheight
@@ -220,6 +222,11 @@ _Tilemap_Draw_ResetPointers: {
 }
 
 
+
+
+
+
+
 /////////////////////////////////////////////base code from here????
 _Tilemap_Draw: {
 		.const TileDef = S65_TempDword1
@@ -309,9 +316,7 @@ _Tilemap_Draw: {
 
 
 				//push tile chars onto stack backwards
-				lda TilemapTilesize
-				asl 
-				taz
+				ldz TilemapTilesizeDouble:#$BEEF
 				dez
 			!:
 				lda ((TileDef)), z 
@@ -328,59 +333,43 @@ _Tilemap_Draw: {
 				sta.z ColCount
 
 				ldz #$00 //column counter
-				clc
+				// clc
 				!colloop:
 						pla 
-						sta ((ScreenRam)), z
-							//calc color ptr 
-
-							// adc.z S65_TileColordefPointer + 0
-							// sta.z ColorPtr + 0		
+						sta ((ScreenRam)), z	
 
 						inz
 						pla
+	 					sta ((ColorRam)), z
+	 					and #$0f
 						sta ((ScreenRam)), z 
-
-							// //color ram
-							// adc.z S65_TileColordefPointer + 1
-							// sta.z ColorPtr + 1
-
-							// dez 
-	 					// 	lda ((ColorPtr)),z 
-	 					// 	inz 
-
-	 					and #$f0
-	 					sta ((ColorRam)), z 
-
 						inz
+
 						dec.z ColCount 
 						bne !colloop-
 
 
 
-
-						
 				//add to screenRamPointer and colorRamPointer
 				clc
 				lda.z ScreenRam + 0
 				adc $d058 //LOGICAL ROW SIZE LSB
 				sta.z ScreenRam + 0
-				// ldy RectHeightCount
+				sta.z ColorRam + 0
+
+				php
 				lda.z ScreenRam + 1
 				adc $d059 //LOGICAL ROW SIZE LSB
 				sta.z ScreenRam + 1
-
-				clc
-				lda.z ColorRam + 0
-				adc $d058 //LOGICAL ROW SIZE LSB
-				sta.z ColorRam + 0
+				plp
 				lda.z ColorRam + 1
 				adc $d059 //LOGICAL ROW SIZE LSB
-				sta.z ColorRam + 1
-
-
+				sta.z ColorRam + 1				
+			
 				dec.z RowCount 
 				bne !rowloop-
+
+
 
 
 

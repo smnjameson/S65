@@ -978,7 +978,7 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Data generator that copys a defined number of bytes from one location in memory to another using the DMagic chip @ 20mb/s <br>This is NOT executable code, only data and should be used as such<br><br>    </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>DMA_CopyJob <i>source</i> : <i>destination</i> : <i>length</i> : <i>chain</i> : <i>Destination</i></div>
+						<div class='macroUsage'>DMA_CopyJob <i>source</i> : <i>destination</i> : <i>length</i> : <i>chain</i> : <i>backwards</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
@@ -999,7 +999,7 @@ h4 {
 						</div>
 					
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{bool} {IMM} Destination - pointer progresses backwards</div></span>
+						<span><div class='paramHeader'>{bool} {IMM} backwards - pointer progresses backwards</div></span>
 						</div>
 					
 						
@@ -1232,6 +1232,8 @@ h4 {
 					<div class='macroIndex'><a href='#Layer_SetGotoX'>SetGotoX</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_SetScreenPointersXY'>SetScreenPointersXY</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_Shift'>Shift</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_Update'>Update</a></div>
 				
@@ -1500,6 +1502,27 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{byte} {REG|IMM} ypos - y position on layer</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_Shift'>Shift
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Shift the cahrs on this layer horizontally     </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_Shift <i>xshift</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} xshift - The number of chars to shift</div></span>
 						</div>
 					
 						

@@ -375,7 +375,6 @@ _Layer_AddText: {
 		phy
 		phz
 
-
 			jsr _Layer_Update
 			Sprite_Update Layer_LayerList.size()
 
@@ -592,6 +591,154 @@ _Layer_Update: {
 	S65_AddToMemoryReport("Layer_AdvanceScreenPointers")
 }
 
+
+
+/**
+* .pseudocommand Shift
+*
+* Shift the cahrs on this layer horizontally
+* 
+* @namespace Layer
+*
+* @param {byte} {IMM} xshift The number of chars to shift
+*
+* 
+* @return {byte} A <add description here> 
+*/
+.pseudocommand Layer_Shift xshift {
+		.var lengthJob= DMA_Layer_Shift.job + $02
+		.var lengthJob2 = DMA_Layer_Shift.job2 + $02
+	pha 
+	phx 
+	phy 
+		Layer_SetScreenPointersXY #0 : #0
+
+		ldy #LastLayerValue
+		lda Layer_width, y
+		sec 
+		sbc #xshift.getValue() * 2
+		sta lengthJob
+		sta lengthJob2
+
+		lda #xshift.getValue() * 2
+		sta _Layer_Shift.ScreenAdd
+		sta _Layer_Shift.ColorAdd
+		
+		jsr _Layer_Shift
+	ply 
+	plx 
+	pla
+}
+
+_Layer_Shift: {
+		.var lengthJob= DMA_Layer_Shift.job + $02
+		.var destJob = DMA_Layer_Shift.job + $07
+		.var srcJob = DMA_Layer_Shift.job + $04
+
+		.var lengthJob2= DMA_Layer_Shift.job2 + $02
+		.var destJob2 = DMA_Layer_Shift.job2 + $07
+		.var srcJob2 = DMA_Layer_Shift.job2 + $04
+		
+
+
+		clc 
+		lda.z S65_ScreenRamPointer  + 0
+		sta destJob + 0
+		adc ScreenAdd:#$02
+		sta srcJob + 0
+
+		lda.z S65_ScreenRamPointer  + 1
+		sta destJob + 1
+		adc #$00
+		sta srcJob + 1	
+
+		lda.z S65_ScreenRamPointer  + 2
+		and #$0f
+		sta destJob + 2
+		adc #$00
+		sta srcJob + 2
+
+	
+		clc 
+		lda.z S65_ColorRamPointer  + 0
+		sta destJob2 + 0
+		adc ColorAdd:#$02
+		sta srcJob2 + 0
+
+		lda.z S65_ColorRamPointer  + 1
+		sta destJob2 + 1
+		adc #$00
+		sta srcJob2 + 1	
+
+		lda.z S65_ColorRamPointer  + 2
+		and #$0f
+		sta destJob2 + 2
+		adc #$00
+		sta srcJob2 + 2	
+
+
+		ldx #$00
+	!:
+			DMA_Execute DMA_Layer_Shift
+
+			clc 
+			lda srcJob + 0
+			adc RowWidthLSB:#$BEEF
+			sta srcJob  + 0
+			lda srcJob  + 1
+			adc RowWidthMSB:#$BEEF
+			sta srcJob  + 1
+
+			clc 
+			lda destJob + 0
+			adc RowWidthLSB
+			sta destJob  + 0
+			lda destJob  + 1
+			adc RowWidthMSB
+			sta destJob  + 1
+
+
+
+			clc 
+			lda srcJob2 + 0
+			adc RowWidthLSB
+			sta srcJob2  + 0
+			lda srcJob2  + 1
+			adc RowWidthMSB
+			sta srcJob2  + 1
+
+			clc 
+			lda destJob2 + 0
+			adc RowWidthLSB
+			sta destJob2  + 0
+			lda destJob2  + 1
+			adc RowWidthMSB
+			sta destJob2  + 1
+
+
+		inx 
+		cpx RowCount:#$BEEF
+		bne !-
+		// jmp *
+		rts
+}
+
+
+DMA_Layer_Shift: {
+		DMA_Header #0 : #0
+.print ("job: $" + toHexString(job))
+	job:
+		.var lengthJob = * + $02
+		.var destJob = * + $07
+		.var srcJob = * + $04
+		DMA_CopyJob S65_ScreenRamPointer : S65_ScreenRamPointer : #$0002 : #TRUE : #FALSE
+		DMA_Header #$ff : #$ff
+	job2:
+		.var lengthJob2 = * + $02
+		.var destJob2 = * + $07
+		.var srcJob2 = * + $04		
+		DMA_CopyJob S65_ScreenRamPointer : S65_ScreenRamPointer : #$0002 : #FALSE : #FALSE
+}
 /**
 * .pseudocommand WriteToScreen
 *
