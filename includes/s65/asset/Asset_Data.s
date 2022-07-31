@@ -45,7 +45,7 @@
 * @struct {byte} tilewidth The width of a tile in chars
 * @struct {byte} tileheight The height of a tile in chars
 * @struct {List} tilemap A List of bytes containing the tilemap data
-* @struct {List} tiles A List of bytes containing the tile definition data
+* @struct {List} tiles A List of tiles containing a list for each tile definition data
 */
 .struct Asset_Tilemap { id, name, tilemapAddress, tiledefAddress, colorAddress, width, height, tilewidth, tileheight, tilemap, tiles }
 

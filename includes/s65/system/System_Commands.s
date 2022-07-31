@@ -114,23 +114,53 @@ _System_Random16: {
 *
 * @param {byte} {IMM|ABS16|ABX16|ABY16} valueA Vlaue to compare against valueB
 * @param {byte} {IMM|ABS16|ABX16|ABY16} valueB Value to compare against valueA
-*
+* @regsiters A
 * @flags nzc
 */
 .pseudocommand System_Compare16 valueA : valueB {
     S65_AddToMemoryReport("System_Compare16")
     .if(!_isAbsImm(valueA) && !_isAbsXY(valueA)) .error "System_Compare16:"+S65_TypeError
     .if(!_isAbsImm(valueB) && !_isAbsXY(valueB)) .error "System_Compare16:"+S65_TypeError
-    pha
+
+        .if(_isAbs(valueA)) {
+            lda valueA.getValue() + 1
+        } 
+        .if(_isAbsX(valueA)) {
+            lda valueA.getValue() + 1, x 
+        }  
+        .if(_isAbsY(valueA)) {
+            lda valueA.getValue() + 1, y 
+        }                   
+        .if(_isImm(valueA)){
+            lda #>valueA.getValue()
+        }
+
+
+
+        .if(_isAbs(valueB)) {
+            cmp valueB.getValue() + 1
+        } 
+        .if(_isAbsX(valueB)) {
+            cmp valueB.getValue() + 1, x 
+        }  
+        .if(_isAbsY(valueB)) {
+            cmp valueB.getValue() + 1, y 
+        }          
+        .if(_isImm(valueB)){
+            cmp #>valueB.getValue()
+        } 
+
+        bne !notEq+
+
         .if(_isAbs(valueA)) {
             lda valueA.getValue() + 0
         } 
-        .if(_isAbsX(valueA)) {
+         .if(_isAbsX(valueA)) {
             lda valueA.getValue() + 0, x 
         }  
         .if(_isAbsY(valueA)) {
             lda valueA.getValue() + 0, y 
-        }                   
+        }         
         .if(_isImm(valueA)){
             lda #<valueA.getValue()
         }
@@ -145,41 +175,71 @@ _System_Random16: {
         }  
         .if(_isAbsY(valueB)) {
             cmp valueB.getValue() + 0, y 
-        }          
-        .if(_isImm(valueB)){
-            cmp #<valueB.getValue()
-        } 
-
-
-
-        .if(_isAbs(valueA)) {
-            lda valueA.getValue() + 1
-        } 
-         .if(_isAbsX(valueA)) {
-            lda valueA.getValue() + 1, x 
-        }  
-        .if(_isAbsY(valueA)) {
-            lda valueA.getValue() + 1, y 
-        }         
-        .if(_isImm(valueA)){
-            lda #>valueA.getValue()
-        }
-
-
-
-        .if(_isAbs(valueB)) {
-            sbc valueB.getValue() + 1
-        } 
-        .if(_isAbsX(valueB)) {
-            sbc valueB.getValue() + 1, x 
-        }  
-        .if(_isAbsY(valueB)) {
-            sbc valueB.getValue() + 1, y 
         }           
         .if(_isImm(valueB)){
-            sbc #>valueB.getValue()
-        }                
-    pla
+            cmp #<valueB.getValue()
+        }             
+
+    !notEq:
+
+        // .if(_isAbs(valueA)) {
+        //     lda valueA.getValue() + 0
+        // } 
+        // .if(_isAbsX(valueA)) {
+        //     lda valueA.getValue() + 0, x 
+        // }  
+        // .if(_isAbsY(valueA)) {
+        //     lda valueA.getValue() + 0, y 
+        // }                   
+        // .if(_isImm(valueA)){
+        //     lda #<valueA.getValue()
+        // }
+
+
+
+        // .if(_isAbs(valueB)) {
+        //     cmp valueB.getValue() + 0
+        // } 
+        // .if(_isAbsX(valueB)) {
+        //     cmp valueB.getValue() + 0, x 
+        // }  
+        // .if(_isAbsY(valueB)) {
+        //     cmp valueB.getValue() + 0, y 
+        // }          
+        // .if(_isImm(valueB)){
+        //     cmp #<valueB.getValue()
+        // } 
+
+
+
+        // .if(_isAbs(valueA)) {
+        //     lda valueA.getValue() + 1
+        // } 
+        //  .if(_isAbsX(valueA)) {
+        //     lda valueA.getValue() + 1, x 
+        // }  
+        // .if(_isAbsY(valueA)) {
+        //     lda valueA.getValue() + 1, y 
+        // }         
+        // .if(_isImm(valueA)){
+        //     lda #>valueA.getValue()
+        // }
+
+
+
+        // .if(_isAbs(valueB)) {
+        //     sbc valueB.getValue() + 1
+        // } 
+        // .if(_isAbsX(valueB)) {
+        //     sbc valueB.getValue() + 1, x 
+        // }  
+        // .if(_isAbsY(valueB)) {
+        //     sbc valueB.getValue() + 1, y 
+        // }           
+        // .if(_isImm(valueB)){
+        //     sbc #>valueB.getValue()
+        // } 
+
     S65_AddToMemoryReport("System_Compare16")
 }
 

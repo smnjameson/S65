@@ -12,7 +12,7 @@
 		.for(var i=0; i<Asset_PreloaderList.size(); i++) {
 			.var asset = Asset_PreloaderList.get(i)
 			SDCard_LoadToChipRam  asset.get("addr") : asset.get("filename")
-			.print("preload "+asset.get("name")+" to $"+toHexString(asset.get("addr")) +"  fn: $"+toHexString(asset.get("filename")) )
+			S65_Trace("preload "+asset.get("name")+" to $"+toHexString(asset.get("addr")) +"  fn: $"+toHexString(asset.get("filename")) )
 		}
 
 		System_ShowScreen		
@@ -247,8 +247,6 @@
 * @param {word} address The address to laod the data into
 */
 .macro Asset_ImportTilemap(name, path, charset, address) {
-		//Add an entry to the buildtime spriteset list
-		//{ id, name, address, colorAddress, palette, colors }
 		.var charbase = charset.indices.get(0)
 
         .eval Asset_TilemapList.add( Asset_Tilemap(
@@ -319,6 +317,19 @@
 			.eval tilemap.tiledefAddress = address + bin.getSize() - 6 //-6 for map header
 		}
    		
+		//Add tile definitons to struct
+
+		.var size = tilemap.tilewidth * tilemap.tileheight
+   		.for(var i=0; i<tbin.getSize(); i+=2 * size) {
+   			.var tiledefs = List()
+   			.for(var j=0; j<size; j++) {
+	   			.var addr = [tbin.uget(i + j*2) + [tbin.uget(i  + j*2 + 1) * $100]] + charbase
+	   			.eval tiledefs.add(addr)
+   			}
+   			.eval tilemap.tiles.add(tiledefs)
+   		}
+
+
         .if(!preload) {
         	.eval S65_LastImportPtr = *
         	* = PC "Tilemap import"
