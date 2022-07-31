@@ -11,6 +11,7 @@
 .const HVC_SD_TO_CHIPRAM = $36
 .const HVC_SD_TO_ATTICRAM = $3e
 
+#import "includes/s65/sdcard/SDCard_Macros.s"
 #import "includes/s65/sdcard/SDCard_Commands.s"
 
 

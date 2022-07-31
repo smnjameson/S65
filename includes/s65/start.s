@@ -317,7 +317,7 @@ S65: {
 			lda #$05
 			sta $d054
 
-
+			System_HideScreen 
 			
 			rts
 	}

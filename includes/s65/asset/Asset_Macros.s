@@ -7,10 +7,7 @@
 */
 .macro Asset_Preload() {
 	.if(Asset_PreloaderList.size() > 0) {
-		lda #$ff 
-		sta $d020 
-		lda #$6b 
-		sta $d011 
+		System_HideScreen
 
 		.for(var i=0; i<Asset_PreloaderList.size(); i++) {
 			.var asset = Asset_PreloaderList.get(i)
@@ -18,8 +15,7 @@
 			.print("preload "+asset.get("name")+" to $"+toHexString(asset.get("addr")) +"  fn: $"+toHexString(asset.get("filename")) )
 		}
 
-		lda #$1b 
-		sta $d011 		
+		System_ShowScreen		
 	}
 }
 
@@ -378,3 +374,37 @@
 	.var palette = Asset_CharList.get(Asset_GetCharset(name).get("id")).get("palette")
 	.fill palette.getSize(), palette.get(i)
 }
+
+
+
+/**
+* .macro AddExternal
+*
+* Adds a new external asset file to the SDCard containing the binary data providewd. It can then be loaded
+* later using the name provided
+* 
+* @namespace Asset
+*
+* @param {string} name The name to reference this file
+* @param {binary} data The binary data, either from previous Asset_Imports (eg charset.palette) or from a kick ass LoadBinary()
+*/
+.macro Asset_AddExternal(name, data) {
+		.var fname = "S"+Asset_ExternalAssetList.size()
+		Asset_ExternalAssetFetchSegment(Asset_ExternalAssetList.size())
+			.eval Asset_ExternalAssetList.add(Hashtable().put(
+				"name", name,
+				"filename", Asset_PreloaderFilenamePointer 
+			))
+			.fill data.getSize(), data.get(i)
+			S65_Trace("Adding "+name+" external asssets to the SDCard")
+		.segment S65Code
+
+		.segment PreloadFilenames
+		.encoding "ascii"
+			.text fname
+			.byte $00,$01
+			.eval Asset_PreloaderFilenamePointer = *
+		.encoding "screencode_mixed"
+		.segment S65Code
+}
+

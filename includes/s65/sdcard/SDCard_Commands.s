@@ -43,21 +43,13 @@
 	S65_AddToMemoryReport("SDCard_LoadToChipRam")
 	S65_SaveRegisters()	
 
-		lda #>filePtr 
-		ldx #<filePtr 
+		lda #>filePtr.getValue()
+		ldx #<filePtr.getValue()
 		jsr SDIO.CopyFileName
 
-		ldx #<addr
-		ldy #>addr
-		ldz #[[addr & $ff0000] >> 16]
-
-		ldx #>filePtr.getValue()
-		ldy #<filePtr.getValue()
-		jsr SDIO.CopyFileName
-
-		ldx #<addr.getValue()
-		ldy #>addr.getValue()
-		ldz #[[addr.getValue() & $ff0000] >> 16]
+		ldx #<[addr.getValue() - $8000000]
+		ldy #>[addr.getValue() - $8000000]
+		ldz #[[[addr.getValue() - $8000000] & $ff0000] >> 16]
 
 		jsr SDIO.LoadAttic
 	S65_RestoreRegisters()
@@ -72,6 +64,7 @@ SDIO: {
 		ldx #$00
 	!:
 		lda FileName:$BEEF, x 
+.print ("SDFILENAME: $" + toHexString(SDFILENAME))
 		sta SDFILENAME, x 
 		inx
 		bne !-

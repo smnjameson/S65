@@ -119,6 +119,9 @@
 	S65_AddToMemoryReport("Palette_LoadFromSD")
 }
 
+
+
+
 _CopyPaletteFromBuffer: {
 		ldx #$00
 	!:

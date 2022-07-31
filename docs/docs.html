@@ -579,6 +579,8 @@ h4 {
 		
 				<div class='macroHeader' id='Asset_Macros'>Macros</div>
 			
+					<div class='macroIndex'><a href='#Asset_AddExternal'>AddExternal</a></div>
+				
 					<div class='macroIndex'><a href='#Asset_ImportCharset'>ImportCharset</a></div>
 				
 					<div class='macroIndex'><a href='#Asset_ImportCharsetPalette'>ImportCharsetPalette</a></div>
@@ -591,6 +593,29 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Asset_Preload'>Preload</a></div>
 				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Asset_AddExternal'>AddExternal
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'></span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Adds a new external asset file to the SDCard containing the binary data providewd. It can then be loaded later using the name provided   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Asset_AddExternal(<i>name</i>, <i>data</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The name to reference this file</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{binary} data - The binary data, either from previous Asset_Imports (eg charset.palette) or from a kick ass LoadBinary()</div></span>
+						</div>
+					
+						
+						
+					</div>
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Asset_ImportCharset'>ImportCharset
 							<div class='macroItemSubHeader'>
@@ -2094,7 +2119,7 @@ h4 {
 					
 					</div><br><br>
 			<div class='categoryHeader' id='Palette'><span><h4>Namespace<h2>Palette</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Palette_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Palette_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Palette_Vars'><div class='sectionButton'>Vars</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Palette_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Palette_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Palette_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Palette_Vars'><div class='sectionButton'>Vars</div></a></span>
 			<div class='categoryDescription'> API for manipulating the <a href="##MEGA65_Palette">MEGA65 Palettes</a>  </div>
 			<br>
 		
@@ -2242,6 +2267,39 @@ h4 {
 						
 						
 					</div><br>
+				<div class='macroHeader' id='Palette_Macros'>Macros</div>
+			
+					<div class='macroIndex'><a href='#Palette_LoadFromExternal'>LoadFromExternal</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_LoadFromExternal'>LoadFromExternal
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Loads a full 256 color palette from SD card into the currently active palette using the name referenced in a <a href="#Asset_AddExternal">Asset_AddExternal</a>   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_LoadFromExternal(<i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The Asset name defined in the Asset_AddExternal macro call</div></span>
+						</div>
+					
+						
+						
+					</div><br>
 				<div class='macroHeader' id='Palette_Data'>Data</div>
 			
 					<div class='macroIndex'><a href='#Palette_MEGA65_Palette'>MEGA65_Palette</a></div>
@@ -2303,7 +2361,7 @@ h4 {
 						<div class='macroUsage'>Palette_3</div>						
 					</div><br><br>
 			<div class='categoryHeader' id='SDCard'><span><h4>Namespace<h2>SDCard</h2></h4></span></div>
-			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#SDCard_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a></span>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#SDCard_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#SDCard_Macros'><div class='sectionButton'>Macros</div></a></span>
 			<div class='categoryDescription'> API for using the SD card to load assets to memory using mostly macros </div>
 			<br>
 		
@@ -2378,6 +2436,78 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{word} {ABS} filePtr - Pointer to the filename (zero terminated) on the SDCard to load</div></span>
+						</div>
+					
+						
+						
+					</div><br>
+				<div class='macroHeader' id='SDCard_Macros'>Macros</div>
+			
+					<div class='macroIndex'><a href='#SDCard_LoadExternalToAtticRam'>LoadExternalToAtticRam</a></div>
+				
+					<div class='macroIndex'><a href='#SDCard_LoadExternalToChipRam'>LoadExternalToChipRam</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='SDCard_LoadExternalToAtticRam'>LoadExternalToAtticRam
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Loads a binary from SD card into the attic ram location provided   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>SDCard_LoadExternalToAtticRam(<i>name</i>, <i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The Asset name defined in the Asset_AddExternal macro call</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{dword} name - The address to load the file into</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='SDCard_LoadExternalToChipRam'>LoadExternalToChipRam
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+						</div>
+						<div class='macroItemDescription'> Loads a binary from SD card into the chip ram location provided   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>SDCard_LoadExternalToChipRam(<i>name</i>, <i>name</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} name - The Asset name defined in the Asset_AddExternal macro call</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{dword} name - The address to load the file into</div></span>
 						</div>
 					
 						
@@ -3253,7 +3383,11 @@ h4 {
 				
 					<div class='macroIndex'><a href='#System_GetRandom8'>GetRandom8</a></div>
 				
+					<div class='macroIndex'><a href='#System_HideScreen'>HideScreen</a></div>
+				
 					<div class='macroIndex'><a href='#System_SeedRandom16'>SeedRandom16</a></div>
+				
+					<div class='macroIndex'><a href='#System_ShowScreen'>ShowScreen</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_Compare16'>Compare16
@@ -3353,6 +3487,29 @@ h4 {
 						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_HideScreen'>HideScreen
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Hides the display by setting illegal values in $d011. Useful for blacking out screen when loading from SDCard  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_HideScreen </div>
+						
+						
+						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_SeedRandom16'>SeedRandom16
 							
 							<div class='macroItemSubHeader'>
@@ -3378,6 +3535,29 @@ h4 {
 						<span><div class='paramHeader'>{byte} {REG|IMM|ABS16|ABX16|ABY16} seed - The 16bit value to use as a seed</div></span>
 						</div>
 					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_ShowScreen'>ShowScreen
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Shows the display after a HideScreen by setting valid values in $d011. Useful for blacking out screen when loading from SDCard  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_ShowScreen </div>
+						
 						
 						
 					</div><br>

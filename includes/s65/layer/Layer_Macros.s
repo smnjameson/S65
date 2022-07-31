@@ -618,11 +618,14 @@
 		lda #>[Tilemap_TilemapData + Asset_TilemapList.size() * 9]
 		sta _Tilemap_RestorePointers.tilecolors2 + 1
 
+
+		System_HideScreen
+
 		* = * "Post Layer_InitScreen User Code and Data"
 		.eval PostLayerInitScreen = *
 
 	.if(S65_SCREEN_LOGICAL_ROW_WIDTH > $1f4) {
-		.error "Pixel clock limits S65_SCREEN_LOGICAL_ROW_WIDTH to values <= $1f4, you are using $"+toHexString(S65_SCREEN_LOGICAL_ROW_WIDTH)+" bytes per row.  Please reduce your layer widths..."
+		.error "S65 Limits S65_SCREEN_LOGICAL_ROW_WIDTH to values <= $1f4, you are using $"+toHexString(S65_SCREEN_LOGICAL_ROW_WIDTH)+" bytes per row.  Please reduce your layer widths..."
 	}
 }
 

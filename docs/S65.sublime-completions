@@ -329,6 +329,13 @@
             "details": "The object returned by Anim_Get  / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}   *"
         },
         {
+            "trigger": "Asset_AddExternal",
+            "annotation": "name,data",
+            "contents": "Asset_AddExternal(${1:name}, ${2:data})",
+            "kind": "snippet",
+            "details": "Adds a new external asset file to the SDCard containing the binary data providewd. It can then be loaded later using the name provided"
+        },
+        {
             "trigger": "Asset_ImportCharset",
             "annotation": "name,path,address",
             "contents": "Asset_ImportCharset(${1:name}, ${2:path}, ${3:address})",
@@ -752,6 +759,13 @@
             "details": "Sets the currently active palette in IO memory."
         },
         {
+            "trigger": "Palette_LoadFromExternal",
+            "annotation": "name",
+            "contents": "Palette_LoadFromExternal(${1:name})",
+            "kind": "snippet",
+            "details": "Loads a full 256 color palette from SD card into the currently active palette using the name referenced in a <a href=\"#Asset_AddExternal\">Asset_AddExternal</a>"
+        },
+        {
             "trigger": "Palette_MEGA65_Palette",
             "annotation": "The MEGA65 has up to 4 palettes that can be assigned to the various graphic types Sprite and Character. At any one time one of the palettes will be banked into IO memory at $d100-$d3ff.  Note: While the palette format is RGB788 the nybbles of each byte are switched e.g. $F0 becomes $0F, to maintain compatibility with the C65",
             "kind": "snippet",
@@ -794,6 +808,20 @@
             "contents": "SDCard_LoadToChipRam ${1:addr} : ${2:filePtr}",
             "kind": "snippet",
             "details": "Loads a file from the SDCard into chip RAM"
+        },
+        {
+            "trigger": "SDCard_LoadExternalToAtticRam",
+            "annotation": "name,name",
+            "contents": "SDCard_LoadExternalToAtticRam(${1:name}, ${2:name})",
+            "kind": "snippet",
+            "details": "Loads a binary from SD card into the attic ram location provided"
+        },
+        {
+            "trigger": "SDCard_LoadExternalToChipRam",
+            "annotation": "name,name",
+            "contents": "SDCard_LoadExternalToChipRam(${1:name}, ${2:name})",
+            "kind": "snippet",
+            "details": "Loads a binary from SD card into the chip ram location provided"
         },
         {
             "trigger": "Sprite_Get",
@@ -1091,11 +1119,25 @@
             "details": "Returns a random 8 bit number in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator"
         },
         {
+            "trigger": "System_HideScreen",
+            "annotation": "",
+            "contents": "System_HideScreen ",
+            "kind": "snippet",
+            "details": "Hides the display by setting illegal values in $d011. Useful for blacking out screen when loading from SDCard"
+        },
+        {
             "trigger": "System_SeedRandom16",
             "annotation": "seed",
             "contents": "System_SeedRandom16 ${1:seed}",
             "kind": "snippet",
             "details": "Seeds the random number generator using a 16bit non zero value. Passing a register will use that byute for both LSB and MSB"
+        },
+        {
+            "trigger": "System_ShowScreen",
+            "annotation": "",
+            "contents": "System_ShowScreen ",
+            "kind": "snippet",
+            "details": "Shows the display after a HideScreen by setting valid values in $d011. Useful for blacking out screen when loading from SDCard"
         },
         {
             "trigger": "System_BasicUpstart65",

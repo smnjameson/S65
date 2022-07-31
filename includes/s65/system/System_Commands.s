@@ -182,3 +182,45 @@ _System_Random16: {
     pla
     S65_AddToMemoryReport("System_Compare16")
 }
+
+
+/**
+* .pseudocommand HideScreen
+*
+* Hides the display by setting illegal values in $d011. Useful for blacking out
+* screen when loading from SDCard
+* 
+* @namespace System
+* @flags nz
+*/
+.pseudocommand System_HideScreen {
+    S65_AddToMemoryReport("System_HideScreen")
+    pha
+        lda #$10
+        trb $d011 
+        lda #$60 
+        tsb $d011
+    pla
+    S65_AddToMemoryReport("System_HideScreen")
+}
+
+
+/**
+* .pseudocommand ShowScreen
+*
+* Shows the display after a HideScreen by setting valid values in $d011. Useful for blacking out
+* screen when loading from SDCard
+* 
+* @namespace System
+* @flags nz
+*/
+.pseudocommand System_ShowScreen {
+    S65_AddToMemoryReport("System_ShowScreen")
+    pha
+        lda #$10
+        tsb $d011 
+        lda #$60 
+        trb $d011
+    pla
+    S65_AddToMemoryReport("System_ShowScreen")
+}

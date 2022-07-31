@@ -20,4 +20,5 @@
  */
 #import "includes/S65/palette/Palette_Data.s"
 #import "includes/S65/palette/Palette_Commands.s"
+#import "includes/S65/palette/Palette_Macros.s"
 
