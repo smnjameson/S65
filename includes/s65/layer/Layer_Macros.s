@@ -619,7 +619,7 @@
 		sta _Tilemap_RestorePointers.tilecolors2 + 1
 
 
-		System_HideScreen
+		System_ShowScreen
 
 		* = * "Post Layer_InitScreen User Code and Data"
 		.eval PostLayerInitScreen = *

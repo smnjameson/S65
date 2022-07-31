@@ -223,7 +223,7 @@ function sortNCMDataForSprites(png, sw, sh, palette, charData) {
                             let i = (index + ((y * 8) + x ))//
                             charNewData.push(charData.data[i])
 
-                            if(y|x|sx|sy===0) {
+                            if(x===0 && y===0 && sx===0 && sy===0) {
                                 spriteData.colors.push(charData.slices[i])
                             }
                         }

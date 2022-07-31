@@ -64,7 +64,6 @@ SDIO: {
 		ldx #$00
 	!:
 		lda FileName:$BEEF, x 
-.print ("SDFILENAME: $" + toHexString(SDFILENAME))
 		sta SDFILENAME, x 
 		inx
 		bne !-

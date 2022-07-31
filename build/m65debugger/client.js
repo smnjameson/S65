@@ -66,12 +66,23 @@ async function sendFilesToSD(prgname) {
 }
 
 async function sendFiles(fpath, files) {
-    for(var i=0; i<files.length; i++) {
+    let BATCH_SIZE = 8
+    
+    for(var i=0; i<files.length; i+=BATCH_SIZE) {
         await new Promise(res => {
             let cmd = path.resolve(__dirname, "../", "mega65_ftp.exe") 
-            let src = path.resolve(fpath, files[i]) 
-            console.log("Uploading "+src)
-            let proc = exec(`${cmd} -l${process.argv[2]} -c "put ${src} ${files[i]}" -c "quit"`, 
+            
+            
+            let commands = ``
+            for(var j=0; j<BATCH_SIZE; j++) {
+                if(i+j < files.length) {
+                    let src = path.resolve(fpath, files[i+j]) 
+                    console.log("Uploading "+src)
+                    commands += `-c "put ${src} ${files[i+j]}" `
+                }
+            }
+           
+            let proc = exec(`${cmd} -l${process.argv[2]} ${commands} -c "quit"`, 
             (error, stdout, stderr) => {
                 if (error) {
                     console.log(`error: ${error.message}`);

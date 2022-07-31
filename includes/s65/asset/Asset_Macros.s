@@ -59,7 +59,7 @@
 			.segment PreloadFilenames
 			.encoding "ascii"
 				.text name
-				.byte $00,$01
+				.byte $00
 				.eval Asset_PreloaderFilenamePointer = *
 			.encoding "screencode_mixed"
 			.segment S65Code
@@ -402,7 +402,7 @@
 		.segment PreloadFilenames
 		.encoding "ascii"
 			.text fname
-			.byte $00,$01
+			.byte $00
 			.eval Asset_PreloaderFilenamePointer = *
 		.encoding "screencode_mixed"
 		.segment S65Code
