@@ -182,64 +182,6 @@ _System_Random16: {
 
     !notEq:
 
-        // .if(_isAbs(valueA)) {
-        //     lda valueA.getValue() + 0
-        // } 
-        // .if(_isAbsX(valueA)) {
-        //     lda valueA.getValue() + 0, x 
-        // }  
-        // .if(_isAbsY(valueA)) {
-        //     lda valueA.getValue() + 0, y 
-        // }                   
-        // .if(_isImm(valueA)){
-        //     lda #<valueA.getValue()
-        // }
-
-
-
-        // .if(_isAbs(valueB)) {
-        //     cmp valueB.getValue() + 0
-        // } 
-        // .if(_isAbsX(valueB)) {
-        //     cmp valueB.getValue() + 0, x 
-        // }  
-        // .if(_isAbsY(valueB)) {
-        //     cmp valueB.getValue() + 0, y 
-        // }          
-        // .if(_isImm(valueB)){
-        //     cmp #<valueB.getValue()
-        // } 
-
-
-
-        // .if(_isAbs(valueA)) {
-        //     lda valueA.getValue() + 1
-        // } 
-        //  .if(_isAbsX(valueA)) {
-        //     lda valueA.getValue() + 1, x 
-        // }  
-        // .if(_isAbsY(valueA)) {
-        //     lda valueA.getValue() + 1, y 
-        // }         
-        // .if(_isImm(valueA)){
-        //     lda #>valueA.getValue()
-        // }
-
-
-
-        // .if(_isAbs(valueB)) {
-        //     sbc valueB.getValue() + 1
-        // } 
-        // .if(_isAbsX(valueB)) {
-        //     sbc valueB.getValue() + 1, x 
-        // }  
-        // .if(_isAbsY(valueB)) {
-        //     sbc valueB.getValue() + 1, y 
-        // }           
-        // .if(_isImm(valueB)){
-        //     sbc #>valueB.getValue()
-        // } 
-
     S65_AddToMemoryReport("System_Compare16")
 }
 

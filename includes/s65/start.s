@@ -255,7 +255,7 @@ System_BasicUpstart65(S65_InitComplete)
  * 16 bytes of spare storage free for use when the S65 base page is active
  * to assist with using commands that expect to be in S65 base page
  */	 			
- 			S65_SpareBasePage: .fill 16, 0
+ 			S65_SpareBasePage: .fill 80, 0
 
 ///////////////////////////////////////////// 51 of 64 bytes reserved
 * = * "S65 Base Library methods"
