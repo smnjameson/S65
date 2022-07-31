@@ -8,12 +8,13 @@
 * @registers A
 * @flags nzc 
 */
-.pseudocommand System_GetRandom8 {        
+.pseudocommand System_GetRandom8 {    
+    S65_AddToMemoryReport("System_GetRandom8")    
         lda #$00
         sta S65_ReturnValue + 1
 		jsr _System_Random16
 		sta S65_ReturnValue + 0	
-
+    S65_AddToMemoryReport("System_GetRandom8")  
 }
 /**
 * .pseudocommand GetRandom16
@@ -27,11 +28,12 @@
 * @flags nzc
 */
 .pseudocommand System_GetRandom16 {
-
+    S65_AddToMemoryReport("System_GetRandom16")
 	 	jsr _System_Random16
 		sta S65_ReturnValue + 0
 		lda _System_Random16.rng_zp_low
 		sta S65_ReturnValue + 1	
+    S65_AddToMemoryReport("System_GetRandom16")        
 }
 _System_Random16: {
 		// from https://codebase64.org/doku.php?id=base:16bit_xorshift_random_generator
@@ -54,6 +56,54 @@ _System_Random16: {
     rng_zp_high: .byte $2d   
 }
 
+/**
+* .pseudocommand SeedRandom16
+*
+* Seeds the random number generator using a 16bit non zero value. Passing a register will
+* use that byute for both LSB and MSB
+* 
+* @namespace System
+*
+* @param {byte} {REG|IMM|ABS16|ABX16|ABY16} seed The 16bit value to use as  a seed
+* @flags nz
+*/
+.pseudocommand System_SeedRandom16 seed {
+    S65_AddToMemoryReport("System_SeedRandom16")  
+    .if(!_isReg(seed) && !_isImm(seed) && !_isAbs(seed) && !_isAbsXY(seed)) .error "System_SeedRandom16" +S65_TypeError
+    _saveIfReg(seed, S65_PseudoReg + 0)
+    pha 
+            .if(_isReg(seed)) {
+                lda S65_PseudoReg + 0
+                sta _System_Random16.rng_zp_low
+                sta _System_Random16.rng_zp_high
+            }
+            .if(_isImm(seed)) {
+                lda #<seed.getValue()
+                sta _System_Random16.rng_zp_low
+                lda #>seed.getValue()
+                sta _System_Random16.rng_zp_high
+            }
+            .if(_isAbs(seed)) {
+                lda seed.getValue() + 0
+                sta _System_Random16.rng_zp_low
+                lda seed.getValue() + 1
+                sta _System_Random16.rng_zp_high
+            } 
+            .if(_isAbsX(seed)) {
+                lda seed.getValue() + 0, x
+                sta _System_Random16.rng_zp_low
+                lda seed.getValue() + 1, x
+                sta _System_Random16.rng_zp_high
+            }   
+            .if(_isAbsY(seed)) {
+                lda seed.getValue() + 0, y
+                sta _System_Random16.rng_zp_low
+                lda seed.getValue() + 1, y
+                sta _System_Random16.rng_zp_high
+            }                                  
+    pla
+    S65_AddToMemoryReport("System_SeedRandom16")  
+}
 
 /**
 * .pseudocommand Compare16

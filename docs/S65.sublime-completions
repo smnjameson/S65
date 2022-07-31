@@ -1091,6 +1091,13 @@
             "details": "Returns a random 8 bit number in <a href=\"#Global_ReturnValue\">S65_ReturnValue</a> and the accumulator"
         },
         {
+            "trigger": "System_SeedRandom16",
+            "annotation": "seed",
+            "contents": "System_SeedRandom16 ${1:seed}",
+            "kind": "snippet",
+            "details": "Seeds the random number generator using a 16bit non zero value. Passing a register will use that byute for both LSB and MSB"
+        },
+        {
             "trigger": "System_BasicUpstart65",
             "annotation": "addr",
             "contents": "System_BasicUpstart65(${1:addr})",

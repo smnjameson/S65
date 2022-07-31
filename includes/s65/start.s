@@ -23,9 +23,9 @@
 .cpu _45gs02
 
 //Constants for limits on various objects
-.const S65_MAX_LAYERS = $10
-.const S65_SPRITESET_LIMIT = $10
-.const S65_MAX_TILEMAPS = $20
+.var S65_MAX_LAYERS = $10
+.var S65_SPRITESET_LIMIT = $10
+.var S65_MAX_TILEMAPS = $20
 
 
 .const S65_HIGHEST_LOAD = $f000

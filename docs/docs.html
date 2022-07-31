@@ -1532,7 +1532,7 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABX|ABY} xshift - The number of chars to shift</div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABX|ABY} xshift - The number of chars to shift (Currently values other than -1 or 1 may cause issues)</div></span>
 						</div>
 					
 						
@@ -3253,6 +3253,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#System_GetRandom8'>GetRandom8</a></div>
 				
+					<div class='macroIndex'><a href='#System_SeedRandom16'>SeedRandom16</a></div>
+				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='System_Compare16'>Compare16
 							
@@ -3347,6 +3349,35 @@ h4 {
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>System_GetRandom8 </div>
 						
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='System_SeedRandom16'>SeedRandom16
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Seeds the random number generator using a 16bit non zero value. Passing a register will use that byute for both LSB and MSB   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>System_SeedRandom16 <i>seed</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {REG|IMM|ABS16|ABX16|ABY16} seed - The 16bit value to use as a seed</div></span>
+						</div>
+					
 						
 						
 					</div><br>
