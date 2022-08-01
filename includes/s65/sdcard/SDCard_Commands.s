@@ -74,6 +74,7 @@ SDIO: {
 		sta $d640 
 		nop
 		bcs !success+
+		lda #$04
 		jmp SDIO.Error
 	!success:
 		rts
@@ -83,6 +84,7 @@ SDIO: {
 		sta $d640 
 		nop
 		bcs !success+
+		lda #$02
 		jmp SDIO.Error
 	!success:		
 		rts		
@@ -92,17 +94,25 @@ SDIO: {
 		sta $d640 
 		nop
 		bcs !success+
+		lda #$03
 		jmp SDIO.Error
 	!success:
 		rts		
 	}
 
 	Error: {
+		sta $d020  
 		lda #$38
 		sta $d640
 		clv 
-		inc $d020
-		jmp *-3
+		tax
+	!:
+		lda $d020
+		clc 
+		adc #$08
+		and #$0f 
+		sta $d020
+		jmp !-
 	}
 
 }

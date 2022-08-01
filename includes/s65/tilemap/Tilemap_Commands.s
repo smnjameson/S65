@@ -104,7 +104,7 @@ _Tilemap_RestorePointers: {
 * 
 * @namespace Tilemap
 *
-* @param {byte} {IMM|REG|BS|ABSX|ABSY} srcX The source rectangle X 
+* @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcX The source rectangle X 
 * @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcY The source rectangle Y
 * @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcWidth The source rectangle width
 * @param {byte} {IMM|REG|ABS|ABSX|ABSY} srcHeight The source rectangel height

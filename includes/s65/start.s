@@ -35,8 +35,8 @@
 	.const Palette_SDBuffer = $1400
 // 	.fill 768,0
 
-// * = $1700 "SDCard preloader info"
-	.var Asset_PreloaderFilenamePointer = $1700
+// * = $2100 "SDCard preloader info"
+.var Asset_PreloaderFilenamePointer = $2100
 
 
 * = $2001 "S65 BasicUpstart"
