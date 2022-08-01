@@ -92,34 +92,6 @@ _Tilemap_RestorePointers: {
 		sta.z S65_TileColordefPointer + 3
 
 		rts
-
-		// lda _Tilemap_#<tilemap.tilemapAddress
-		// sta.z S65_TilemapPointer + 0
-		// lda #>tilemap.tilemapAddress
-		// sta.z S65_TilemapPointer + 1
-		// lda #[[tilemap.tilemapAddress >> 16] & $ff]
-		// sta.z S65_TilemapPointer + 2
-		// lda #[[tilemap.tilemapAddress >> 24] & $ff]
-		// sta.z S65_TilemapPointer + 3
-
-		// lda #<tilemap.tiledefAddress
-		// sta.z S65_TiledefPointer + 0
-		// lda #>tilemap.tiledefAddress
-		// sta.z S65_TiledefPointer + 1
-		// lda #[[tilemap.tiledefAddress >> 16] & $ff]
-		// sta.z S65_TiledefPointer + 2
-		// lda #[[tilemap.tiledefAddress >> 24] & $ff]
-		// sta.z S65_TiledefPointer + 3	
-
-
-		// lda #<tilemap.colorAddress
-		// sta.z S65_TileColordefPointer + 0
-		// lda #>tilemap.colorAddress
-		// sta.z S65_TileColordefPointer + 1
-		// lda #[[tilemap.colorAddress >> 16] & $ff]
-		// sta.z S65_TileColordefPointer + 2
-		// lda #[[tilemap.colorAddress >> 24] & $ff]
-		// sta.z S65_TileColordefPointer + 3
 }
 
 /**

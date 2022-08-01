@@ -318,13 +318,14 @@
 		}
    		
 		//Add tile definitons to struct
-
 		.var size = tilemap.tilewidth * tilemap.tileheight
    		.for(var i=0; i<tbin.getSize(); i+=2 * size) {
    			.var tiledefs = List()
    			.for(var j=0; j<size; j++) {
 	   			.var addr = [tbin.uget(i + j*2) + [tbin.uget(i  + j*2 + 1) * $100]] + charbase
-	   			.eval tiledefs.add(addr)
+
+	   			.var color = charset.colors.get(addr-charbase) 
+	   			.eval tiledefs.add(addr + color * $100)
    			}
    			.eval tilemap.tiles.add(tiledefs)
    		}
