@@ -199,7 +199,7 @@ _Tilemap_RestorePointers: {
 
 
 		.if(_isReg(srcHeight)) {
-			lda S65_PseudoReg + 2
+			lda S65_PseudoReg + 3
 		} 		
 		.if(_isImm(srcHeight) || _isAbs(srcHeight)) {
 			lda srcHeight 
@@ -218,7 +218,7 @@ _Tilemap_RestorePointers: {
 
 
 		.if(_isReg(srcWidth)) {
-			lda S65_PseudoReg + 3
+			lda S65_PseudoReg + 2
 		}
 		.if(_isImm(srcWidth) || _isAbs(srcWidth)) {
 			lda srcWidth 

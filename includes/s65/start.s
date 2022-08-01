@@ -1,6 +1,6 @@
  .file [name="main.prg", segments="S65Code,PreloadFilenames", allowOverlap]
  .segmentdef S65Code [start=$2001]
- .segmentdef PreloadFilenames [start=$1700]
+ .segmentdef PreloadFilenames [start=$2100]
 .segment S65Code
 
 /**
@@ -255,7 +255,11 @@ System_BasicUpstart65(S65_InitComplete)
  * 16 bytes of spare storage free for use when the S65 base page is active
  * to assist with using commands that expect to be in S65 base page
  */	 			
- 			S65_SpareBasePage: .fill 80, 0
+ 			S65_Trace("S65_SpareBasePage $"+toHexString($2100 - *)+ " bytes free. Start address $"+toHexString(*))
+ 			S65_SpareBasePage: .fill $2100 - *, 0
+
+* = * "Preloader Filename space"
+	.fill $100, 0
 
 ///////////////////////////////////////////// 51 of 64 bytes reserved
 * = * "S65 Base Library methods"

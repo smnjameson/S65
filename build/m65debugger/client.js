@@ -20,13 +20,22 @@ ws.binaryType = 'arraybuffer';
 ws.onopen = async () => {
     let data = null
     if(process.argv[3]) {
-        data = fs.readFileSync(process.argv[3])
-        await sendFilesToSD(process.argv[3])
+        if(process.argv[2].toLowerCase() === "xemu") {
+            data = fs.readFileSync(process.argv[4])
+            await sendFilesToSD(process.argv[4])
+        } else {
+           data = fs.readFileSync(process.argv[3])
+            await sendFilesToSD(process.argv[3])         
+        }
     } else {
         data = fs.readFileSync(process.argv[2])
     }
     console.log("Launching application...")
-    ws.send(data);
+    if(process.argv[2].toLowerCase() === "xemu") {
+        ws.close()
+    } else {
+        ws.send(data);
+    }
     ws.onmessage = function(message) {
         ws.close()
     };    
@@ -38,7 +47,7 @@ ws.onopen = async () => {
 
 async function sendFilesToSD(prgname) {
     let sdcardPath = path.resolve(path.dirname(prgname), "./sdcard")
-
+    
     return new Promise(res => {
         fs.readdir(sdcardPath, async (err, files) => {
             console.log(sdcardPath, files)
@@ -81,8 +90,12 @@ async function sendFiles(fpath, files) {
                     commands += `-c "put ${src} ${files[i+j]}" `
                 }
             }
-           
-            let proc = exec(`${cmd} -l${process.argv[2]} ${commands} -c "quit"`, 
+            
+            let script=`${cmd} -l ${process.argv[2]} ${commands} -c "quit"`
+            if(process.argv[2].toLowerCase() === "xemu") {
+                script = `${cmd} -d ${process.argv[3]} ${commands} -c "quit"`
+            } 
+            let proc = exec(script, 
             (error, stdout, stderr) => {
                 if (error) {
                     console.log(`error: ${error.message}`);
