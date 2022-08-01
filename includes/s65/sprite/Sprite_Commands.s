@@ -600,7 +600,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	.if(_isImm(speed) && speed.getValue()<1) .error "Sprite_SetAnim: speed should be minimum 1"
 
 	_saveIfReg(animId, S65_PseudoReg + 0)
-	_saveIfReg(animId, S65_PseudoReg + 1)
+	_saveIfReg(speed, S65_PseudoReg + 1)
 	phy
 	pha	
 			.if(_isReg(animId)) {
