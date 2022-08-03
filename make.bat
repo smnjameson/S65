@@ -8,7 +8,7 @@ set KICK=java -cp %S65PATH%\build\kickass.jar kickass.KickAssembler65CE02 -vices
 set PNG65=node %S65PATH%\build\aseparse65\png65.js
 set LDTK65=node %S65PATH%\build\ldtk65\ldtk65.js
 set DEPLOY=node %S65PATH%\build\m65debugger\client.js
-
+set XEMUSDCARD=%APPDATA%\xemu-lgb\mega65\mega65.img
 
 
 
@@ -28,10 +28,18 @@ echo DEPLOYING...
 IF [%1]==[] GOTO NO_ARGUMENT
 	echo Deploy plus Assets to SDCard
 	%DEPLOY% %SERIAL% .\bin\main.prg  
+	
+	rem ==Xemu deploy + assets to sd==
+	rem %DEPLOY% xemu %XEMUSDCARD% .\bin\main.prg  
+	rem "C:\Program Files\xemu\xmega65.exe" -besure  -prg "./bin/main.prg"
 	GOTO DONE
+
 :NO_ARGUMENT
 	echo Deploy Without Assets
 	%DEPLOY% .\bin\main.prg
+
+	rem ==Xemu deploy==
+	rem "C:\Program Files\xemu\xmega65.exe" -besure  -prg "./bin/main.prg"
 :DONE
 
 echo IF THINGS LOOK WRONG BE SURE TO LOAD YOUR ASSETS TO THE SDCARD FIRST USING SHIFT+F8!!!

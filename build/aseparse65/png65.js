@@ -479,7 +479,6 @@ function sortNCMPalette(charData, paletteData, wid, hei) {
                     pal.g.push(nswap(color.green))
                     pal.b.push(nswap(color.blue))
                 } else {
-                    if(!argv.nofill) {
                         palette.push({
                             red: 0,
                             green: 0,
@@ -488,11 +487,9 @@ function sortNCMPalette(charData, paletteData, wid, hei) {
                         }); 
                         pal.r.push(0)
                         pal.g.push(0)
-                        pal.b.push(0)  
-                    }                 
+                        pal.b.push(0)              
                 }
             }
-
 
             if(sortedArray[s].reduce((p, a) => p + a, 0)) {
                 console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
@@ -502,8 +499,9 @@ function sortNCMPalette(charData, paletteData, wid, hei) {
 
         if(argv.nofill) {
             for(var i=0; i<16; i++) {
-                if(sortedArray[i].length === 1) break
+                if(sortedArray[i].length === 1) break                 
             }
+
             let sliceCount = i
             pal.r.splice(i * 16, pal.r.length)
             pal.g.splice(i * 16, pal.g.length)
@@ -602,12 +600,15 @@ function appendPaletteFCM(palette, charData, isSprites) {
     let spriteData = charData.spriteData
 
     existingPalette = fs.readFileSync(path.resolve(argv.palette), null)
-        
+
+
+
+
     let pal = { r: [], g: [], b: [] }
     var numCols = existingPalette.length/3
     let startIndex = Math.ceil(numCols / 16) * 16
 
-    
+    console.log(`Palette append: Existing ${numCols} from  ${startIndex}`) 
 
     //put existing palette in place
     for(var i=0; i<startIndex; i++) {
@@ -621,6 +622,7 @@ function appendPaletteFCM(palette, charData, isSprites) {
             pal.b.push(0)            
         }
     }
+
     //now check every char and add a new color offset
     let cnt = 0
     for(var i=0; i< data.length; i++) {
@@ -652,6 +654,11 @@ function appendPaletteFCM(palette, charData, isSprites) {
         }
 
     }
+
+
+
+
+
     console.log(`Palette append: Existing ${numCols} from  ${startIndex} plus ${cnt} new colors`)
     return {pal, data}
 }
@@ -697,11 +704,7 @@ function appendPaletteNCM(palette, charData, isSprites) {
             spriteData.colors[i] += startIndex/16
         }
     }
-    //now check every char and add a new color offset
-    // let cnt = 0
-    // for(var i=0; i< data.length; i++) {
-    //     if(data[i] !== 0) data[i] = newVal
-    // }
+
     pal.r.splice(256,pal.r.length)
     pal.g.splice(256,pal.g.length)
     pal.b.splice(256,pal.b.length)
@@ -765,12 +768,18 @@ async function runCharMapper(argv) {
         }
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
     } else {
-        fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from([]))
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from([])) //write empty as theres no NCM data
     }
 
 
     //SAVE PALETTE
-    fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
+    if(argv.palette) {
+        fs.writeFileSync(path.resolve(argv.palette), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from([]))
+    } else {
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
+    }
+
     //SAVE CHARS
     fs.writeFileSync(path.resolve(outputPath, inputName+"_chars.bin"), Buffer.from(charData.data))
 }
@@ -874,7 +883,14 @@ async function runSpriteMapper(argv) {
 
 
     //SAVE PALETTE
-    fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
+    if(argv.palette) {
+        fs.writeFileSync(path.resolve(argv.palette), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from([]))
+
+    } else {
+        fs.writeFileSync(path.resolve(outputPath, inputName+"_palette.bin"), Buffer.from(convertedPal.r.concat(convertedPal.g).concat(convertedPal.b)))
+    }
+    
     
     
     //SAVE CHARS

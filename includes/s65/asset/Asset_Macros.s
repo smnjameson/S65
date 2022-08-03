@@ -45,7 +45,7 @@
 		//preload?
 		.var preload = false
 		.if(address >= S65_HIGHEST_LOAD) {
-			.var name = "P"+Asset_PreloaderList.size()
+			.var name = "p"+Asset_PreloaderList.size()
 			Asset_PreloaderFetchSegment(Asset_PreloaderList.size())
 				.eval Asset_PreloaderList.add(Hashtable().put(
 					"name", name,
@@ -160,7 +160,7 @@
 		//preload?
 		.var preload = false
 		.if(address >= S65_HIGHEST_LOAD) {
-			.var name = "P"+Asset_PreloaderList.size()
+			.var name = "p"+Asset_PreloaderList.size()
 			Asset_PreloaderFetchSegment(Asset_PreloaderList.size())
 				.eval Asset_PreloaderList.add(Hashtable().put(
 					"name", name,
@@ -205,19 +205,19 @@
            
 
 
-    		.var paletteBin = LoadBinary(path+"_palette.bin")
-    		.eval charSet.palette = paletteBin
+		.var paletteBin = LoadBinary(path+"_palette.bin")
+		.eval charSet.palette = paletteBin
 
-    		.var ncmBin = LoadBinary(path+"_ncm.bin")
-    		.eval charSet.colors = List()
-    		.if(ncmBin.getSize() > 0) {
-    			.eval charSet.colorAddress = *
-    			// .fill ncmBin.getSize(), ncmBin.uget(i)
-    			.for(var i=0; i<ncmBin.getSize(); i++) {
-    				.byte ncmBin.uget(i)
-    				.eval charSet.colors.add(ncmBin.uget(i))
-    			}
-    		}
+		.var ncmBin = LoadBinary(path+"_ncm.bin")
+		.eval charSet.colors = List()
+		.if(ncmBin.getSize() > 0) {
+			.eval charSet.colorAddress = *
+			// .fill ncmBin.getSize(), ncmBin.uget(i)
+			.for(var i=0; i<ncmBin.getSize(); i++) {
+				.byte ncmBin.uget(i)
+				.eval charSet.colors.add(ncmBin.uget(i))
+			}
+		}
 
     		
         .if(!preload) {
@@ -247,8 +247,8 @@
 * @param {word} address The address to laod the data into
 */
 .macro Asset_ImportTilemap(name, path, charset, address) {
-		.var charbase = charset.indices.get(0)
 
+		.var charbase = charset.indices.get(0)
         .eval Asset_TilemapList.add( Asset_Tilemap(
         	Asset_TilemapList.size(), 	//id
         	name,
@@ -272,7 +272,7 @@
 		//preload?
 		.var preload = false
 		.if(address >= S65_HIGHEST_LOAD) {
-			.var name = "P"+Asset_PreloaderList.size()
+			.var name = "p"+Asset_PreloaderList.size()
 			Asset_PreloaderFetchSegment(Asset_PreloaderList.size())
 				.eval Asset_PreloaderList.add(Hashtable().put(
 					"name", name,
@@ -314,6 +314,7 @@
 			// .import binary path+"_tiles.bin"
 			_Asset_ImportTilemap_AddBaseToTiles(path, charbase, charset)
 		} else {
+
 			.eval tilemap.tiledefAddress = address + bin.getSize() - 6 //-6 for map header
 		}
    		
@@ -337,6 +338,8 @@
         } else {
         	.eval S65_LastImportPtr = tilemap.tiledefAddress + tbin.getSize()
         }
+
+        .print ("tilemap.tiledefAddress: $" + toHexString(tilemap.tiledefAddress))
 }
 .macro _Asset_ImportTilemap_StripTilemapHeader(path) {
 		.var bin = LoadBinary(path+"_map.bin")	
@@ -345,10 +348,18 @@
 .macro _Asset_ImportTilemap_AddBaseToTiles(path, base, charset) {
 		.var bin = LoadBinary(path+"_tiles.bin")
 		.for(var i=0; i<bin.getSize(); i+=2) {
+
 			.var addr = [bin.uget(i) + [bin.uget(i + 1) * $100]] + base
+
 			.var tileNum = bin.uget(i) + $100 * bin.uget(i+1)
 
-			.byte <addr, [>addr] + charset.colors.get(tileNum)
+			.var color = charset.colors.get(tileNum) & $f0
+
+			.byte <addr, [>addr] + color
+
+// .print ("tileNum: $" + toHexString(tileNum))
+// .print ("addr: $" + toHexString(addr))
+// .print ("charset.colors.get(tileNum): $" + toHexString(color))
 		}
 }
 
@@ -401,7 +412,7 @@
 * @param {binary} data The binary data, either from previous Asset_Imports (eg charset.palette) or from a kick ass LoadBinary()
 */
 .macro Asset_AddExternal(name, data) {
-		.var fname = "S"+Asset_ExternalAssetList.size()
+		.var fname = "s"+Asset_ExternalAssetList.size()
 		Asset_ExternalAssetFetchSegment(Asset_ExternalAssetList.size())
 			.eval Asset_ExternalAssetList.add(Hashtable().put(
 				"name", name,
