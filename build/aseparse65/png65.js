@@ -24,12 +24,12 @@ const argv = yargs(hideBin(process.argv))
         })
         .option('palette', {
             alias: 'p',
-            description: 'if provided this is the path to which the generated palette will be appended',
+            description: 'if provided this is the path to which the generated palette will be appended rather than creating a new palette',
             type: 'string',
         })  
         .option('nofill', {
             alias: 'l',
-            description: 'if provided the palette will not be padded out to 256 colors, useful for appending with --palette option',
+            description: 'if provided the palette will not be padded out to 256 colors, useful for appending palettes with --palette option',
             type: 'boolean',
         })                  
         .option('fcm', {
