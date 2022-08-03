@@ -24,7 +24,7 @@ const argv = yargs(hideBin(process.argv))
         })
         .option('palette', {
             alias: 'p',
-            description: 'if provided this is the path to the palette which will be prepended to the one created',
+            description: 'if provided this is the path to which the generated palette will be appended',
             type: 'string',
         })  
         .option('nofill', {
