@@ -274,6 +274,9 @@ System_BasicUpstart65(S65_InitComplete)
 #import "includes/s65/palette.s"
 #import "includes/s65/anim.s"
 #import "includes/s65/tilemap.s"
+#import "includes/s65/debug.s"
+
+
 
 S65: {
 	Init: {

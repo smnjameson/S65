@@ -367,7 +367,6 @@
         	.eval S65_LastImportPtr = tilemap.tiledefAddress + tbin.getSize()
         }
 
-        .print ("tilemap.tiledefAddress: $" + toHexString(tilemap.tiledefAddress))
 }
 .macro _Asset_ImportTilemap_StripTilemapHeader(path) {
 		.var bin = LoadBinary(path+"_map.bin")	
@@ -385,9 +384,6 @@
 
 			.byte <addr, [>addr] + color
 
-// .print ("tileNum: $" + toHexString(tileNum))
-// .print ("addr: $" + toHexString(addr))
-// .print ("charset.colors.get(tileNum): $" + toHexString(color))
 		}
 }
 

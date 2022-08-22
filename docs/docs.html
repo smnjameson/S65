@@ -155,6 +155,8 @@ h4 {
 		
 			<div class='macroIndex'><a href='#DMA'>DMA</a></div>
 		
+			<div class='macroIndex'><a href='#Debug'>Debug</a></div>
+		
 			<div class='macroIndex'><a href='#Layer'>Layer</a></div>
 		
 			<div class='macroIndex'><a href='#Palette'>Palette</a></div>
@@ -1305,6 +1307,35 @@ h4 {
 						
 						</div>
 					
+					</div><br><br>
+			<div class='categoryHeader' id='Debug'><span><h4>Namespace<h2>Debug</h2></h4></span></div>
+			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Debug_Functions'><div class='sectionButton'>Functions</div></a></span>
+			<div class='categoryDescription'> Simple debug time namespace for displaying live memory contents via watchers </div>
+			<br>
+		
+				<div class='macroHeader' id='Debug_Functions'>Functions</div>
+			
+					<div class='macroIndex'><a href='#Debug_AddWatcher'>AddWatcher</a></div>
+				
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Debug_AddWatcher'>AddWatcher
+						</div>
+						<div class='macroItemDescription'> Creates a watcher that is then displayed in the debug overlay. 4 bytes at a time are watcehd at each address. Best declared directly after your S65 library import.  Requires NODEBUG to NOT be defined    </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Debug_AddWatcher(<i>label</i>, <i>address</i>)</div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{string} label - The label to give the watcher</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{dword} address - The address from which to watch data</div></span>
+						</div>
+					
+						
+						
 					</div><br><br>
 			<div class='categoryHeader' id='Layer'><span><h4>Namespace<h2>Layer</h2></h4></span></div>
 			<span class='sectionButtonContainer'><a style='text-decoration:none;' href='#Layer_Pseudocommands'><div class='sectionButton'>Pseudocommands</div></a><a style='text-decoration:none;' href='#Layer_Macros'><div class='sectionButton'>Macros</div></a><a style='text-decoration:none;' href='#Layer_Functions'><div class='sectionButton'>Functions</div></a><a style='text-decoration:none;' href='#Layer_Data'><div class='sectionButton'>Data</div></a><a style='text-decoration:none;' href='#Layer_Vars'><div class='sectionButton'>Vars</div></a><a style='text-decoration:none;' href='#Layer_Lists'><div class='sectionButton'>Lists</div></a><a style='text-decoration:none;' href='#Layer_Hashtables'><div class='sectionButton'>Hashtables</div></a></span>

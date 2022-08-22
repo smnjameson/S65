@@ -422,7 +422,8 @@ _Tilemap_Draw: {
 				!colloop:
 						pla 
 						sta ((ScreenRam)), z	
-
+						lda #$08
+						sta ((ColorRam)), z	
 						inz
 						pla
 	 					sta ((ColorRam)), z

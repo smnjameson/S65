@@ -217,6 +217,12 @@
 	S65_AddToMemoryReport("Layer_InitScreen")
 
 	
+	#if NODEBUG
+	#else
+		.eval LAYER_DEBUG = Layer_GetLayerCount()
+		Layer_DefineScreenLayer(20, 0, false)
+		Debug_Start()
+	#endif
 
 	.const GOTOX = 1
 	.eval S65_SCREEN_RAM = screenBaseAddress
@@ -752,14 +758,17 @@
 	//6
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : tilemapList.get(i).tileheight * tilemapList.get(i).tilewidth]
 	//7
+.print ("tilemapList.get(i).colorAddress: $" + toHexString(tilemapList.get(2).colorAddress))
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).colorAddress]
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).colorAddress]
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).colorAddress >> 16] & $ff] ]
 	//10
+.print ("tilemapList.get(i).tilemapAddress: $" + toHexString(tilemapList.get(2).tilemapAddress))
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).tilemapAddress]
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).tilemapAddress]
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).tilemapAddress >> 16] & $ff] ]
 	//13
+.print ("tilemapList.get(i).tiledefAddress: $" + toHexString(tilemapList.get(2).tiledefAddress))
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : <tilemapList.get(i).tiledefAddress]
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : >tilemapList.get(i).tiledefAddress]
 	.fill S65_MAX_TILEMAPS, [ i>=size ? 0 : [[tilemapList.get(i).tiledefAddress >> 16] & $ff] ]

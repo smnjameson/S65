@@ -499,6 +499,13 @@
             "details": "Offsets into the DMagic job for the <a target=\"_blank\" href=\"#https://files.mega65.org/manuals-upload/mega65-chipset-reference.pdf#F018%20DMA%20Job%20List%20Format\">F018 11 byte data format</a>."
         },
         {
+            "trigger": "Debug_AddWatcher",
+            "annotation": "label,address",
+            "contents": "Debug_AddWatcher(${1:label}, ${2:address})",
+            "kind": "snippet",
+            "details": "Creates a watcher that is then displayed in the debug overlay. 4 bytes at a time are watcehd at each address. Best declared directly after your S65 library import.  Requires NODEBUG to NOT be defined"
+        },
+        {
             "trigger": "Layer_AddText",
             "annotation": "xpos:ypos:textPtr:color",
             "contents": "Layer_AddText ${1:xpos} : ${2:ypos} : ${3:textPtr} : ${4:color}",

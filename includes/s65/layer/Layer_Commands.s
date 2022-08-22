@@ -516,6 +516,10 @@ DMA_Layer_ClearAllLayersZero: {
 			System_BorderDebug($09)
 			Sprite_Update Layer_LayerList.size()
 
+			#if NODEBUG
+			#else
+				Debug_Update()
+			#endif
 		plz
 		ply
 		plx

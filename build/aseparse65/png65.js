@@ -764,7 +764,7 @@ async function runCharMapper(argv) {
     if(argv.ncm){
         //save NCM color table
         if(argv.palette) {
-            sortedPalette.charColors = sortedPalette.charColors.map(a => a + appendPal.sliceOffset + 0x0f)
+            sortedPalette.charColors = sortedPalette.charColors.map(a => (a + appendPal.sliceOffset + 0x0f) & 0xf0)
         }
         fs.writeFileSync(path.resolve(outputPath, inputName+"_ncm.bin"), Buffer.from(sortedPalette.charColors))
     } else {
