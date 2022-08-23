@@ -2229,6 +2229,8 @@ h4 {
 			
 					<div class='macroIndex'><a href='#Palette_Assign'>Assign</a></div>
 				
+					<div class='macroIndex'><a href='#Palette_Cycle'>Cycle</a></div>
+				
 					<div class='macroIndex'><a href='#Palette_LoadFromMem'>LoadFromMem</a></div>
 				
 					<div class='macroIndex'><a href='#Palette_LoadFromSD'>LoadFromSD</a></div>
@@ -2269,6 +2271,41 @@ h4 {
 					
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'><small><i>optional</i></small>{byte} {IMM} paletteRRBSprite - The Palette for RRB Sprites</div></span>
+						</div>
+					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Palette_Cycle'>Cycle
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Cycles a range of colors in the current palette shifting them in a loop by 1 backwards   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Palette_Cycle <i>from</i> : <i>count</i></div>
+						
+							<div class='macroUsageText'><i>Parameters:</i></div>
+						
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {ABS|IMM|REG} from - The start position to cycle from</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {ABS|IMM|REG} count - the number of colors in the cycle</div></span>
 						</div>
 					
 						

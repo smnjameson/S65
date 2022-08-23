@@ -766,6 +766,13 @@
             "details": "Assigns palettes to the MEGA65 palette banks."
         },
         {
+            "trigger": "Palette_Cycle",
+            "annotation": "from:count",
+            "contents": "Palette_Cycle ${1:from} : ${2:count}",
+            "kind": "snippet",
+            "details": "Cycles a range of colors in the current palette shifting them in a loop by 1 backwards"
+        },
+        {
             "trigger": "Palette_LoadFromMem",
             "annotation": "addr:size",
             "contents": "Palette_LoadFromMem ${1:addr} : ${2:size}",

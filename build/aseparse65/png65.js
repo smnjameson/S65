@@ -41,6 +41,11 @@ const argv = yargs(hideBin(process.argv))
             alias: 'n',
             description: 'use NCM char mode',
             type: 'boolean',
+        })   
+        .option('noshare', {
+            alias: 'ns',
+            description: 'doesnt try to use colors already in the palette',
+            type: 'boolean',
         })                   
         // .option('dedupe', {
         //     alias: 'd',
@@ -437,7 +442,7 @@ function findBestFitForCharColors(inp, out) {
         for(var i=0; i<out.length; i++) {
             let matches = inp.filter(a => out[i].includes(a));
             let uniques = inp.filter(a => !out[i].includes(a));
-            if( matches.length > best && //most matches in this palette slice
+            if ( matches.length > best && //most matches in this palette slice
                 uniques.length + out[i].length <= 15) {
                 best = i 
                 max = matches.length
@@ -458,12 +463,12 @@ function sortNCMPalette(charData, paletteData, wid, hei) {
         hei = hei || 1
         let sortedArray = new Array(16).fill([0])
 
-        // console.log(charData.charColors)
-        for(var i=0; i<charData.charColors.length; i++) {
 
-            let colors = charData.charColors[i]
-            sortedArray = findBestFitForCharColors(colors, sortedArray)
-        }
+            for(var i=0; i<charData.charColors.length; i++) {
+                let colors = charData.charColors[i]
+                sortedArray = findBestFitForCharColors(colors, sortedArray)
+            }
+        
         let palette = [];
         let pal = { r: [], g: [], b: [] }
         for(var s = 0; s<16; s++){
@@ -492,7 +497,9 @@ function sortNCMPalette(charData, paletteData, wid, hei) {
             }
 
             if(sortedArray[s].reduce((p, a) => p + a, 0)) {
-                console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
+                if(!argv.palette) {
+                    console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
+                } 
             }
         }
 
@@ -608,7 +615,10 @@ function appendPaletteFCM(palette, charData, isSprites) {
     var numCols = existingPalette.length/3
     let startIndex = Math.ceil(numCols / 16) * 16
 
-    console.log(`Palette append: Existing ${numCols} from  ${startIndex}`) 
+    // console.log(`Palette append: Existing ${numCols} from  ${startIndex}`) 
+    // if(sortedArray[s].reduce((p, a) => p + a, 0)) {
+    //     if(!argv.palette) console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
+    // }
 
     //put existing palette in place
     for(var i=0; i<startIndex; i++) {
@@ -664,7 +674,7 @@ function appendPaletteFCM(palette, charData, isSprites) {
 }
 
 
-function appendPaletteNCM(palette, charData, isSprites) {
+function appendPaletteNCM(palette, charData, isSprites, sortedPalette) {
     let existingPalette = []
     let data = charData.data 
     let spriteData = charData.spriteData
@@ -676,7 +686,12 @@ function appendPaletteNCM(palette, charData, isSprites) {
     var numCols = existingPalette.length/3
     let startIndex = Math.ceil(numCols / 16) * 16
 
-    console.log(`Palette append: Existing ${numCols} from  ${startIndex}`)
+    // console.log(`Palette append: Existing ${numCols} from  ${startIndex}`)
+    //     console.log(`Palette append: Existing ${numCols} from  ${startIndex}`) 
+    // if(sortedArray[s].reduce((p, a) => p + a, 0)) {
+    //     if(!argv.palette) console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
+    // }
+
     if(!isSprites) {
         sliceOffset = startIndex
     }
@@ -705,9 +720,17 @@ function appendPaletteNCM(palette, charData, isSprites) {
         }
     }
 
+    if(sortedPalette) {
+        console.log ("Palette NCM $"+(startIndex/16).toString(16)+":   " + palette.r.length + " colors" )
+    } else {
+        // console.log(`Palette append: Existing ${numCols} from  ${startIndex} plus ${cnt} new colors`)  
+    }
     pal.r.splice(256,pal.r.length)
     pal.g.splice(256,pal.g.length)
     pal.b.splice(256,pal.b.length)
+
+     
+
     return {pal, data, spriteData, sliceOffset}
 }
 ////////////////////////////////////////////////////////////////
@@ -748,9 +771,9 @@ async function runCharMapper(argv) {
     if(argv.palette) {
         
         if(argv.ncm) {
-            appendPal = appendPaletteNCM(convertedPal, charData)
+            appendPal = appendPaletteNCM(convertedPal, charData, false, sortedPalette)
         } else {
-            appendPal = appendPaletteFCM(convertedPal, charData)
+            appendPal = appendPaletteFCM(convertedPal, charData, false)
         }
         if(!argv.nofill) {
             convertedPal = fillPalette(appendPal.pal)

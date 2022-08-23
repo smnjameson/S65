@@ -135,3 +135,87 @@ _CopyPaletteFromBuffer: {
 		bne !-
 		rts
 }
+
+
+/**
+* .pseudocommand Cycle
+*
+* Cycles a range of colors in the current palette shifting them in a loop by 1 backwards
+* 
+* @namespace Palette
+*
+* @param {byte} {ABS|IMM|REG} from The start position to cycle from
+* @param {byte} {ABS|IMM|REG} count the number of colors in the cycle
+* @flags nzc
+*/
+.pseudocommand Palette_Cycle from : count {
+	S65_AddToMemoryReport("Palette_Cycle")
+	.if(!_isAbsImmOrReg(from) ) .error "Palette_LoadFromSD:"+S65_TypeError
+	.if(!_isAbsImmOrReg(count) ) .error "Palette_LoadFromSD:"+S65_TypeError
+	_saveIfReg(from, S65_PseudoReg + 0)
+	_saveIfReg(count, S65_PseudoReg + 1)
+	pha 
+	phx 
+	phy 
+		.if(_isReg(from)) {
+			lda S65_PseudoReg + 0
+		} else {
+			lda from
+		}
+		sta _Palette_Cycle.sm_index
+
+		.if(_isReg(count)) {
+			lda S65_PseudoReg + 1
+		} else {
+			lda count
+		}
+		sta _Palette_Cycle.sm_count
+
+		jsr _Palette_Cycle
+	ply 
+	plx 
+	plz
+	S65_AddToMemoryReport("Palette_Cycle")
+}
+
+_Palette_Cycle: {
+		dec sm_index
+		lda sm_count:#$BEEF
+		clc 
+		adc sm_index:#$BEEF
+		tay 
+		dey 
+
+
+
+			lda $d100,y
+			pha 
+			lda $d200,y
+			pha
+			lda $d300,y
+			pha
+			 
+
+			ldx sm_count
+			dex
+			dey
+		!loop:
+			lda $d100,y
+			sta $d101,y
+			lda $d200,y
+			sta $d201,y
+			lda $d300,y
+			sta $d301,y
+			dey
+			dex
+			bne !loop-
+
+			ldy sm_index
+			pla 
+			sta $d300,y
+			pla 
+			sta $d200,y
+			pla 
+			sta $d100,y
+			rts
+}
