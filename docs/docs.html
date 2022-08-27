@@ -1362,6 +1362,8 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_Shift'>Shift</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_SortSprites'>SortSprites</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_Update'>Update</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_WriteToScreen'>WriteToScreen</a></div>
@@ -1662,6 +1664,31 @@ h4 {
 						<span><div class='paramHeader'>{byte} {IMM|REG|ABS|ABX|ABY} xshift - The number of chars to shift (Currently values other than -1 or 1 may cause issues)</div></span>
 						</div>
 					
+						
+						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SortSprites'>SortSprites
+							
+							<div class='macroItemSubHeader'>
+								<span  style='display:inline-flex;'>registers:  flags: 
+		<table><th></th><tr style="display:inline-block;">
+	
+			<td >c</td>
+		
+			<td >n</td>
+		
+			<td >z</td>
+		
+		</tr></table>
+	</span>
+							</div>
+							
+						</div>
+						<div class='macroItemDescription'> Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SortSprites </div>
+						
 						
 						
 					</div>
@@ -2063,9 +2090,15 @@ h4 {
 				
 					<div class='macroIndex'><a href='#Layer_RowAddressMSB'>RowAddressMSB</a></div>
 				
+					<div class='macroIndex'><a href='#Layer_SpriteCount'>SpriteCount</a></div>
+				
 					<div class='macroIndex'><a href='#Layer_SpriteIOAddrLSB'>SpriteIOAddrLSB</a></div>
 				
 					<div class='macroIndex'><a href='#Layer_SpriteIOAddrMSB'>SpriteIOAddrMSB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_SpriteSortListLSB'>SpriteSortListLSB</a></div>
+				
+					<div class='macroIndex'><a href='#Layer_SpriteSortListMSB'>SpriteSortListMSB</a></div>
 				
 					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_AddrOffsets'>AddrOffsets</div>
@@ -2152,6 +2185,12 @@ h4 {
 						<div class='macroUsage'>Layer_RowAddressMSB</div>						
 					</div>
 					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SpriteCount'>SpriteCount</div>
+						<div class='macroItemDescription'> How many sprites there are max in this layer   </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SpriteCount</div>						
+					</div>
+					<div class='macroItem'>
 						<div class='macroItemHeader' id='Layer_SpriteIOAddrLSB'>SpriteIOAddrLSB</div>
 						<div class='macroItemDescription'> Pointer to the table of LSB values for the address of the start of the layers sprite IO area  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
@@ -2162,6 +2201,18 @@ h4 {
 						<div class='macroItemDescription'> Pointer to the table of MSB values for the address of the start of the layers sprite IO area  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Layer_SpriteIOAddrMSB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SpriteSortListLSB'>SpriteSortListLSB</div>
+						<div class='macroItemDescription'> Pointer to the LSB of table of sorted sprite indices  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SpriteSortListLSB</div>						
+					</div>
+					<div class='macroItem'>
+						<div class='macroItemHeader' id='Layer_SpriteSortListMSB'>SpriteSortListMSB</div>
+						<div class='macroItemDescription'> Pointer to the MSB of table of sorted sprite indices  </div>
+						<div class='macroUsageText'><i>Usage:</i></div>
+						<div class='macroUsage'>Layer_SpriteSortListMSB</div>						
 					</div><br>
 				<div class='macroHeader' id='Layer_Lists'>Lists</div>
 			

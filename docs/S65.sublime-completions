@@ -569,6 +569,13 @@
             "details": "Shift the cahrs on this layer horizontally"
         },
         {
+            "trigger": "Layer_SortSprites",
+            "annotation": "",
+            "contents": "Layer_SortSprites ",
+            "kind": "snippet",
+            "details": "Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base"
+        },
+        {
             "trigger": "Layer_Update",
             "annotation": "",
             "contents": "Layer_Update ",
@@ -747,6 +754,12 @@
             "details": "Pointer to the table of MSB values for the address of the start of each screen row directly after the first GOTOX"
         },
         {
+            "trigger": "Layer_SpriteCount",
+            "annotation": "How many sprites there are max in this layer",
+            "kind": "snippet",
+            "details": "How many sprites there are max in this layer"
+        },
+        {
             "trigger": "Layer_SpriteIOAddrLSB",
             "annotation": "Pointer to the table of LSB values for the address of the start of the layers sprite IO area",
             "kind": "snippet",
@@ -757,6 +770,18 @@
             "annotation": "Pointer to the table of MSB values for the address of the start of the layers sprite IO area",
             "kind": "snippet",
             "details": "Pointer to the table of MSB values for the address of the start of the layers sprite IO area"
+        },
+        {
+            "trigger": "Layer_SpriteSortListLSB",
+            "annotation": "Pointer to the LSB of table of sorted sprite indices",
+            "kind": "snippet",
+            "details": "Pointer to the LSB of table of sorted sprite indices"
+        },
+        {
+            "trigger": "Layer_SpriteSortListMSB",
+            "annotation": "Pointer to the MSB of table of sorted sprite indices",
+            "kind": "snippet",
+            "details": "Pointer to the MSB of table of sorted sprite indices"
         },
         {
             "trigger": "Palette_Assign",

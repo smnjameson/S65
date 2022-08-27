@@ -43,7 +43,9 @@
 		//sprite data
 		.fill Sprite_SpriteIOLength * count, $00
 
-		
+		.eval Layer_LayerList.get(layerNum).put("spriteSortList", *)
+		.fill count, i
+			
 
 	S65_Trace("      Register dimensions $"+toHexString(count)+ " x $"+toHexString((*-startAddr)/count))	
 }

@@ -153,6 +153,33 @@ S65_AddToMemoryReport("Layer_DynamicDataAndIO")
 	.var Layer_IsRRBSprite = $0000
 
 
+	/**
+	* .var SpriteSortListLSB
+	*
+	* Pointer to the LSB of table of sorted sprite indices
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_SpriteSortListLSB = $0000
+
+	/**
+	* .var SpriteSortListMSB
+	*
+	* Pointer to the MSB of table of sorted sprite indices
+	* 
+	* @namespace Layer
+	*/
+	.var Layer_SpriteSortListMSB = $0000
+
+	/**
+	* .var SpriteCount
+	*
+	* How many sprites there are max in this layer
+	* 
+	* @namespace Layer
+	*
+	*/
+	.var Layer_SpriteCount = $0000
 
 	/**
 	* .var DMAClear

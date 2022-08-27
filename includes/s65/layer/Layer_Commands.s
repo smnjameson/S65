@@ -1024,6 +1024,133 @@ DMA_Layer_Shift: {
 
 
 /**
+* .pseudocommand SortSprites
+*
+* Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base
+* 
+* @namespace Layer
+*
+* @flags nzc
+*/
+.pseudocommand Layer_SortSprites {
+	S65_AddToMemoryReport("Layer_SortSprites")
+	phx 
+	phy
+	pha
+			.const SprIO = S65_TempWord1
+			.const SprIOBase = S65_TempWord4
+			.const SprIndices = S65_TempWord5
+
+			ldx.z S65_CurrentLayer	
+			lda Layer_SpriteSortListLSB, x
+			sta.z SprIndices + 0
+			sta SortDMAClearTable.sm_lsb + 0
+			lda Layer_SpriteSortListMSB, x
+			sta.z SprIndices + 1
+			sta SortDMAClearTable.sm_lsb + 1
+			lda Layer_SpriteIOAddrLSB, x
+			sta.z SprIO + 0
+			lda Layer_SpriteIOAddrMSB, x
+			sta.z SprIO + 1
+			lda Layer_SpriteCount, x 
+			sta sm_count
+			sta SortDMAClearTable.sm_count
+
+			jsr SortDMAClearTable
+
+			ldx #$00
+		!loop:
+			ldy #Sprite_IOflags
+			lda (SprIO), y	
+			bit #Sprite_IOflagEnabled 
+			beq !done+	//If not enabled skip
+
+			//Otheriwse get its baseline y pos
+			ldy #Sprite_IOheight
+			lda (SprIO), y
+			tay 
+			lda Times8Table, y 
+			ldy #Sprite_IOy
+			clc
+			adc (SprIO), y
+			tay 	//Y = baseline Y pos
+
+			//find closest slot in table
+		!next:
+			lda SortTempTable, y 
+			beq !+
+			iny 
+			bra !next-
+		!:
+
+			cpx #$00 //First needs recording
+			bne !+
+			lda #$ff 
+			sta SortTempTable, y 
+			bra !done+
+		!:
+			txa 
+			sta SortTempTable, y 
+		!done:
+			clc 
+			lda.z SprIO + 0
+			adc #Sprite_SpriteIOLength
+			sta.z SprIO + 0
+			bcc !+
+			inc.z SprIO + 1
+		!:
+			inx 
+			cpx sm_count:#$BEEF
+
+			bne !loop-
+
+			//Now copy the list to 
+			//the sorted list 
+			ldx #$00
+			ldy #$00
+		!loop:
+			lda SortTempTable, x 
+			beq !next+		
+			cmp #$ff
+			bne !+
+			lda #$00
+		!:
+			sta (SprIndices), y
+			iny 
+		!next:
+			inx 
+			bne !loop-
+
+		//fill rest with $ff
+			lda #$ff
+		!:
+			cpy sm_count
+			bcs !exit+
+			sta (SprIndices), y
+			iny 
+			bra !-
+		!exit:
+
+	pla
+	ply
+	plx                
+    S65_AddToMemoryReport("Layer_SortSprites")
+}
+SortDMAClearTable: {
+		DMA_Execute job 
+		rts 
+	job:
+		DMA_Header #0 : #0
+		DMA_FillJob #0 : SortTempTable : #256 : #TRUE
+		.label sm_count= * + $02
+		.label sm_lsb = * + $07	
+		DMA_FillJob #$ff : SortTempTable : #$00 : #FALSE
+}
+Times8Table:	.fill 16, i* 8
+SortTempTable: .fill 256, 0
+SortTempZero: .byte $00
+
+/**
 * .pseudocommand WriteToScreen
 *
 * Copys up to 256 bytes from the source addresses to the locations

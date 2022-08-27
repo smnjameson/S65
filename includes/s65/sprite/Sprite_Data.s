@@ -213,6 +213,8 @@
 .var Sprite_IOanimSpeed= Sprite_SpriteIOLength
 .eval Sprite_SpriteIOLength += 1  //16 of 16
 
+.eval Sprite_SpriteIOLength =   16
+
 
 // /**
 // * .var IOpixelWidth

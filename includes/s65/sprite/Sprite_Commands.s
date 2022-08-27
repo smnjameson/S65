@@ -876,13 +876,18 @@ _Sprite_SetSpriteMeta: {
 			.const SprIO = S65_TempWord1
 			.const LayerIO = S65_TempWord2
 			.const AnimData = S65_TempWord3
+			.const SprIOBase = S65_TempWord4
+			.const SprIndices = S65_TempWord5
 
 			// Sprite IO base
 			lda Layer_SpriteIOAddrLSB, x
-			sta.z SprIO + 0
+			sta.z SprIOBase + 0
 			lda Layer_SpriteIOAddrMSB, x
-			sta.z SprIO + 1
-
+			sta.z SprIOBase + 1
+			lda Layer_SpriteSortListLSB, x
+			sta.z SprIndices + 0
+			lda Layer_SpriteSortListMSB, x
+			sta.z SprIndices + 1
 
 			// Layer IO base ; TODO- Optimize
 			txa 
@@ -933,6 +938,8 @@ MaskRowValue:
 		.const SprIO = S65_TempWord1
 		.const LayerIO = S65_TempWord2
 		.const AnimData = S65_TempWord3
+		.const SprIOBase = S65_TempWord4
+		.const SprIndices = S65_TempWord5
 
 		ldy #Layer_IOmaxSpritesRRB //maxSprite offset
 		lda (LayerIO), y 
@@ -942,14 +949,40 @@ MaskRowValue:
 		ldz #$00 //sprite
 	!spriteloop:
 			phz
+
+	//Convert Z to new SPRIO using lookup table
+	lda #$00 
+	sta.z SprIO + 1
+	lda (SprIndices), z 
+	asl 
+	rol.z SprIO + 1
+	asl 
+	rol.z SprIO + 1
+	asl 
+	rol.z SprIO + 1
+	asl 
+	rol.z SprIO + 1
+	adc.z SprIOBase + 0
+	sta.z SprIO + 0
+	lda.z SprIO + 1
+	adc.z SprIOBase + 1
+	sta.z SprIO + 1
+
+
 			ldy #Sprite_IOflags 
 			lda (SprIO), y
-			and #%00100000
+			bit #%00100000
 
 			//Skip if not enabled
 			lbeq !nextsprite+
 
+			lda (SprIndices), z 
+			cmp #$ff 
+			lbeq !nextsprite+
+			
 			//store flags to apply later
+			// lda (SprIO), y
+			ldy #Sprite_IOflags 
 			lda (SprIO), y
 			and #%11011111
 			sta S65_SpriteFlags

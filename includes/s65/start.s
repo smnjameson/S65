@@ -193,6 +193,8 @@ System_BasicUpstart65(S65_InitComplete)
  			S65_TempWord2:	.word $0000
  			S65_TempWord3:	.word $0000
  			S65_TempWord4:	.word $0000
+ 			S65_TempWord5:	.word $0000
+ 			S65_TempWord6:	.word $0000
  			S65_TempByte1:	.byte $00
  			S65_TempByte2:	.byte $00
  			S65_TempByte3:	.byte $00
