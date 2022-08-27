@@ -1079,10 +1079,16 @@
             "details": "Turns on NCM for this sprite<br><br> NOTE: It is best to use NCM where possible as it takes half the processing time per visible sprite on a Layer_Update, less chars on a line, and less memory for the image data at the cost of dropping to 16 colors"
         },
         {
-            "trigger": "Sprite_IOflags",
-            "annotation": "Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled",
+            "trigger": "Sprite_IOflagOneShot",
+            "annotation": "Starts as zero sets to 1 when the first animation loop has passed",
             "kind": "snippet",
-            "details": "Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled"
+            "details": "Starts as zero sets to 1 when the first animation loop has passed"
+        },
+        {
+            "trigger": "Sprite_IOflags",
+            "annotation": "Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled bit 0 = One shot flag",
+            "kind": "snippet",
+            "details": "Flags for the state of this sprite  bit 7 = Flip V (Not yet implemented) bit 6 = Flip H bit 5 = Enabled bit 0 = One shot flag"
         },
         {
             "trigger": "Sprite_IOflipHoffset",

@@ -174,7 +174,7 @@ _CopyPaletteFromBuffer: {
 		jsr _Palette_Cycle
 	ply 
 	plx 
-	plz
+	pla
 	S65_AddToMemoryReport("Palette_Cycle")
 }
 

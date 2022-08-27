@@ -29,8 +29,6 @@
 			sta.z S65_TilemapPointer + 1
 			lda #[[tilemap.tilemapAddress >> 16] & $ff]
 			sta.z S65_TilemapPointer + 2
-			lda #[[tilemap.tilemapAddress >> 24] & $ff]
-			sta.z S65_TilemapPointer + 3
 
 			lda #<tilemap.tiledefAddress
 			sta.z S65_TiledefPointer + 0
@@ -38,9 +36,7 @@
 			sta.z S65_TiledefPointer + 1
 			lda #[[tilemap.tiledefAddress >> 16] & $ff]
 			sta.z S65_TiledefPointer + 2
-			lda #[[tilemap.tiledefAddress >> 24] & $ff]
-			sta.z S65_TiledefPointer + 3	
-
+			
 
 			lda #<tilemap.colorAddress
 			sta.z S65_TileColordefPointer + 0
@@ -48,7 +44,10 @@
 			sta.z S65_TileColordefPointer + 1
 			lda #[[tilemap.colorAddress >> 16] & $ff]
 			sta.z S65_TileColordefPointer + 2
-			lda #[[tilemap.colorAddress >> 24] & $ff]
+			
+			lda $00
+			sta.z S65_TilemapPointer + 3
+			sta.z S65_TiledefPointer + 3	
 			sta.z S65_TileColordefPointer + 3
 
 
@@ -69,8 +68,6 @@ _Tilemap_RestorePointers: {
 		sta.z S65_TilemapPointer + 1
 		lda tilemap2:$BEEF, y
 		sta.z S65_TilemapPointer + 2
-		lda #$00
-		sta.z S65_TilemapPointer + 3
 
 		lda tiledef0:$BEEF, y
 		sta.z S65_TiledefPointer + 0
@@ -78,9 +75,6 @@ _Tilemap_RestorePointers: {
 		sta.z S65_TiledefPointer + 1
 		lda tiledef2:$BEEF, y
 		sta.z S65_TiledefPointer + 2
-		lda #$00
-		sta.z S65_TiledefPointer + 3	
-
 
 		lda tilecolors0:$BEEF, y
 		sta.z S65_TileColordefPointer + 0
@@ -88,7 +82,10 @@ _Tilemap_RestorePointers: {
 		sta.z S65_TileColordefPointer + 1
 		lda tilecolors2:$BEEF, y
 		sta.z S65_TileColordefPointer + 2
+		
 		lda #$00
+		sta.z S65_TilemapPointer + 3		
+		sta.z S65_TiledefPointer + 3	
 		sta.z S65_TileColordefPointer + 3
 
 		rts

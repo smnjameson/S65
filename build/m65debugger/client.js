@@ -75,7 +75,7 @@ async function sendFilesToSD(prgname) {
 }
 
 async function sendFiles(fpath, files) {
-    let BATCH_SIZE = 8
+    let BATCH_SIZE = 32
     
     for(var i=0; i<files.length; i+=BATCH_SIZE) {
         await new Promise(res => {

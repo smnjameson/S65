@@ -603,18 +603,40 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	_saveIfReg(speed, S65_PseudoReg + 1)
 	phy
 	pha	
+
 			.if(_isReg(animId)) {
 				lda.z S65_PseudoReg + 0
 			} else {
 				lda animId
 			}
 			ldy #[Sprite_IOanim]
-			sta (S65_LastSpriteIOPointer), y	
+			cmp (S65_LastSpriteIOPointer), y				
+			beq !exit+
+			sta (S65_LastSpriteIOPointer), y
+				//reset the one shot flag if this is new anim	
+				ldy #[Sprite_IOflags]			
+				lda (S65_LastSpriteIOPointer), y	
+				and #[255 - Sprite_IOflagOneShot]
+				sta (S65_LastSpriteIOPointer), y	
+			ldy #[Sprite_IOanim]
+		!:
 			lda #$00
 			iny	//timer
 			sta (S65_LastSpriteIOPointer), y
 			iny //frame
 			sta (S65_LastSpriteIOPointer), y
+
+//Apply color of first frame to anim
+//TODO - Fix for other addressing modes
+.if(_isImm(animId)) {	
+	.var firstFrame = Anim_SeqList.get(animId.getValue()).startFrame
+	.var meta = Anim_SeqList.get(animId.getValue()).spriteSet.get("meta")
+	.var numSprites = meta.get($02) + meta.get($03) * 256
+	lda #meta.get($20 + numSprites * 2 + firstFrame)		
+	ldy #[Sprite_IOcolor]
+	sta (S65_LastSpriteIOPointer), y	
+}
+
 			.if(_isReg(speed)) {
 				lda.z S65_PseudoReg + 1
 			} else {
@@ -625,7 +647,8 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 				}
 			}		
 			iny //speed
-			sta (S65_LastSpriteIOPointer), y			
+			sta (S65_LastSpriteIOPointer), y	
+		!exit:		
 	pla
 	ply
 	S65_AddToMemoryReport("Sprite_SetAnim")	
@@ -1052,6 +1075,10 @@ MaskRowValue:
 				cmp Anim_FrameCounts -1, y 
 				
 				bcc !noWrap+
+				ldy #Sprite_IOflags 
+				lda (SprIO), y	
+				ora Sprite_IOflagOneShot
+				sta (SprIO), y	
 				lda #$00
 			!noWrap:
 				ldy #Sprite_IOanimFrame
@@ -1070,6 +1097,8 @@ MaskRowValue:
 				lda (AnimData), y //ptrHi
 				sta.z S65_SpritePointerTemp + 1 //byte 0
 				sta.z S65_SpritePointerOld + 1 //byte 0	
+
+
 				bra !ptrDone+
 //get and store base pointer from standard Sprite_IOptr
 

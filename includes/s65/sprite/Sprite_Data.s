@@ -43,7 +43,7 @@
  * bit 7 = Flip V (Not yet implemented)
  * bit 6 = Flip H 
  * bit 5 = Enabled
- * 
+ * bit 0 = One shot flag
  * @namespace Sprite
  */
  .var Sprite_IOflags = Sprite_SpriteIOLength
@@ -79,6 +79,12 @@
 * @namespace Sprite
 */
 .const Sprite_IOflagNCM = $08
+/**
+* .var IOflagOneShot
+* Starts as zero sets to 1 when the first animation loop has passed
+* @namespace Sprite
+*/
+.const Sprite_IOflagOneShot = $01
 
 
  /**

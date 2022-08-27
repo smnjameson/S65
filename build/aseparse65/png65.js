@@ -46,7 +46,12 @@ const argv = yargs(hideBin(process.argv))
             alias: 'ns',
             description: 'doesnt try to use colors already in the palette',
             type: 'boolean',
-        })                   
+        }) 
+        .option('nosort', {
+            alias: 'no',
+            description: 'doesnt sort ncm colors but instead uses the exact palette in the provided png',
+            type: 'boolean',
+        })                           
         // .option('dedupe', {
         //     alias: 'd',
         //     description: 'Remove duplicate chars when getting char data',
@@ -463,10 +468,13 @@ function sortNCMPalette(charData, paletteData, wid, hei) {
         hei = hei || 1
         let sortedArray = new Array(16).fill([0])
 
+            if(argv.nosort) {
 
-            for(var i=0; i<charData.charColors.length; i++) {
-                let colors = charData.charColors[i]
-                sortedArray = findBestFitForCharColors(colors, sortedArray)
+            } else {
+                for(var i=0; i<charData.charColors.length; i++) {
+                    let colors = charData.charColors[i]
+                    sortedArray = findBestFitForCharColors(colors, sortedArray)
+                }
             }
         
         let palette = [];
