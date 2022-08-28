@@ -570,8 +570,8 @@
         },
         {
             "trigger": "Layer_SortSprites",
-            "annotation": "",
-            "contents": "Layer_SortSprites ",
+            "annotation": "count",
+            "contents": "Layer_SortSprites ${1:count}",
             "kind": "snippet",
             "details": "Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base"
         },

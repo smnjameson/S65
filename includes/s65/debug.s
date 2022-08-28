@@ -10,7 +10,7 @@
 .var Debug_DataLabel = 0
 .var Debug_WatcherList = null
 
-	.eval Debug_WatcherList = List()
+.eval Debug_WatcherList = List()
 
 
 
@@ -32,15 +32,11 @@
 * @return {byte} <add description here>
 */
 .macro Debug_AddWatcher(label, address) {
-
 		.var t = Debug_AddWatcherFunc(label, address)
-
 }
 
 .function Debug_AddWatcherFunc(label, address) {
-	#if NODEBUG
-	#else
-
+	#if WATCHERS
 		.eval Debug_WatcherList.add( Hashtable().put(
 			"name", label,
 			"address", address

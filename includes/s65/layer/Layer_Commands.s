@@ -757,34 +757,41 @@ _Layer_Update: {
 	pha 
 	phx 
 	phy 
-		
+	phz
 		//ALL but REG
 		.if(!_isReg(xshift)) {
 			lda xshift
+			sta S65_TempByte1
+			bpl !+
+			neg
+		!:
 			asl 
-			sta.z S65_TempByte1
+			sta.z S65_TempByte2
 		} else {
-			asl.z S65_TempByte1
+			lda S65_TempByte1
+			bpl !+
+			neg
+		!:
+			asl
+			sta.z S65_TempByte2
 		}
 
 		
-		jsr _Layer_Shift_ResetScreen
 		
+		jsr _Layer_Shift_ResetScreen	
+
 		ldy.z S65_CurrentLayer
 		lda.z S65_TempByte1
 		bmi !negative+
 	!postitive:
 		lda Layer_width, y
 		jsr _Layer_Shift_PrepPos
-
 		bra !done+
-
 	!negative:
-
 		lda Layer_width, y
 		jsr _Layer_Shift_PrepNeg
 	!done:
-
+	plz
 	ply 
 	plx 
 	pla
@@ -796,19 +803,16 @@ _Layer_Shift_ResetScreen: {
 	rts
 }
 _Layer_Shift_PrepPos: {
-
 		jsr _Layer_Shift_SetLength
-		lda S65_TempByte1
+		lda S65_TempByte2
 		sta _Layer_Shift_X_Positive.ScreenAdd
 		sta _Layer_Shift_X_Positive.ColorAdd
 		jmp _Layer_Shift_X_Positive	//tail call	
 
 }
 _Layer_Shift_PrepNeg: {
-		lda Layer_width, y
 		jsr _Layer_Shift_SetLength
-		lda S65_TempByte1
-		neg
+		lda S65_TempByte2
 		sta _Layer_Shift_X_Negative.ScreenAdd
 		sta _Layer_Shift_X_Negative.ColorAdd
 		jmp _Layer_Shift_X_Negative //tail call		
@@ -819,7 +823,7 @@ _Layer_Shift_SetLength: {
 		.var lengthJob2 = DMA_Layer_Shift.job2 + $02	
 
 		sec 
-		sbc.z S65_TempByte1
+		sbc #$02
 		sta lengthJob
 		sta lengthJob2
 		rts
@@ -833,8 +837,12 @@ _Layer_Shift_X_Negative: {
 		.var destJob2 = DMA_Layer_Shift.job2 + $07
 		.var srcJob2 = DMA_Layer_Shift.job2 + $04
 		
+.print ("lengthJob: $" + toHexString(lengthJob))
+.print ("destJob: $" + toHexString(destJob))
+.print ("srcJob: $" + toHexString(srcJob))
+
 		sec 
-		lda.z S65_ScreenRamPointer  + 0
+		lda.z S65_ScreenRamPointer  + 0	
 		sta destJob + 0
 		sbc ScreenAdd:#$02
 		sta srcJob + 0
@@ -852,9 +860,21 @@ _Layer_Shift_X_Negative: {
 		sta srcJob + 2
 
 			//adjust src and dest as we go backwards
-				clc 
+				clc
+				lda lengthJob
+				adc #$01
+				sta lengthJobback 
+				// inc lengthJob
+				// dec lengthJob
+				// dec lengthJob
+
+				// inc lengthJob
+				// inc lengthJob
+
+
+				clc
 				lda srcJob+0
-				adc lengthJob 
+				adc lengthJobback:#$BEEF
 				sta srcJob+0
 				lda srcJob+1
 				adc #$00
@@ -862,11 +882,13 @@ _Layer_Shift_X_Negative: {
 
 				clc 
 				lda destJob+0
-				adc lengthJob
+				adc lengthJobback
 				sta destJob+0
 				lda destJob+1
 				adc #$00
 				sta destJob+1
+
+
 
 
 
@@ -890,7 +912,7 @@ _Layer_Shift_X_Negative: {
 
 				clc 
 				lda srcJob2+0
-				adc lengthJob
+				adc lengthJobback
 				sta srcJob2+0
 				lda srcJob2+1
 				adc #$00
@@ -898,14 +920,12 @@ _Layer_Shift_X_Negative: {
 
 				clc 
 				lda destJob2+0
-				adc lengthJob
+				adc lengthJobback
 				sta destJob2+0
 				lda destJob2+1
 				adc #$00
 				sta destJob2+1
-
-
-
+// jmp *
 		jsr DMA_Layer_Shift_ExecuteRows
 		rts
 }
@@ -918,7 +938,9 @@ _Layer_Shift_X_Positive: {
 		.var lengthJob2= DMA_Layer_Shift.job2 + $02
 		.var destJob2 = DMA_Layer_Shift.job2 + $07
 		.var srcJob2 = DMA_Layer_Shift.job2 + $04
-		
+	
+
+
 		clc 
 		lda.z S65_ScreenRamPointer  + 0
 		sta destJob + 0
@@ -936,7 +958,8 @@ _Layer_Shift_X_Positive: {
 		adc #$00
 		sta srcJob + 2
 
-	
+
+
 		clc 
 		lda.z S65_ColorRamPointer  + 0
 		sta destJob2 + 0
@@ -1029,11 +1052,14 @@ DMA_Layer_Shift: {
 * Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base
 * 
 * @namespace Layer
-*
+* @param {byte} {IMM?} count Optional count of sprites to sort, allows you to keep some always on top in the higher areas
 * @flags nzc
 */
-.pseudocommand Layer_SortSprites {
+
+.pseudocommand Layer_SortSprites count {
 	S65_AddToMemoryReport("Layer_SortSprites")
+	.if(!_isImmOrNone(count)).error "Layer_SortSprites:"+ S65_TypeError
+
 	phx 
 	phy
 	pha
@@ -1052,7 +1078,11 @@ DMA_Layer_Shift: {
 			sta.z SprIO + 0
 			lda Layer_SpriteIOAddrMSB, x
 			sta.z SprIO + 1
-			lda Layer_SpriteCount, x 
+			.if(_isImm(count)) {
+				lda count.getValue()
+			} else {
+				lda Layer_SpriteCount, x 
+			}
 			sta sm_count
 			sta SortDMAClearTable.sm_count
 
