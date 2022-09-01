@@ -1052,13 +1052,14 @@ DMA_Layer_Shift: {
 * Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base
 * 
 * @namespace Layer
-* @param {byte} {IMM?} count Optional count of sprites to sort, allows you to keep some always on top in the higher areas
+* @param {byte} {IMM} start  start of sprites to sort, allows you to keep some always on top in the higher areas
+* @param {byte} {IMM} count  count of sprites to sort, allows you to keep some always on top in the higher areas
 * @flags nzc
 */
 
-.pseudocommand Layer_SortSprites count {
+.pseudocommand Layer_SortSprites start : count {
 	S65_AddToMemoryReport("Layer_SortSprites")
-	.if(!_isImmOrNone(count)).error "Layer_SortSprites:"+ S65_TypeError
+	.if(!_isImm(count) && !_isImm(start)).error "Layer_SortSprites:"+ S65_TypeError
 
 	phx 
 	phy
@@ -1083,7 +1084,10 @@ DMA_Layer_Shift: {
 			} else {
 				lda Layer_SpriteCount, x 
 			}
-			sta sm_count
+			// sta sm_count
+			clc 
+			adc #start.getValue()
+			sta sm_last
 			sta SortDMAClearTable.sm_count
 
 			jsr SortDMAClearTable
@@ -1095,6 +1099,16 @@ DMA_Layer_Shift: {
 			bit #Sprite_IOflagEnabled 
 			beq !done+	//If not enabled skip
 
+
+			cpx #start.getValue()
+			bcs !sortit+
+			txa 
+			bne !+
+			lda #$ff 
+		!:
+			sta SortTempTable, x 
+			bra !done+
+		!sortit:
 			//Otheriwse get its baseline y pos
 			ldy #Sprite_IOheight
 			lda (SprIO), y
@@ -1130,7 +1144,7 @@ DMA_Layer_Shift: {
 			inc.z SprIO + 1
 		!:
 			inx 
-			cpx sm_count:#$BEEF
+			cpx sm_last:#$BEEF
 
 			bne !loop-
 
@@ -1154,7 +1168,7 @@ DMA_Layer_Shift: {
 		//fill rest with $ff
 			lda #$ff
 		!:
-			cpy sm_count
+			cpy sm_last
 			bcs !exit+
 			sta (SprIndices), y
 			iny 

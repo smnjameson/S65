@@ -570,8 +570,8 @@
         },
         {
             "trigger": "Layer_SortSprites",
-            "annotation": "count",
-            "contents": "Layer_SortSprites ${1:count}",
+            "annotation": "start:count",
+            "contents": "Layer_SortSprites ${1:start} : ${2:count}",
             "kind": "snippet",
             "details": "Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base"
         },
@@ -986,7 +986,7 @@
             "annotation": "pointer",
             "contents": "Sprite_SetPointer ${1:pointer}",
             "kind": "snippet",
-            "details": "Sets the current selected sprite pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address"
+            "details": "Sets the current selected sprite pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value"
         },
         {
             "trigger": "Sprite_SetPositionX",

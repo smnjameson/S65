@@ -1687,12 +1687,16 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_SortSprites <i>count</i></div>
+						<div class='macroUsage'>Layer_SortSprites <i>start</i> : <i>count</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM?} count - Optional count of sprites to sort, allows you to keep some always on top in the higher areas</div></span>
+						<span><div class='paramHeader'>{byte} {IMM} start - start of sprites to sort, allows you to keep some always on top in the higher areas</div></span>
+						</div>
+					
+						<div class='macroUsage'> 
+						<span><div class='paramHeader'>{byte} {IMM} count - count of sprites to sort, allows you to keep some always on top in the higher areas</div></span>
 						</div>
 					
 						
@@ -3154,7 +3158,7 @@ h4 {
 							</div>
 							
 						</div>
-						<div class='macroItemDescription'> Sets the current selected sprite pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address  </div>
+						<div class='macroItemDescription'> Sets the current selected sprite pointer. If pointer is passed as a register it sets ONLY the LSB, MSB sets to 0. If ABS mode is used then two bytes are read from that address and used to set the value  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
 						<div class='macroUsage'>Sprite_SetPointer <i>pointer</i></div>
 						

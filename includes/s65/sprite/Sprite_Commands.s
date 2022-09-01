@@ -170,11 +170,21 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	phy
 	pha
 		.if(_isReg(enabled)) {
-			_saveIfReg(enabled,	Reg)
-			ldy #Sprite_IOflags 
-			lda Reg:#$BEEF
+			_saveIfReg(enabled,	S65_PseudoReg+ 0)
+ 
+			ldy #Sprite_IOflags
+			lda S65_PseudoReg + 0
+			beq !+
 
-			sta (S65_LastSpriteIOPointer), y
+				lda (S65_LastSpriteIOPointer), y	
+				ora #%00100000
+				sta (S65_LastSpriteIOPointer), y
+				bra !done+
+			!:
+				lda (S65_LastSpriteIOPointer), y	
+				and #%11011111
+				sta (S65_LastSpriteIOPointer), y
+			!done:
 		} else {
 			.if(enabled.getValue() == 0) {
 				ldy #Sprite_IOflags 
