@@ -234,7 +234,7 @@ function sortNCMDataForSprites(png, sw, sh, palette, charData) {
                             charNewData.push(charData.data[i])
 
                             if(x===0 && y===0 && sx===0 && sy===0) {
-                                spriteData.colors.push(charData.slices[i])
+                                spriteData.colors.push(Math.round(charData.charColors[s] / 16))
                             }
                         }
                     }  
@@ -244,6 +244,21 @@ function sortNCMDataForSprites(png, sw, sh, palette, charData) {
         }
         for(var j=0; j<64;j++) charNewData.push(0)
 
+
+        // for(var i=0; i<charData.charColors.length ; i++) {
+        //     for(var j=0; j<sortedArray.length; j++) {
+        //         var colors = charData.charColors[i]
+        //         let matches = sortedArray[j].filter(a => colors.includes(a));
+        //         // console.log(matches, colors)
+        //         if(matches && matches.length === colors.length) {
+        //             charData.charColors[i] =  j << 4
+        //             charData.slices.push(j)
+
+        //             break
+        //         }
+        //     }
+
+        // }
 
         return {    data:charNewData, 
                     charColors:charData.charColors, 
@@ -344,7 +359,7 @@ function getNCMDataForSprites(png, palette, wid, hei) {
                 for(var c=0; c<16; c+=2) {
 
 
-                    let i = ( row * (y + ty * 8 ) + (x + tx * 16) + r*row + c)//row * (y + ty * 8 + r) + (x + tx * 16 + c)
+                    let i = ( row * (y + ty * 8 ) + (x + tx * 16) + r*row + c)  //row * (y + ty * 8 + r) + (x + tx * 16 + c)
 
                     i *=4
                     let j = i + 4
@@ -700,6 +715,8 @@ function appendPaletteNCM(palette, charData, isSprites, sortedPalette) {
     //     if(!argv.palette) console.log ("Palette NCM $"+s.toString(16)+":   " + (sortedArray[s].map(a => a.toString(16).padStart(2,"0") )))
     // }
 
+   
+
     if(!isSprites) {
         sliceOffset = startIndex
     }
@@ -723,9 +740,11 @@ function appendPaletteNCM(palette, charData, isSprites, sortedPalette) {
     }
 
     if(isSprites) {
+         // console.log(spriteData.colors)
         for(var i=0; i<spriteData.colors.length; i++) {
             spriteData.colors[i] += startIndex/16
         }
+         // console.log(spriteData.colors)
     }
 
     if(sortedPalette) {
@@ -737,7 +756,6 @@ function appendPaletteNCM(palette, charData, isSprites, sortedPalette) {
     pal.g.splice(256,pal.g.length)
     pal.b.splice(256,pal.b.length)
 
-     
 
     return {pal, data, spriteData, sliceOffset}
 }
@@ -907,6 +925,7 @@ async function runSpriteMapper(argv) {
     ) 
     metaBuffer = metaBuffer.concat(meta.charindices.map(a => a & 0xff))
     metaBuffer = metaBuffer.concat(meta.charindices.map(a => (a>>8) & 0xff))
+    // console.log(meta.colors)
     if(argv.ncm) metaBuffer = metaBuffer.concat(meta.colors.map( a=> a << 4))
 
 
