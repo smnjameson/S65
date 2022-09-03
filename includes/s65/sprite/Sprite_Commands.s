@@ -678,7 +678,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 * 
 * @namespace Sprite
 *
-* @param {byte} {IMM} spritesId The spriteset index retrieved from Sprite_GetSprites
+* @param {byte} {IMM|REG} spritesId The spriteset index retrieved from Sprite_GetSprites
 * @param {byte?} {IMM|REG|ABSXY} spriteNum The sprite index from the spriteset (ordered left to right, top to bottom)
 
 * @flags nzc
@@ -687,16 +687,17 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	S65_AddToMemoryReport("Sprite_SetSprite")
 	pha
 	phy
-		.if(spritesId.getValue() > S65_SPRITESET_LIMIT) .error "Sprite_SetSprite: spritesId must be between 0 and "+(S65_SPRITESET_LIMIT-1)
-		.if(!_isImm(spritesId)) .error "Sprite_SetSprite: "+S65_TypeError
+		.if(_isImm(spritesId) && spritesId.getValue() > S65_SPRITESET_LIMIT) .error "Sprite_SetSprite: spritesId must be between 0 and "+(S65_SPRITESET_LIMIT-1)
+		.if(!_isImmOrReg(spritesId)) .error "Sprite_SetSprite: "+S65_TypeError
 		.if(!_isNone(spriteNum) && !_isImm(spriteNum) && !_isReg(spriteNum) && !_isAbs(spriteNum) && !_isAbsXY(spriteNum)) .error "Sprite_SetSprite: "+S65_TypeError
 
 		_saveIfReg(spriteNum, S65_PseudoReg + 0)
+		_saveIfReg(spritesId, S65_PseudoReg + 1)
 
 
 		//We can use preloaded sprite meta data
 		.if(spritesId.getValue() < Asset_SpriteList.size() &&
-			_isImm(spriteNum) && !_isReg(spriteNum)) {
+			_isImm(spriteNum) && !_isReg(spriteNum) && !_isReg(spritesId)) {
 
 					.var meta = Asset_SpriteList.get(spritesId.getValue()).get("meta")
 					.var numSprites = meta.get($02) + meta.get($03) * $100
@@ -738,11 +739,34 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					//We must instead use lookup tables for meta data
 					.const SprMETA = S65_TempWord1
 					.const NumSPRITE = S65_TempWord2
+					.const SprLookup = S65_TempWord2
 
-					lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 0]
-					sta.z SprMETA + 0 
-					lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 1]
-					sta.z SprMETA + 1				
+					.if(_isImm(spritesId)) {
+						lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 0]
+						sta.z SprMETA + 0 
+						lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 1]
+						sta.z SprMETA + 1		
+					} else {
+						lda S65_PseudoReg + 1 
+						asl 
+						pha
+						clc 
+						adc #<Asset_SpriteListMetaTable
+						// lda [Asset_SpriteListMetaTable + spritesId.getValue()* 2 + 0]
+						// sta.z SprMETA + 0 
+						sta.z SprLookup + 0
+						pla 
+						adc #>Asset_SpriteListMetaTable
+						// sta.z SprMETA + 1	
+						sta.z SprLookup + 1
+
+						ldy #$00
+						lda (SprLookup), y 
+						sta.z SprMETA + 0 
+						iny
+						lda (SprLookup), y 
+						sta.z SprMETA + 1 
+					}		
 					
 					.if(_isReg(spriteNum)) {
 						lda S65_PseudoReg + 0
@@ -960,23 +984,27 @@ MaskRowValue:
 	!spriteloop:
 			phz
 
-	//Convert Z to new SPRIO using lookup table
-	lda #$00 
-	sta.z SprIO + 1
-	lda (SprIndices), z 
-	asl 
-	rol.z SprIO + 1
-	asl 
-	rol.z SprIO + 1
-	asl 
-	rol.z SprIO + 1
-	asl 
-	rol.z SprIO + 1
-	adc.z SprIOBase + 0
-	sta.z SprIO + 0
-	lda.z SprIO + 1
-	adc.z SprIOBase + 1
-	sta.z SprIO + 1
+			//Convert Z to new SPRIO using lookup table
+			lda #$00 
+			sta.z SprIO + 1
+			lda (SprIndices), z 
+			asl 
+			rol.z SprIO + 1
+			asl 
+			rol.z SprIO + 1
+			asl 
+			rol.z SprIO + 1
+			asl 
+			rol.z SprIO + 1
+			clc
+			adc.z SprIOBase + 0
+			sta.z SprIO + 0
+			lda.z SprIO + 1
+			adc.z SprIOBase + 1
+			sta.z SprIO + 1
+
+
+
 
 
 			ldy #Sprite_IOflags 
@@ -986,10 +1014,11 @@ MaskRowValue:
 			//Skip if not enabled
 			lbeq !nextsprite+
 
+			// lda (SprIndices), z 
 			lda (SprIndices), z 
 			cmp #$ff 
 			lbeq !nextsprite+
-			
+
 			//store flags to apply later
 			// lda (SprIO), y
 			ldy #Sprite_IOflags 

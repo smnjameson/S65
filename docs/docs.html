@@ -1687,16 +1687,12 @@ h4 {
 						</div>
 						<div class='macroItemDescription'> Y sorts the sprite render order for this layer, using the sprite y pos + its height as a base  </div>
 						<div class='macroUsageText'><i>Usage:</i></div>
-						<div class='macroUsage'>Layer_SortSprites <i>start</i> : <i>count</i></div>
+						<div class='macroUsage'>Layer_SortSprites <i>start</i></div>
 						
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
 						<span><div class='paramHeader'>{byte} {IMM} start - start of sprites to sort, allows you to keep some always on top in the higher areas</div></span>
-						</div>
-					
-						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} count - count of sprites to sort, allows you to keep some always on top in the higher areas</div></span>
 						</div>
 					
 						
@@ -3254,7 +3250,7 @@ h4 {
 							<div class='macroUsageText'><i>Parameters:</i></div>
 						
 						<div class='macroUsage'> 
-						<span><div class='paramHeader'>{byte} {IMM} spritesId - The spriteset index retrieved from Sprite_GetSprites</div></span>
+						<span><div class='paramHeader'>{byte} {IMM|REG} spritesId - The spriteset index retrieved from Sprite_GetSprites</div></span>
 						</div>
 					
 						<div class='macroUsage'> 

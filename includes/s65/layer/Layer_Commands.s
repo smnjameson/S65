@@ -836,10 +836,7 @@ _Layer_Shift_X_Negative: {
 		.var lengthJob2= DMA_Layer_Shift.job2 + $02
 		.var destJob2 = DMA_Layer_Shift.job2 + $07
 		.var srcJob2 = DMA_Layer_Shift.job2 + $04
-		
-.print ("lengthJob: $" + toHexString(lengthJob))
-.print ("destJob: $" + toHexString(destJob))
-.print ("srcJob: $" + toHexString(srcJob))
+	
 
 		sec 
 		lda.z S65_ScreenRamPointer  + 0	
@@ -1053,17 +1050,18 @@ DMA_Layer_Shift: {
 * 
 * @namespace Layer
 * @param {byte} {IMM} start  start of sprites to sort, allows you to keep some always on top in the higher areas
-* @param {byte} {IMM} count  count of sprites to sort, allows you to keep some always on top in the higher areas
 * @flags nzc
 */
 
-.pseudocommand Layer_SortSprites start : count {
-	S65_AddToMemoryReport("Layer_SortSprites")
-	.if(!_isImm(count) && !_isImm(start)).error "Layer_SortSprites:"+ S65_TypeError
+.pseudocommand Layer_SortSprites start {
+		S65_AddToMemoryReport("Layer_SortSprites")
+	.if(!_isImm(start)).error "Layer_SortSprites:"+ S65_TypeError
 
 	phx 
 	phy
 	pha
+			jsr SortDMAClearTable
+
 			.const SprIO = S65_TempWord1
 			.const SprIOBase = S65_TempWord4
 			.const SprIndices = S65_TempWord5
@@ -1071,26 +1069,16 @@ DMA_Layer_Shift: {
 			ldx.z S65_CurrentLayer	
 			lda Layer_SpriteSortListLSB, x
 			sta.z SprIndices + 0
-			sta SortDMAClearTable.sm_lsb + 0
 			lda Layer_SpriteSortListMSB, x
 			sta.z SprIndices + 1
-			sta SortDMAClearTable.sm_lsb + 1
 			lda Layer_SpriteIOAddrLSB, x
 			sta.z SprIO + 0
 			lda Layer_SpriteIOAddrMSB, x
 			sta.z SprIO + 1
-			.if(_isImm(count)) {
-				lda count.getValue()
-			} else {
-				lda Layer_SpriteCount, x 
-			}
-			// sta sm_count
-			clc 
-			adc #start.getValue()
-			sta sm_last
-			sta SortDMAClearTable.sm_count
 
-			jsr SortDMAClearTable
+			lda Layer_SpriteCount, x  
+			sta sm_count
+
 
 			ldx #$00
 		!loop:
@@ -1099,17 +1087,13 @@ DMA_Layer_Shift: {
 			bit #Sprite_IOflagEnabled 
 			beq !done+	//If not enabled skip
 
-
+			//If we are at the start just add to first bucket
 			cpx #start.getValue()
 			bcs !sortit+
-			txa 
-			bne !+
-			lda #$ff 
-		!:
-			sta SortTempTable, x 
-			bra !done+
+			ldy #$00
+			bra !addtobucket+
+
 		!sortit:
-			//Otheriwse get its baseline y pos
 			ldy #Sprite_IOheight
 			lda (SprIO), y
 			tay 
@@ -1119,22 +1103,12 @@ DMA_Layer_Shift: {
 			adc (SprIO), y
 			tay 	//Y = baseline Y pos
 
-			//find closest slot in table
-		!next:
-			lda SortTempTable, y 
-			beq !+
-			iny 
-			bra !next-
-		!:
-
-			cpx #$00 //First needs recording
-			bne !+
-			lda #$ff 
-			sta SortTempTable, y 
-			bra !done+
-		!:
+		!addtobucket:
+			lda SortBuckets, y 
+			sta SortSpriteList, x 
 			txa 
-			sta SortTempTable, y 
+			sta SortBuckets, y 
+			
 		!done:
 			clc 
 			lda.z SprIO + 0
@@ -1144,55 +1118,194 @@ DMA_Layer_Shift: {
 			inc.z SprIO + 1
 		!:
 			inx 
-			cpx sm_last:#$BEEF
+			cpx sm_count:#$BEEF
 
 			bne !loop-
+			
 
-			//Now copy the list to 
-			//the sorted list 
-			ldx #$00
-			ldy #$00
+
+			//Convert list to sprIndices 
+			ldz #$00  //list offset
+			ldx #$00  //bucket
 		!loop:
-			lda SortTempTable, x 
-			beq !next+		
-			cmp #$ff
-			bne !+
-			lda #$00
-		!:
-			sta (SprIndices), y
-			iny 
-		!next:
+			lda SortBuckets, x 
+			cmp #$ff 
+			beq !next+
+
+			sta (SprIndices), z 
+			inz
+
+			!listloop:
+				tay 
+				lda SortSpriteList, y 
+				cmp #$ff 
+				beq !next+
+				sta (SprIndices), z 
+				inz 
+				bra !listloop-
+		!next:	
 			inx 
 			bne !loop-
 
-		//fill rest with $ff
-			lda #$ff
+
+			//fill rest
+			lda #$ff 
 		!:
-			cpy sm_last
-			bcs !exit+
-			sta (SprIndices), y
-			iny 
+			inz 
+			cpz sm_count
+			bcs !done+		
+			sta (SprIndices), z
 			bra !-
-		!exit:
+		!done:
 
 	pla
 	ply
 	plx                
-    S65_AddToMemoryReport("Layer_SortSprites")
+    S65_AddToMemoryReport("Layer_SortSprites")	
 }
 SortDMAClearTable: {
 		DMA_Execute job 
 		rts 
 	job:
 		DMA_Header #0 : #0
-		DMA_FillJob #0 : SortTempTable : #256 : #TRUE
-		.label sm_count= * + $02
-		.label sm_lsb = * + $07	
-		DMA_FillJob #$ff : SortTempTable : #$00 : #FALSE
+		DMA_FillJob #$ff : SortBuckets : #512 : #FALSE
 }
 Times8Table:	.fill 16, i* 8
-SortTempTable: .fill 256, 0
+SortBuckets: .fill 256, 0
+SortSpriteList: .fill 256, 0
 SortTempZero: .byte $00
+
+
+
+
+// .pseudocommand Layer_SortSprites2 start : count {
+// 	S65_AddToMemoryReport("Layer_SortSprites")
+// 	.if(!_isImm(count) && !_isImm(start)).error "Layer_SortSprites:"+ S65_TypeError
+
+// 	phx 
+// 	phy
+// 	pha
+// 			.const SprIO = S65_TempWord1
+// 			.const SprIOBase = S65_TempWord4
+// 			.const SprIndices = S65_TempWord5
+
+// 			ldx.z S65_CurrentLayer	
+// 			lda Layer_SpriteSortListLSB, x
+// 			sta.z SprIndices + 0
+// 			sta SortDMAClearTable.sm_lsb + 0
+// 			lda Layer_SpriteSortListMSB, x
+// 			sta.z SprIndices + 1
+// 			sta SortDMAClearTable.sm_lsb + 1
+// 			lda Layer_SpriteIOAddrLSB, x
+// 			sta.z SprIO + 0
+// 			lda Layer_SpriteIOAddrMSB, x
+// 			sta.z SprIO + 1
+// 			.if(_isImm(count)) {
+// 				lda count.getValue()
+// 			} else {
+// 				lda Layer_SpriteCount, x 
+// 			}
+// 			// sta sm_count
+// 			// clc 
+// 			// adc #start.getValue()
+// 			sta sm_last
+// 			sta SortDMAClearTable.sm_count
+
+// 			jsr SortDMAClearTable
+
+
+
+// 			ldx #$00
+// 		!loop:
+// 			ldy #Sprite_IOflags
+// 			lda (SprIO), y	
+// 			// bit #Sprite_IOflagEnabled 
+// 			// beq !done+	//If not enabled skip
+
+
+// 			cpx #start.getValue()
+// 			bcs !sortit+
+// 			txa 
+// 			bne !+
+// 			lda #$ff 
+// 		!:
+// 			sta SortTempTable, x 
+// 			bra !done+
+
+// 		!sortit:
+// 		// jmp !done+
+// 			//Otheriwse get its baseline y pos
+// 			ldy #Sprite_IOheight
+// 			lda (SprIO), y
+// 			tay 
+// 			lda Times8Table, y 
+// 			ldy #Sprite_IOy
+// 			clc
+// 			adc (SprIO), y
+// 			tay 	//Y = baseline Y pos
+
+// 			//find closest slot in table
+// 		!next:
+// 			lda SortTempTable, y 
+// 			beq !+
+// 			iny 
+// 			bra !next-
+// 		!:
+
+// 			cpx #$00 //First needs recording
+// 			bne !+
+// 			lda #$ff 
+// 			sta SortTempTable, y 
+// 			bra !done+
+// 		!:
+// 			txa 
+// 			sta SortTempTable, y 
+// 		!done:
+// 			clc 
+// 			lda.z SprIO + 0
+// 			adc #Sprite_SpriteIOLength
+// 			sta.z SprIO + 0
+// 			bcc !+
+// 			inc.z SprIO + 1
+// 		!:
+// 			inx 
+// 			cpx sm_last:#$BEEF
+
+// 			bne !loop-
+
+// 			//Now copy the list to 
+// 			//the sorted list 
+// 			ldx #$00
+// 			ldy #$00
+// 		!loop:
+// 			lda SortTempTable, x 
+// 			beq !next+		
+// 			cmp #$ff
+// 			bne !+
+// 			lda #$00
+// 		!:
+// 			sta (SprIndices), y
+// 			iny 
+// 		!next:
+// 			inx 
+// 			bne !loop-
+
+// 		//fill rest with $ff
+// 			lda #$ff
+// 		!:
+// 			cpy sm_last
+// 			bcs !exit+
+// 			sta (SprIndices), y
+// 			iny 
+// 			bra !-
+// 		!exit:
+// 			// jmp *
+// 	pla
+// 	ply
+// 	plx                
+//     S65_AddToMemoryReport("Layer_SortSprites")
+// }
+
 
 /**
 * .pseudocommand WriteToScreen
