@@ -157,6 +157,11 @@
             "kind": "snippet"
         },
         {
+            "trigger": "color",
+            "annotation": "Anim_Sequence",
+            "kind": "snippet"
+        },
+        {
             "trigger": "S65_AddToMemoryReport",
             "annotation": "name",
             "contents": "S65_AddToMemoryReport(${1:name})",
@@ -324,9 +329,9 @@
         },
         {
             "trigger": "Anim_Sequence",
-            "annotation": "The object returned by Anim_Get  / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}   *",
+            "annotation": "The object returned by Anim_Get   / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame, color}   *",
             "kind": "snippet",
-            "details": "The object returned by Anim_Get  / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}   *"
+            "details": "The object returned by Anim_Get   / truct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame, color}   *"
         },
         {
             "trigger": "Asset_AddExternal",

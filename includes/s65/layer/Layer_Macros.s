@@ -243,7 +243,7 @@
 		.var layer = Layer_LayerList.get(i)
 		.if(layer.get("rrbSprites") == true) {
 			.eval layer.put("addrOffset", currsize)
-			S65_Trace("RRB Sprite Layer at byte offset $"+ toHexString(layer.get("addrOffset"))+" of width $"+toHexString(layer.get("charWidth"))+ " chars.")
+			.print("RRB Sprite Layer at byte offset $"+ toHexString(layer.get("addrOffset"))+" of width $"+toHexString(layer.get("charWidth"))+ " chars.")
 			.eval currsize += layer.get("charWidth") * 2
 		} else {
 			.eval layer.put("addrOffset", currsize)

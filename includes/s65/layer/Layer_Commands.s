@@ -1151,10 +1151,11 @@ DMA_Layer_Shift: {
 			//fill rest
 			lda #$ff 
 		!:
-			inz 
+
 			cpz sm_count
 			bcs !done+		
 			sta (SprIndices), z
+						inz 
 			bra !-
 		!done:
 

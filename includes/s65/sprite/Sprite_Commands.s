@@ -636,6 +636,8 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 			iny //frame
 			sta (S65_LastSpriteIOPointer), y
 
+
+
 //Apply color of first frame to anim
 //TODO - Fix for other addressing modes
 .if(_isImm(animId)) {	
@@ -645,7 +647,11 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 	lda #meta.get($20 + numSprites * 2 + firstFrame)		
 	ldy #[Sprite_IOcolor]
 	sta (S65_LastSpriteIOPointer), y	
+} else {
+	
 }
+
+
 
 			.if(_isReg(speed)) {
 				lda.z S65_PseudoReg + 1

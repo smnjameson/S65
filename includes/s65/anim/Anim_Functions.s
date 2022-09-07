@@ -12,7 +12,11 @@
 * @return {Anim_Sequence} The struct containing this animation
 */
 .function Anim_Define (name, spriteSet, start, end) {
-		//id, name, address, spriteSet, startFrame, endFrame 
+		//id, name, address, spriteSet, startFrame, endFrame, color
+		.var meta = spriteSet.get("meta")
+		.var numSprites = meta.get($02) + meta.get($03) * 256
+		.var color = meta.get($20 + numSprites * 2 + start)	
+
 		.var id = Anim_SeqList.size()
 		.eval Anim_SeqList.add(Anim_Sequence(
 			id,
@@ -20,7 +24,8 @@
 			$0000,		//address
 			spriteSet,
 			start,
-			end
+			end,
+			color
 		))
 		.return Anim_SeqList.get(id)
 }

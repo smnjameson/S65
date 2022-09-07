@@ -37,7 +37,7 @@
 		// .eval io.put("spriteIOOffsetsLsb", offset)
 		// .fill count, >[* + count * 2 + i * Sprite_SpriteIOLength] 
 
-		S65_Trace("      Sprite IO registers for layer "+layerNum+ " at $"+toHexString(*))
+		.print("      Sprite IO registers for layer "+layerNum+ " at $"+toHexString(*))
 		.eval Layer_LayerList.get(layerNum).put("spriteIOAddr", *)
 		.var startAddr = *
 		//sprite data

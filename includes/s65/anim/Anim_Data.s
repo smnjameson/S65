@@ -9,8 +9,10 @@
 * @struct {Asset_Spriteset} spriteSet The struct for the spriteset
 * @struct {byte} startFrame The starting frame in the spriteset
 * @struct {byte} endFrame The end frame in the spriteset
+* @struct {byte} color The color for this animnation
+* 
 **/
-.struct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame}
+.struct Anim_Sequence { id, name, address, spriteSet, startFrame, endFrame, color}
 
 
 /**
