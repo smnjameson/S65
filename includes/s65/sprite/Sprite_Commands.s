@@ -662,7 +662,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					lda speed
 				}
 			}		
-			iny //speed
+			ldy #[Sprite_IOanimSpeed] //speed
 			sta (S65_LastSpriteIOPointer), y	
 		!exit:		
 	pla
@@ -742,6 +742,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 					// 	sta (S65_LastSpriteIOPointer), y
 					// }											
 		} else {
+			// jsr MapSpriteMeta
 					//We must instead use lookup tables for meta data
 					.const SprMETA = S65_TempWord1
 					.const NumSPRITE = S65_TempWord2
@@ -784,7 +785,7 @@ _getSprIOoffsetForLayer: {	//Layer = y, Sprite = x
 						}
 					}
 					jsr _Sprite_SetSpriteMeta.SetData
-
+			// jsr UnmapSpriteMeta
 					// jsr _Sprite_SetDimensions
 		}
 	ply
@@ -880,7 +881,28 @@ _Sprite_SetSpriteMeta: {
 		}
 }
 
+MapSpriteMeta: {
+		phx 
+		phz 
+			mapMemory($80fe000,$e000)
+		plz
+		plx 
+		rts
+}
 
+UnmapSpriteMeta: {
+		phx 
+		phz 
+			lda #$00
+			tax 
+			tay 
+			taz 
+			map 
+			eom	
+		plz
+		plx 
+		rts
+}
 
 
 /**
@@ -1155,7 +1177,7 @@ MaskRowValue:
 				bcc !noWrap+
 				ldy #Sprite_IOflags 
 				lda (SprIO), y	
-				ora Sprite_IOflagOneShot
+				ora #Sprite_IOflagOneShot
 				sta (SprIO), y	
 				lda #$00
 			!noWrap:

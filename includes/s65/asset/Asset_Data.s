@@ -106,6 +106,44 @@
 }
 
 /*
+ * Segment definitions to enable the preloader system
+ */
+.macro Asset_PreloaderSegment(num) {
+	.if(num==0) .segment Preload0
+	.if(num==1) .segment Preload1
+	.if(num==2) .segment Preload2
+	.if(num==3) .segment Preload3
+	.if(num==4) .segment Preload4
+	.if(num==5) .segment Preload5 
+	.if(num==6) .segment Preload6 
+	.if(num==7) .segment Preload7 
+	.if(num==8) .segment Preload8 
+	.if(num==9) .segment Preload9 
+	.if(num==10) .segment Preload10 
+	.if(num==11) .segment Preload11 
+	.if(num==12) .segment Preload12 
+	.if(num==13) .segment Preload13 
+	.if(num==14) .segment Preload14 
+	.if(num==15) .segment Preload15 
+	.if(num==16) .segment Preload16 
+	.if(num==17) .segment Preload17 
+	.if(num==18) .segment Preload18 
+	.if(num==19) .segment Preload19 
+	.if(num==20) .segment Preload20 
+	.if(num==21) .segment Preload21 
+	.if(num==22) .segment Preload22 
+	.if(num==23) .segment Preload23 
+	.if(num==24) .segment Preload24 
+	.if(num==25) .segment Preload25 
+	.if(num==26) .segment Preload26 
+	.if(num==27) .segment Preload27 
+	.if(num==28) .segment Preload28 
+	.if(num==29) .segment Preload29 
+	.if(num==30) .segment Preload30 
+	.if(num==31) .segment Preload31 
+}
+
+/*
  * Segment definitions to enable the sd card loading system
  */
 .macro Asset_ExternalAssetFetchSegment(num) {

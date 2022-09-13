@@ -1273,6 +1273,13 @@
             "details": "Draws a rectangle from the currently active tilemap to the currently active layer using the current screenpointers<br> NOTE: that this routine will NOT wrap at the edge of the later so make sure to not ewxceed the layers right edge or you may cause RRB corruption"
         },
         {
+            "trigger": "Tilemap_DrawTile",
+            "annotation": "tileId",
+            "contents": "Tilemap_DrawTile ${1:tileId}",
+            "kind": "snippet",
+            "details": "Draw a single tile at the current location"
+        },
+        {
             "trigger": "Tilemap_Get",
             "annotation": "tilemapId",
             "contents": "Tilemap_Get ${1:tilemapId}",

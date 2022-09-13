@@ -217,11 +217,13 @@
 	S65_AddToMemoryReport("Layer_InitScreen")
 
 	
-	#if NODEBUG
-	#else
-		.eval LAYER_DEBUG = Layer_GetLayerCount()
-		Layer_DefineScreenLayer(20, 0, false)
-		Debug_Start()
+	#if WATCHERS
+		#if NODEBUG
+		#else
+			.eval LAYER_DEBUG = Layer_GetLayerCount()
+			Layer_DefineScreenLayer(20, 0, false)
+			Debug_Start()
+		#endif
 	#endif
 
 	.const GOTOX = 1

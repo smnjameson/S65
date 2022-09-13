@@ -91,6 +91,44 @@ _Tilemap_RestorePointers: {
 		rts
 }
 
+
+
+/**
+* .pseudocommand DrawTile
+*
+* Draw a single tile at the current location
+* 
+* @namespace Tilemap
+*
+* @param {byte} {IMM|REG|ABS} tileId The tile id to draw at the current location
+*
+* @registers
+* @flags
+* 
+* @return {byte} A <add description here> 
+*/
+.pseudocommand Tilemap_DrawTile tileId {
+		S65_AddToMemoryReport("Tilemap_DrawTile")
+		.if(!_isImm(tileId) && !_isReg(tileId) && !_isAbs(tileId)) .error "Tilemap_DrawTile:" + S65_TypeError
+	pha 
+	phz 
+	phy
+		_saveIfReg(tileId, S65_PseudoReg + 0)
+
+		.if(_isReg(tileId)) {
+			lda S65_PseudoReg + 0
+		} else {
+			lda tileId
+		}
+		sta _Tilemap_Draw.sm_forcetile
+		Tilemap_Draw #0 : #0 : #1 : #1
+
+	ply 
+	plz 
+	pla	
+		S65_AddToMemoryReport("Tilemap_DrawTile")
+
+}
 /**
 * .pseudocommand Draw
 *
@@ -371,7 +409,10 @@ _Tilemap_Draw: {
 				ldz #$00
 				stz $d771	//reset hw mult msb
 				stz $d775   //reset hw mult msb
+				lda sm_forcetile:#$00
+				bne !+
 				lda ((MapPtr)), z 
+			!:
 				asl 			//double for 16 bit chars
 				sta $d770		//HW mult A lsb
 				lda #$00
@@ -517,6 +558,10 @@ _Tilemap_Draw: {
 			dec.z RectWidthCount 
 			lbne !screenloop-
 	!done:
+
+
+		lda #$00
+		sta sm_forcetile
 		rts
 
 }
