@@ -881,6 +881,7 @@ _Sprite_SetSpriteMeta: {
 		}
 }
 
+/*
 MapSpriteMeta: {
 		phx 
 		phz 
@@ -903,6 +904,7 @@ UnmapSpriteMeta: {
 		plx 
 		rts
 }
+*/
 
 
 /**
